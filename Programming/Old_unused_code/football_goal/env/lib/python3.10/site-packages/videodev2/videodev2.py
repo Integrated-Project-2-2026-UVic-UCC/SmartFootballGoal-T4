@@ -1,0 +1,7091 @@
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Copyright (C) 2025, Raspberry Pi Ltd.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived from
+#    this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+"""
+Python ctypes bindings for Video4Linux2 (V4L2) API
+Auto-generated from videodev2.h
+"""
+
+import ctypes
+from ctypes import (
+    Structure, Union, Array, POINTER,
+    c_uint8, c_uint16, c_uint32, c_uint64,
+    c_int8, c_int16, c_int32, c_int64,
+    c_char, c_void_p, c_long, c_ulong, c_char_p, c_size_t, c_int, c_uint, c_longlong
+)
+IntEnum = c_uint
+
+# Helper function for converting c_uint8 arrays to strings
+def arr_to_str(arr, encoding="utf-8", errors="ignore", null_terminated=True):
+    """
+    Convert a ctypes c_uint8 array to a Python string.
+    
+    Args:
+        arr: ctypes c_uint8 array
+        encoding: Text encoding (default: utf-8)
+        errors: How to handle decode errors (ignore/replace/strict)
+        null_terminated: Whether to stop at first null byte (common in C strings)
+    
+    Returns:
+        Python string
+    """
+    byte_data = bytes(arr)
+    if null_terminated:
+        null_pos = byte_data.find(b"\x00")
+        if null_pos != -1:
+            byte_data = byte_data[:null_pos]
+    return byte_data.decode(encoding, errors=errors)
+
+# Explicit exports for star imports
+__all__ = [
+    # All generated symbols
+    'arr_to_str',
+    '_IOC',
+    '_IOC_TYPECHECK',
+    '_IO',
+    '_IOR',
+    '_IOW',
+    '_IOWR',
+    '_IOR_BAD',
+    '_IOW_BAD',
+    '_IOWR_BAD',
+    '_IOC_DIR',
+    '_IOC_TYPE',
+    '_IOC_NR',
+    '_IOC_SIZE',
+    'v4l2_fourcc',
+    'v4l2_fourcc_be',
+    'v4l2_power_line_frequency',
+    'V4L2_CID_POWER_LINE_FREQUENCY_DISABLED',
+    'V4L2_CID_POWER_LINE_FREQUENCY_50HZ',
+    'V4L2_CID_POWER_LINE_FREQUENCY_60HZ',
+    'V4L2_CID_POWER_LINE_FREQUENCY_AUTO',
+    'v4l2_colorfx',
+    'V4L2_COLORFX_NONE',
+    'V4L2_COLORFX_BW',
+    'V4L2_COLORFX_SEPIA',
+    'V4L2_COLORFX_NEGATIVE',
+    'V4L2_COLORFX_EMBOSS',
+    'V4L2_COLORFX_SKETCH',
+    'V4L2_COLORFX_SKY_BLUE',
+    'V4L2_COLORFX_GRASS_GREEN',
+    'V4L2_COLORFX_SKIN_WHITEN',
+    'V4L2_COLORFX_VIVID',
+    'V4L2_COLORFX_AQUA',
+    'V4L2_COLORFX_ART_FREEZE',
+    'V4L2_COLORFX_SILHOUETTE',
+    'V4L2_COLORFX_SOLARIZATION',
+    'V4L2_COLORFX_ANTIQUE',
+    'V4L2_COLORFX_SET_CBCR',
+    'V4L2_COLORFX_SET_RGB',
+    'v4l2_mpeg_stream_type',
+    'V4L2_MPEG_STREAM_TYPE_MPEG2_PS',
+    'V4L2_MPEG_STREAM_TYPE_MPEG2_TS',
+    'V4L2_MPEG_STREAM_TYPE_MPEG1_SS',
+    'V4L2_MPEG_STREAM_TYPE_MPEG2_DVD',
+    'V4L2_MPEG_STREAM_TYPE_MPEG1_VCD',
+    'V4L2_MPEG_STREAM_TYPE_MPEG2_SVCD',
+    'v4l2_mpeg_stream_vbi_fmt',
+    'V4L2_MPEG_STREAM_VBI_FMT_NONE',
+    'V4L2_MPEG_STREAM_VBI_FMT_IVTV',
+    'v4l2_mpeg_audio_sampling_freq',
+    'V4L2_MPEG_AUDIO_SAMPLING_FREQ_44100',
+    'V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000',
+    'V4L2_MPEG_AUDIO_SAMPLING_FREQ_32000',
+    'v4l2_mpeg_audio_encoding',
+    'V4L2_MPEG_AUDIO_ENCODING_LAYER_1',
+    'V4L2_MPEG_AUDIO_ENCODING_LAYER_2',
+    'V4L2_MPEG_AUDIO_ENCODING_LAYER_3',
+    'V4L2_MPEG_AUDIO_ENCODING_AAC',
+    'V4L2_MPEG_AUDIO_ENCODING_AC3',
+    'v4l2_mpeg_audio_l1_bitrate',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_32K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_64K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_96K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_128K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_160K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_192K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_224K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_256K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_288K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_320K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_352K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_384K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_416K',
+    'V4L2_MPEG_AUDIO_L1_BITRATE_448K',
+    'v4l2_mpeg_audio_l2_bitrate',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_32K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_48K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_56K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_64K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_80K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_96K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_112K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_128K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_160K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_192K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_224K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_256K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_320K',
+    'V4L2_MPEG_AUDIO_L2_BITRATE_384K',
+    'v4l2_mpeg_audio_l3_bitrate',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_32K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_40K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_48K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_56K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_64K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_80K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_96K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_112K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_128K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_160K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_192K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_224K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_256K',
+    'V4L2_MPEG_AUDIO_L3_BITRATE_320K',
+    'v4l2_mpeg_audio_mode',
+    'V4L2_MPEG_AUDIO_MODE_STEREO',
+    'V4L2_MPEG_AUDIO_MODE_JOINT_STEREO',
+    'V4L2_MPEG_AUDIO_MODE_DUAL',
+    'V4L2_MPEG_AUDIO_MODE_MONO',
+    'v4l2_mpeg_audio_mode_extension',
+    'V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_4',
+    'V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_8',
+    'V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_12',
+    'V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_16',
+    'v4l2_mpeg_audio_emphasis',
+    'V4L2_MPEG_AUDIO_EMPHASIS_NONE',
+    'V4L2_MPEG_AUDIO_EMPHASIS_50_DIV_15_uS',
+    'V4L2_MPEG_AUDIO_EMPHASIS_CCITT_J17',
+    'v4l2_mpeg_audio_crc',
+    'V4L2_MPEG_AUDIO_CRC_NONE',
+    'V4L2_MPEG_AUDIO_CRC_CRC16',
+    'v4l2_mpeg_audio_ac3_bitrate',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_32K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_40K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_48K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_56K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_64K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_80K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_96K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_112K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_128K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_160K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_192K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_224K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_256K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_320K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_384K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_448K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_512K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_576K',
+    'V4L2_MPEG_AUDIO_AC3_BITRATE_640K',
+    'v4l2_mpeg_audio_dec_playback',
+    'V4L2_MPEG_AUDIO_DEC_PLAYBACK_AUTO',
+    'V4L2_MPEG_AUDIO_DEC_PLAYBACK_STEREO',
+    'V4L2_MPEG_AUDIO_DEC_PLAYBACK_LEFT',
+    'V4L2_MPEG_AUDIO_DEC_PLAYBACK_RIGHT',
+    'V4L2_MPEG_AUDIO_DEC_PLAYBACK_MONO',
+    'V4L2_MPEG_AUDIO_DEC_PLAYBACK_SWAPPED_STEREO',
+    'v4l2_mpeg_video_encoding',
+    'V4L2_MPEG_VIDEO_ENCODING_MPEG_1',
+    'V4L2_MPEG_VIDEO_ENCODING_MPEG_2',
+    'V4L2_MPEG_VIDEO_ENCODING_MPEG_4_AVC',
+    'v4l2_mpeg_video_aspect',
+    'V4L2_MPEG_VIDEO_ASPECT_1x1',
+    'V4L2_MPEG_VIDEO_ASPECT_4x3',
+    'V4L2_MPEG_VIDEO_ASPECT_16x9',
+    'V4L2_MPEG_VIDEO_ASPECT_221x100',
+    'v4l2_mpeg_video_bitrate_mode',
+    'V4L2_MPEG_VIDEO_BITRATE_MODE_VBR',
+    'V4L2_MPEG_VIDEO_BITRATE_MODE_CBR',
+    'V4L2_MPEG_VIDEO_BITRATE_MODE_CQ',
+    'v4l2_mpeg_video_header_mode',
+    'V4L2_MPEG_VIDEO_HEADER_MODE_SEPARATE',
+    'V4L2_MPEG_VIDEO_HEADER_MODE_JOINED_WITH_1ST_FRAME',
+    'v4l2_mpeg_video_multi_slice_mode',
+    'V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_SINGLE',
+    'V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_MAX_MB',
+    'V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_MAX_BYTES',
+    'V4L2_MPEG_VIDEO_MULTI_SICE_MODE_MAX_MB',
+    'V4L2_MPEG_VIDEO_MULTI_SICE_MODE_MAX_BYTES',
+    'v4l2_mpeg_video_intra_refresh_period_type',
+    'V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE_RANDOM',
+    'V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE_CYCLIC',
+    'v4l2_mpeg_video_mpeg2_level',
+    'V4L2_MPEG_VIDEO_MPEG2_LEVEL_LOW',
+    'V4L2_MPEG_VIDEO_MPEG2_LEVEL_MAIN',
+    'V4L2_MPEG_VIDEO_MPEG2_LEVEL_HIGH_1440',
+    'V4L2_MPEG_VIDEO_MPEG2_LEVEL_HIGH',
+    'v4l2_mpeg_video_mpeg2_profile',
+    'V4L2_MPEG_VIDEO_MPEG2_PROFILE_SIMPLE',
+    'V4L2_MPEG_VIDEO_MPEG2_PROFILE_MAIN',
+    'V4L2_MPEG_VIDEO_MPEG2_PROFILE_SNR_SCALABLE',
+    'V4L2_MPEG_VIDEO_MPEG2_PROFILE_SPATIALLY_SCALABLE',
+    'V4L2_MPEG_VIDEO_MPEG2_PROFILE_HIGH',
+    'V4L2_MPEG_VIDEO_MPEG2_PROFILE_MULTIVIEW',
+    'v4l2_mpeg_video_h264_entropy_mode',
+    'V4L2_MPEG_VIDEO_H264_ENTROPY_MODE_CAVLC',
+    'V4L2_MPEG_VIDEO_H264_ENTROPY_MODE_CABAC',
+    'v4l2_mpeg_video_h264_level',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_1_0',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_1B',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_1_1',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_1_2',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_1_3',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_2_0',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_2_1',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_2_2',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_3_0',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_3_1',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_3_2',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_4_0',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_4_1',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_4_2',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_5_0',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_5_1',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_5_2',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_6_0',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_6_1',
+    'V4L2_MPEG_VIDEO_H264_LEVEL_6_2',
+    'v4l2_mpeg_video_h264_loop_filter_mode',
+    'V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_ENABLED',
+    'V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_DISABLED',
+    'V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_DISABLED_AT_SLICE_BOUNDARY',
+    'v4l2_mpeg_video_h264_profile',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_BASELINE',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_BASELINE',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_MAIN',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_EXTENDED',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_HIGH',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_10',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_422',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_444_PREDICTIVE',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_10_INTRA',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_422_INTRA',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_444_INTRA',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_CAVLC_444_INTRA',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_BASELINE',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_HIGH',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_HIGH_INTRA',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_STEREO_HIGH',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_MULTIVIEW_HIGH',
+    'V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_HIGH',
+    'v4l2_mpeg_video_h264_vui_sar_idc',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_UNSPECIFIED',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_1x1',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_12x11',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_10x11',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_16x11',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_40x33',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_24x11',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_20x11',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_32x11',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_80x33',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_18x11',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_15x11',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_64x33',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_160x99',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_4x3',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_3x2',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_2x1',
+    'V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_EXTENDED',
+    'v4l2_mpeg_video_h264_sei_fp_arrangement_type',
+    'V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_CHECKERBOARD',
+    'V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_COLUMN',
+    'V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_ROW',
+    'V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_SIDE_BY_SIDE',
+    'V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_TOP_BOTTOM',
+    'V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_TEMPORAL',
+    'v4l2_mpeg_video_h264_fmo_map_type',
+    'V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_INTERLEAVED_SLICES',
+    'V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_SCATTERED_SLICES',
+    'V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_FOREGROUND_WITH_LEFT_OVER',
+    'V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_BOX_OUT',
+    'V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_RASTER_SCAN',
+    'V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_WIPE_SCAN',
+    'V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_EXPLICIT',
+    'v4l2_mpeg_video_h264_fmo_change_dir',
+    'V4L2_MPEG_VIDEO_H264_FMO_CHANGE_DIR_RIGHT',
+    'V4L2_MPEG_VIDEO_H264_FMO_CHANGE_DIR_LEFT',
+    'v4l2_mpeg_video_h264_hierarchical_coding_type',
+    'V4L2_MPEG_VIDEO_H264_HIERARCHICAL_CODING_B',
+    'V4L2_MPEG_VIDEO_H264_HIERARCHICAL_CODING_P',
+    'v4l2_mpeg_video_mpeg4_level',
+    'V4L2_MPEG_VIDEO_MPEG4_LEVEL_0',
+    'V4L2_MPEG_VIDEO_MPEG4_LEVEL_0B',
+    'V4L2_MPEG_VIDEO_MPEG4_LEVEL_1',
+    'V4L2_MPEG_VIDEO_MPEG4_LEVEL_2',
+    'V4L2_MPEG_VIDEO_MPEG4_LEVEL_3',
+    'V4L2_MPEG_VIDEO_MPEG4_LEVEL_3B',
+    'V4L2_MPEG_VIDEO_MPEG4_LEVEL_4',
+    'V4L2_MPEG_VIDEO_MPEG4_LEVEL_5',
+    'v4l2_mpeg_video_mpeg4_profile',
+    'V4L2_MPEG_VIDEO_MPEG4_PROFILE_SIMPLE',
+    'V4L2_MPEG_VIDEO_MPEG4_PROFILE_ADVANCED_SIMPLE',
+    'V4L2_MPEG_VIDEO_MPEG4_PROFILE_CORE',
+    'V4L2_MPEG_VIDEO_MPEG4_PROFILE_SIMPLE_SCALABLE',
+    'V4L2_MPEG_VIDEO_MPEG4_PROFILE_ADVANCED_CODING_EFFICIENCY',
+    'v4l2_vp8_num_partitions',
+    'V4L2_CID_MPEG_VIDEO_VPX_1_PARTITION',
+    'V4L2_CID_MPEG_VIDEO_VPX_2_PARTITIONS',
+    'V4L2_CID_MPEG_VIDEO_VPX_4_PARTITIONS',
+    'V4L2_CID_MPEG_VIDEO_VPX_8_PARTITIONS',
+    'v4l2_vp8_num_ref_frames',
+    'V4L2_CID_MPEG_VIDEO_VPX_1_REF_FRAME',
+    'V4L2_CID_MPEG_VIDEO_VPX_2_REF_FRAME',
+    'V4L2_CID_MPEG_VIDEO_VPX_3_REF_FRAME',
+    'v4l2_vp8_golden_frame_sel',
+    'V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_USE_PREV',
+    'V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_USE_REF_PERIOD',
+    'v4l2_mpeg_video_vp8_profile',
+    'V4L2_MPEG_VIDEO_VP8_PROFILE_0',
+    'V4L2_MPEG_VIDEO_VP8_PROFILE_1',
+    'V4L2_MPEG_VIDEO_VP8_PROFILE_2',
+    'V4L2_MPEG_VIDEO_VP8_PROFILE_3',
+    'v4l2_mpeg_video_vp9_profile',
+    'V4L2_MPEG_VIDEO_VP9_PROFILE_0',
+    'V4L2_MPEG_VIDEO_VP9_PROFILE_1',
+    'V4L2_MPEG_VIDEO_VP9_PROFILE_2',
+    'V4L2_MPEG_VIDEO_VP9_PROFILE_3',
+    'v4l2_mpeg_video_vp9_level',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_1_0',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_1_1',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_2_0',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_2_1',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_3_0',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_3_1',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_4_0',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_4_1',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_5_0',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_5_1',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_5_2',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_6_0',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_6_1',
+    'V4L2_MPEG_VIDEO_VP9_LEVEL_6_2',
+    'v4l2_mpeg_video_hevc_hier_coding_type',
+    'V4L2_MPEG_VIDEO_HEVC_HIERARCHICAL_CODING_B',
+    'V4L2_MPEG_VIDEO_HEVC_HIERARCHICAL_CODING_P',
+    'v4l2_mpeg_video_hevc_profile',
+    'V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN',
+    'V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN_STILL_PICTURE',
+    'V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN_10',
+    'v4l2_mpeg_video_hevc_level',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_1',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_2',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_2_1',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_3',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_3_1',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_4',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_4_1',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_5',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_5_1',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_5_2',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_6',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_6_1',
+    'V4L2_MPEG_VIDEO_HEVC_LEVEL_6_2',
+    'v4l2_mpeg_video_hevc_tier',
+    'V4L2_MPEG_VIDEO_HEVC_TIER_MAIN',
+    'V4L2_MPEG_VIDEO_HEVC_TIER_HIGH',
+    'v4l2_cid_mpeg_video_hevc_loop_filter_mode',
+    'V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_DISABLED',
+    'V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_ENABLED',
+    'V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_DISABLED_AT_SLICE_BOUNDARY',
+    'v4l2_cid_mpeg_video_hevc_refresh_type',
+    'V4L2_MPEG_VIDEO_HEVC_REFRESH_NONE',
+    'V4L2_MPEG_VIDEO_HEVC_REFRESH_CRA',
+    'V4L2_MPEG_VIDEO_HEVC_REFRESH_IDR',
+    'v4l2_cid_mpeg_video_hevc_size_of_length_field',
+    'V4L2_MPEG_VIDEO_HEVC_SIZE_0',
+    'V4L2_MPEG_VIDEO_HEVC_SIZE_1',
+    'V4L2_MPEG_VIDEO_HEVC_SIZE_2',
+    'V4L2_MPEG_VIDEO_HEVC_SIZE_4',
+    'v4l2_mpeg_video_frame_skip_mode',
+    'V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_DISABLED',
+    'V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_LEVEL_LIMIT',
+    'V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_BUF_LIMIT',
+    'v4l2_mpeg_video_av1_profile',
+    'V4L2_MPEG_VIDEO_AV1_PROFILE_MAIN',
+    'V4L2_MPEG_VIDEO_AV1_PROFILE_HIGH',
+    'V4L2_MPEG_VIDEO_AV1_PROFILE_PROFESSIONAL',
+    'v4l2_mpeg_video_av1_level',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_2_0',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_2_1',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_2_2',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_2_3',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_3_0',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_3_1',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_3_2',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_3_3',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_4_0',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_4_1',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_4_2',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_4_3',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_5_0',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_5_1',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_5_2',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_5_3',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_6_0',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_6_1',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_6_2',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_6_3',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_7_0',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_7_1',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_7_2',
+    'V4L2_MPEG_VIDEO_AV1_LEVEL_7_3',
+    'v4l2_mpeg_cx2341x_video_spatial_filter_mode',
+    'V4L2_MPEG_CX2341X_VIDEO_SPATIAL_FILTER_MODE_MANUAL',
+    'V4L2_MPEG_CX2341X_VIDEO_SPATIAL_FILTER_MODE_AUTO',
+    'v4l2_mpeg_cx2341x_video_luma_spatial_filter_type',
+    'V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_OFF',
+    'V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_1D_HOR',
+    'V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_1D_VERT',
+    'V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_2D_HV_SEPARABLE',
+    'V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_2D_SYM_NON_SEPARABLE',
+    'v4l2_mpeg_cx2341x_video_chroma_spatial_filter_type',
+    'V4L2_MPEG_CX2341X_VIDEO_CHROMA_SPATIAL_FILTER_TYPE_OFF',
+    'V4L2_MPEG_CX2341X_VIDEO_CHROMA_SPATIAL_FILTER_TYPE_1D_HOR',
+    'v4l2_mpeg_cx2341x_video_temporal_filter_mode',
+    'V4L2_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER_MODE_MANUAL',
+    'V4L2_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER_MODE_AUTO',
+    'v4l2_mpeg_cx2341x_video_median_filter_type',
+    'V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_OFF',
+    'V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_HOR',
+    'V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_VERT',
+    'V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_HOR_VERT',
+    'V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_DIAG',
+    'v4l2_mpeg_mfc51_video_frame_skip_mode',
+    'V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_DISABLED',
+    'V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_LEVEL_LIMIT',
+    'V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_BUF_LIMIT',
+    'v4l2_mpeg_mfc51_video_force_frame_type',
+    'V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_DISABLED',
+    'V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_I_FRAME',
+    'V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_NOT_CODED',
+    'v4l2_exposure_auto_type',
+    'V4L2_EXPOSURE_AUTO',
+    'V4L2_EXPOSURE_MANUAL',
+    'V4L2_EXPOSURE_SHUTTER_PRIORITY',
+    'V4L2_EXPOSURE_APERTURE_PRIORITY',
+    'v4l2_auto_n_preset_white_balance',
+    'V4L2_WHITE_BALANCE_MANUAL',
+    'V4L2_WHITE_BALANCE_AUTO',
+    'V4L2_WHITE_BALANCE_INCANDESCENT',
+    'V4L2_WHITE_BALANCE_FLUORESCENT',
+    'V4L2_WHITE_BALANCE_FLUORESCENT_H',
+    'V4L2_WHITE_BALANCE_HORIZON',
+    'V4L2_WHITE_BALANCE_DAYLIGHT',
+    'V4L2_WHITE_BALANCE_FLASH',
+    'V4L2_WHITE_BALANCE_CLOUDY',
+    'V4L2_WHITE_BALANCE_SHADE',
+    'v4l2_iso_sensitivity_auto_type',
+    'V4L2_ISO_SENSITIVITY_MANUAL',
+    'V4L2_ISO_SENSITIVITY_AUTO',
+    'v4l2_exposure_metering',
+    'V4L2_EXPOSURE_METERING_AVERAGE',
+    'V4L2_EXPOSURE_METERING_CENTER_WEIGHTED',
+    'V4L2_EXPOSURE_METERING_SPOT',
+    'V4L2_EXPOSURE_METERING_MATRIX',
+    'v4l2_scene_mode',
+    'V4L2_SCENE_MODE_NONE',
+    'V4L2_SCENE_MODE_BACKLIGHT',
+    'V4L2_SCENE_MODE_BEACH_SNOW',
+    'V4L2_SCENE_MODE_CANDLE_LIGHT',
+    'V4L2_SCENE_MODE_DAWN_DUSK',
+    'V4L2_SCENE_MODE_FALL_COLORS',
+    'V4L2_SCENE_MODE_FIREWORKS',
+    'V4L2_SCENE_MODE_LANDSCAPE',
+    'V4L2_SCENE_MODE_NIGHT',
+    'V4L2_SCENE_MODE_PARTY_INDOOR',
+    'V4L2_SCENE_MODE_PORTRAIT',
+    'V4L2_SCENE_MODE_SPORTS',
+    'V4L2_SCENE_MODE_SUNSET',
+    'V4L2_SCENE_MODE_TEXT',
+    'v4l2_auto_focus_range',
+    'V4L2_AUTO_FOCUS_RANGE_AUTO',
+    'V4L2_AUTO_FOCUS_RANGE_NORMAL',
+    'V4L2_AUTO_FOCUS_RANGE_MACRO',
+    'V4L2_AUTO_FOCUS_RANGE_INFINITY',
+    'v4l2_preemphasis',
+    'V4L2_PREEMPHASIS_DISABLED',
+    'V4L2_PREEMPHASIS_50_uS',
+    'V4L2_PREEMPHASIS_75_uS',
+    'v4l2_flash_led_mode',
+    'V4L2_FLASH_LED_MODE_NONE',
+    'V4L2_FLASH_LED_MODE_FLASH',
+    'V4L2_FLASH_LED_MODE_TORCH',
+    'v4l2_flash_strobe_source',
+    'V4L2_FLASH_STROBE_SOURCE_SOFTWARE',
+    'V4L2_FLASH_STROBE_SOURCE_EXTERNAL',
+    'v4l2_jpeg_chroma_subsampling',
+    'V4L2_JPEG_CHROMA_SUBSAMPLING_444',
+    'V4L2_JPEG_CHROMA_SUBSAMPLING_422',
+    'V4L2_JPEG_CHROMA_SUBSAMPLING_420',
+    'V4L2_JPEG_CHROMA_SUBSAMPLING_411',
+    'V4L2_JPEG_CHROMA_SUBSAMPLING_410',
+    'V4L2_JPEG_CHROMA_SUBSAMPLING_GRAY',
+    'v4l2_dv_tx_mode',
+    'V4L2_DV_TX_MODE_DVI_D',
+    'V4L2_DV_TX_MODE_HDMI',
+    'v4l2_dv_rgb_range',
+    'V4L2_DV_RGB_RANGE_AUTO',
+    'V4L2_DV_RGB_RANGE_LIMITED',
+    'V4L2_DV_RGB_RANGE_FULL',
+    'v4l2_dv_it_content_type',
+    'V4L2_DV_IT_CONTENT_TYPE_GRAPHICS',
+    'V4L2_DV_IT_CONTENT_TYPE_PHOTO',
+    'V4L2_DV_IT_CONTENT_TYPE_CINEMA',
+    'V4L2_DV_IT_CONTENT_TYPE_GAME',
+    'V4L2_DV_IT_CONTENT_TYPE_NO_ITC',
+    'v4l2_deemphasis',
+    'V4L2_DEEMPHASIS_DISABLED',
+    'V4L2_DEEMPHASIS_50_uS',
+    'V4L2_DEEMPHASIS_75_uS',
+    'v4l2_detect_md_mode',
+    'V4L2_DETECT_MD_MODE_DISABLED',
+    'V4L2_DETECT_MD_MODE_GLOBAL',
+    'V4L2_DETECT_MD_MODE_THRESHOLD_GRID',
+    'V4L2_DETECT_MD_MODE_REGION_GRID',
+    'v4l2_stateless_h264_decode_mode',
+    'V4L2_STATELESS_H264_DECODE_MODE_SLICE_BASED',
+    'V4L2_STATELESS_H264_DECODE_MODE_FRAME_BASED',
+    'v4l2_stateless_h264_start_code',
+    'V4L2_STATELESS_H264_START_CODE_NONE',
+    'V4L2_STATELESS_H264_START_CODE_ANNEX_B',
+    'v4l2_stateless_hevc_decode_mode',
+    'V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED',
+    'V4L2_STATELESS_HEVC_DECODE_MODE_FRAME_BASED',
+    'v4l2_stateless_hevc_start_code',
+    'V4L2_STATELESS_HEVC_START_CODE_NONE',
+    'V4L2_STATELESS_HEVC_START_CODE_ANNEX_B',
+    'v4l2_av1_warp_model',
+    'V4L2_AV1_WARP_MODEL_IDENTITY',
+    'V4L2_AV1_WARP_MODEL_TRANSLATION',
+    'V4L2_AV1_WARP_MODEL_ROTZOOM',
+    'V4L2_AV1_WARP_MODEL_AFFINE',
+    'v4l2_av1_reference_frame',
+    'V4L2_AV1_REF_INTRA_FRAME',
+    'V4L2_AV1_REF_LAST_FRAME',
+    'V4L2_AV1_REF_LAST2_FRAME',
+    'V4L2_AV1_REF_LAST3_FRAME',
+    'V4L2_AV1_REF_GOLDEN_FRAME',
+    'V4L2_AV1_REF_BWDREF_FRAME',
+    'V4L2_AV1_REF_ALTREF2_FRAME',
+    'V4L2_AV1_REF_ALTREF_FRAME',
+    'v4l2_av1_frame_restoration_type',
+    'V4L2_AV1_FRAME_RESTORE_NONE',
+    'V4L2_AV1_FRAME_RESTORE_WIENER',
+    'V4L2_AV1_FRAME_RESTORE_SGRPROJ',
+    'V4L2_AV1_FRAME_RESTORE_SWITCHABLE',
+    'v4l2_av1_segment_feature',
+    'V4L2_AV1_SEG_LVL_ALT_Q',
+    'V4L2_AV1_SEG_LVL_ALT_LF_Y_V',
+    'V4L2_AV1_SEG_LVL_REF_FRAME',
+    'V4L2_AV1_SEG_LVL_REF_SKIP',
+    'V4L2_AV1_SEG_LVL_REF_GLOBALMV',
+    'V4L2_AV1_SEG_LVL_MAX',
+    'v4l2_av1_frame_type',
+    'V4L2_AV1_KEY_FRAME',
+    'V4L2_AV1_INTER_FRAME',
+    'V4L2_AV1_INTRA_ONLY_FRAME',
+    'V4L2_AV1_SWITCH_FRAME',
+    'v4l2_av1_interpolation_filter',
+    'V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP',
+    'V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP_SMOOTH',
+    'V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP_SHARP',
+    'V4L2_AV1_INTERPOLATION_FILTER_BILINEAR',
+    'V4L2_AV1_INTERPOLATION_FILTER_SWITCHABLE',
+    'v4l2_av1_tx_mode',
+    'V4L2_AV1_TX_MODE_ONLY_4X4',
+    'V4L2_AV1_TX_MODE_LARGEST',
+    'V4L2_AV1_TX_MODE_SELECT',
+    'v4l2_field',
+    'V4L2_FIELD_ANY',
+    'V4L2_FIELD_NONE',
+    'V4L2_FIELD_TOP',
+    'V4L2_FIELD_BOTTOM',
+    'V4L2_FIELD_INTERLACED',
+    'V4L2_FIELD_SEQ_TB',
+    'V4L2_FIELD_SEQ_BT',
+    'V4L2_FIELD_ALTERNATE',
+    'V4L2_FIELD_INTERLACED_TB',
+    'V4L2_FIELD_INTERLACED_BT',
+    'v4l2_buf_type',
+    'V4L2_BUF_TYPE_VIDEO_CAPTURE',
+    'V4L2_BUF_TYPE_VIDEO_OUTPUT',
+    'V4L2_BUF_TYPE_VIDEO_OVERLAY',
+    'V4L2_BUF_TYPE_VBI_CAPTURE',
+    'V4L2_BUF_TYPE_VBI_OUTPUT',
+    'V4L2_BUF_TYPE_SLICED_VBI_CAPTURE',
+    'V4L2_BUF_TYPE_SLICED_VBI_OUTPUT',
+    'V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY',
+    'V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE',
+    'V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE',
+    'V4L2_BUF_TYPE_SDR_CAPTURE',
+    'V4L2_BUF_TYPE_SDR_OUTPUT',
+    'V4L2_BUF_TYPE_META_CAPTURE',
+    'V4L2_BUF_TYPE_META_OUTPUT',
+    'V4L2_BUF_TYPE_PRIVATE',
+    'v4l2_tuner_type',
+    'V4L2_TUNER_RADIO',
+    'V4L2_TUNER_ANALOG_TV',
+    'V4L2_TUNER_DIGITAL_TV',
+    'V4L2_TUNER_SDR',
+    'V4L2_TUNER_RF',
+    'v4l2_memory',
+    'V4L2_MEMORY_MMAP',
+    'V4L2_MEMORY_USERPTR',
+    'V4L2_MEMORY_OVERLAY',
+    'V4L2_MEMORY_DMABUF',
+    'v4l2_colorspace',
+    'V4L2_COLORSPACE_DEFAULT',
+    'V4L2_COLORSPACE_SMPTE170M',
+    'V4L2_COLORSPACE_SMPTE240M',
+    'V4L2_COLORSPACE_REC709',
+    'V4L2_COLORSPACE_BT878',
+    'V4L2_COLORSPACE_470_SYSTEM_M',
+    'V4L2_COLORSPACE_470_SYSTEM_BG',
+    'V4L2_COLORSPACE_JPEG',
+    'V4L2_COLORSPACE_SRGB',
+    'V4L2_COLORSPACE_OPRGB',
+    'V4L2_COLORSPACE_BT2020',
+    'V4L2_COLORSPACE_RAW',
+    'V4L2_COLORSPACE_DCI_P3',
+    'v4l2_xfer_func',
+    'V4L2_XFER_FUNC_DEFAULT',
+    'V4L2_XFER_FUNC_709',
+    'V4L2_XFER_FUNC_SRGB',
+    'V4L2_XFER_FUNC_OPRGB',
+    'V4L2_XFER_FUNC_SMPTE240M',
+    'V4L2_XFER_FUNC_NONE',
+    'V4L2_XFER_FUNC_DCI_P3',
+    'V4L2_XFER_FUNC_SMPTE2084',
+    'v4l2_ycbcr_encoding',
+    'V4L2_YCBCR_ENC_DEFAULT',
+    'V4L2_YCBCR_ENC_601',
+    'V4L2_YCBCR_ENC_709',
+    'V4L2_YCBCR_ENC_XV601',
+    'V4L2_YCBCR_ENC_XV709',
+    'V4L2_YCBCR_ENC_SYCC',
+    'V4L2_YCBCR_ENC_BT2020',
+    'V4L2_YCBCR_ENC_BT2020_CONST_LUM',
+    'V4L2_YCBCR_ENC_SMPTE240M',
+    'v4l2_hsv_encoding',
+    'V4L2_HSV_ENC_180',
+    'V4L2_HSV_ENC_256',
+    'v4l2_quantization',
+    'V4L2_QUANTIZATION_DEFAULT',
+    'V4L2_QUANTIZATION_FULL_RANGE',
+    'V4L2_QUANTIZATION_LIM_RANGE',
+    'v4l2_priority',
+    'V4L2_PRIORITY_UNSET',
+    'V4L2_PRIORITY_BACKGROUND',
+    'V4L2_PRIORITY_INTERACTIVE',
+    'V4L2_PRIORITY_RECORD',
+    'V4L2_PRIORITY_DEFAULT',
+    'v4l2_frmsizetypes',
+    'V4L2_FRMSIZE_TYPE_DISCRETE',
+    'V4L2_FRMSIZE_TYPE_CONTINUOUS',
+    'V4L2_FRMSIZE_TYPE_STEPWISE',
+    'v4l2_frmivaltypes',
+    'V4L2_FRMIVAL_TYPE_DISCRETE',
+    'V4L2_FRMIVAL_TYPE_CONTINUOUS',
+    'V4L2_FRMIVAL_TYPE_STEPWISE',
+    'v4l2_ctrl_type',
+    'V4L2_CTRL_TYPE_INTEGER',
+    'V4L2_CTRL_TYPE_BOOLEAN',
+    'V4L2_CTRL_TYPE_MENU',
+    'V4L2_CTRL_TYPE_BUTTON',
+    'V4L2_CTRL_TYPE_INTEGER64',
+    'V4L2_CTRL_TYPE_CTRL_CLASS',
+    'V4L2_CTRL_TYPE_STRING',
+    'V4L2_CTRL_TYPE_BITMASK',
+    'V4L2_CTRL_TYPE_INTEGER_MENU',
+    'V4L2_CTRL_COMPOUND_TYPES',
+    'V4L2_CTRL_TYPE_U8',
+    'V4L2_CTRL_TYPE_U16',
+    'V4L2_CTRL_TYPE_U32',
+    'V4L2_CTRL_TYPE_AREA',
+    'V4L2_CTRL_TYPE_HDR10_CLL_INFO',
+    'V4L2_CTRL_TYPE_HDR10_MASTERING_DISPLAY',
+    'V4L2_CTRL_TYPE_H264_SPS',
+    'V4L2_CTRL_TYPE_H264_PPS',
+    'V4L2_CTRL_TYPE_H264_SCALING_MATRIX',
+    'V4L2_CTRL_TYPE_H264_SLICE_PARAMS',
+    'V4L2_CTRL_TYPE_H264_DECODE_PARAMS',
+    'V4L2_CTRL_TYPE_H264_PRED_WEIGHTS',
+    'V4L2_CTRL_TYPE_FWHT_PARAMS',
+    'V4L2_CTRL_TYPE_VP8_FRAME',
+    'V4L2_CTRL_TYPE_MPEG2_QUANTISATION',
+    'V4L2_CTRL_TYPE_MPEG2_SEQUENCE',
+    'V4L2_CTRL_TYPE_MPEG2_PICTURE',
+    'V4L2_CTRL_TYPE_VP9_COMPRESSED_HDR',
+    'V4L2_CTRL_TYPE_VP9_FRAME',
+    'V4L2_CTRL_TYPE_HEVC_SPS',
+    'V4L2_CTRL_TYPE_HEVC_PPS',
+    'V4L2_CTRL_TYPE_HEVC_SLICE_PARAMS',
+    'V4L2_CTRL_TYPE_HEVC_SCALING_MATRIX',
+    'V4L2_CTRL_TYPE_HEVC_DECODE_PARAMS',
+    'V4L2_CTRL_TYPE_AV1_SEQUENCE',
+    'V4L2_CTRL_TYPE_AV1_TILE_GROUP_ENTRY',
+    'V4L2_CTRL_TYPE_AV1_FRAME',
+    'V4L2_CTRL_TYPE_AV1_FILM_GRAIN',
+    'v4l2_edid',
+    'v4l2_ctrl_h264_sps',
+    'v4l2_ctrl_h264_pps',
+    'v4l2_ctrl_h264_scaling_matrix',
+    'v4l2_h264_weight_factors',
+    'v4l2_ctrl_h264_pred_weights',
+    'v4l2_h264_reference',
+    'v4l2_ctrl_h264_slice_params',
+    'v4l2_h264_dpb_entry',
+    'v4l2_ctrl_h264_decode_params',
+    'v4l2_ctrl_fwht_params',
+    'v4l2_vp8_segment',
+    'v4l2_vp8_loop_filter',
+    'v4l2_vp8_quantization',
+    'v4l2_vp8_entropy',
+    'v4l2_vp8_entropy_coder_state',
+    'v4l2_ctrl_vp8_frame',
+    'v4l2_ctrl_mpeg2_sequence',
+    'v4l2_ctrl_mpeg2_picture',
+    'v4l2_ctrl_mpeg2_quantisation',
+    'v4l2_ctrl_hevc_sps',
+    'v4l2_ctrl_hevc_pps',
+    'v4l2_hevc_dpb_entry',
+    'v4l2_hevc_pred_weight_table',
+    'v4l2_ctrl_hevc_slice_params',
+    'v4l2_ctrl_hevc_decode_params',
+    'v4l2_ctrl_hevc_scaling_matrix',
+    'v4l2_ctrl_hdr10_cll_info',
+    'v4l2_ctrl_hdr10_mastering_display',
+    'v4l2_vp9_loop_filter',
+    'v4l2_vp9_quantization',
+    'v4l2_vp9_segmentation',
+    'v4l2_ctrl_vp9_frame',
+    'v4l2_vp9_mv_probs',
+    'v4l2_ctrl_vp9_compressed_hdr',
+    'v4l2_ctrl_av1_sequence',
+    'v4l2_ctrl_av1_tile_group_entry',
+    'v4l2_av1_global_motion',
+    'v4l2_av1_loop_restoration',
+    'v4l2_av1_cdef',
+    'v4l2_av1_segmentation',
+    'v4l2_av1_loop_filter',
+    'v4l2_av1_quantization',
+    'v4l2_av1_tile_info',
+    'v4l2_ctrl_av1_frame',
+    'v4l2_ctrl_av1_film_grain',
+    'v4l2_rect',
+    'v4l2_fract',
+    'v4l2_area',
+    'v4l2_capability',
+    'v4l2_pix_format',
+    'v4l2_fmtdesc',
+    'v4l2_frmsize_discrete',
+    'v4l2_frmsize_stepwise',
+    'v4l2_frmival_stepwise',
+    'v4l2_timecode',
+    'v4l2_jpegcompression',
+    'v4l2_requestbuffers',
+    'v4l2_plane',
+    'v4l2_buffer',
+    'v4l2_exportbuffer',
+    'v4l2_framebuffer',
+    'v4l2_clip',
+    'v4l2_window',
+    'v4l2_captureparm',
+    'v4l2_outputparm',
+    'v4l2_cropcap',
+    'v4l2_crop',
+    'v4l2_selection',
+    'v4l2_standard',
+    'v4l2_bt_timings',
+    'v4l2_dv_timings',
+    'v4l2_bt_timings_cap',
+    'v4l2_dv_timings_cap',
+    'v4l2_input',
+    'v4l2_output',
+    'v4l2_control',
+    'v4l2_ext_control',
+    'v4l2_ext_controls',
+    'v4l2_queryctrl',
+    'v4l2_query_ext_ctrl',
+    'v4l2_querymenu',
+    'v4l2_tuner',
+    'v4l2_modulator',
+    'v4l2_frequency',
+    'v4l2_frequency_band',
+    'v4l2_hw_freq_seek',
+    'v4l2_rds_data',
+    'v4l2_audio',
+    'v4l2_audioout',
+    'v4l2_enc_idx_entry',
+    'v4l2_enc_idx',
+    'v4l2_encoder_cmd',
+    'v4l2_decoder_cmd',
+    'v4l2_vbi_format',
+    'v4l2_sliced_vbi_format',
+    'v4l2_sliced_vbi_cap',
+    'v4l2_sliced_vbi_data',
+    'v4l2_mpeg_vbi_itv0_line',
+    'v4l2_mpeg_vbi_itv0',
+    'v4l2_mpeg_vbi_ITV0',
+    'v4l2_mpeg_vbi_fmt_ivtv',
+    'v4l2_plane_pix_format',
+    'v4l2_pix_format_mplane',
+    'v4l2_sdr_format',
+    'v4l2_meta_format',
+    'v4l2_format',
+    'v4l2_streamparm',
+    'v4l2_event_vsync',
+    'v4l2_event_ctrl',
+    'v4l2_event_frame_sync',
+    'v4l2_event_src_change',
+    'v4l2_event_motion_det',
+    'v4l2_event',
+    'v4l2_event_subscription',
+    'v4l2_dbg_match',
+    'v4l2_dbg_register',
+    'v4l2_dbg_chip_info',
+    'v4l2_create_buffers',
+    'v4l2_remove_buffers',
+    '__u_char',
+    '__u_short',
+    '__u_int',
+    '__u_long',
+    '__int8_t',
+    '__uint8_t',
+    '__int16_t',
+    '__uint16_t',
+    '__int32_t',
+    '__uint32_t',
+    '__int64_t',
+    '__uint64_t',
+    '__int_least8_t',
+    '__uint_least8_t',
+    '__int_least16_t',
+    '__uint_least16_t',
+    '__int_least32_t',
+    '__uint_least32_t',
+    '__int_least64_t',
+    '__uint_least64_t',
+    '__quad_t',
+    '__u_quad_t',
+    '__intmax_t',
+    '__uintmax_t',
+    '__dev_t',
+    '__uid_t',
+    '__gid_t',
+    '__ino_t',
+    '__ino64_t',
+    '__mode_t',
+    '__nlink_t',
+    '__off_t',
+    '__off64_t',
+    '__pid_t',
+    '__fsid_t',
+    '__clock_t',
+    '__rlim_t',
+    '__rlim64_t',
+    '__id_t',
+    '__time_t',
+    '__useconds_t',
+    '__suseconds_t',
+    '__suseconds64_t',
+    '__daddr_t',
+    '__key_t',
+    '__clockid_t',
+    '__timer_t',
+    '__blksize_t',
+    '__blkcnt_t',
+    '__blkcnt64_t',
+    '__fsblkcnt_t',
+    '__fsblkcnt64_t',
+    '__fsfilcnt_t',
+    '__fsfilcnt64_t',
+    '__fsword_t',
+    '__ssize_t',
+    '__syscall_slong_t',
+    '__syscall_ulong_t',
+    '__loff_t',
+    '__intptr_t',
+    '__socklen_t',
+    '__sig_atomic_t',
+    'time_t',
+    'suseconds_t',
+    'sigset_t',
+    '__fd_mask',
+    'fd_mask',
+    '__itimer_which_t',
+    '__s8',
+    '__u8',
+    '__s16',
+    '__u16',
+    '__s32',
+    '__u32',
+    '__kernel_key_t',
+    '__kernel_mqd_t',
+    '__kernel_old_uid_t',
+    '__kernel_old_gid_t',
+    '__kernel_old_dev_t',
+    '__kernel_long_t',
+    '__kernel_ulong_t',
+    '__kernel_ino_t',
+    '__kernel_mode_t',
+    '__kernel_pid_t',
+    '__kernel_ipc_pid_t',
+    '__kernel_uid_t',
+    '__kernel_gid_t',
+    '__kernel_suseconds_t',
+    '__kernel_daddr_t',
+    '__kernel_uid32_t',
+    '__kernel_gid32_t',
+    '__kernel_size_t',
+    '__kernel_ssize_t',
+    '__kernel_ptrdiff_t',
+    '__kernel_off_t',
+    '__kernel_loff_t',
+    '__kernel_old_time_t',
+    '__kernel_time_t',
+    '__kernel_time64_t',
+    '__kernel_clock_t',
+    '__kernel_timer_t',
+    '__kernel_clockid_t',
+    '__kernel_caddr_t',
+    '__kernel_uid16_t',
+    '__kernel_gid16_t',
+    '__le16',
+    '__be16',
+    '__le32',
+    '__be32',
+    '__le64',
+    '__be64',
+    '__sum16',
+    '__wsum',
+    '__poll_t',
+    'v4l2_std_id',
+    '_IOC_NRBITS',
+    '_IOC_TYPEBITS',
+    '_IOC_SIZEBITS',
+    '_IOC_DIRBITS',
+    '_IOC_NRSHIFT',
+    '_IOC_NONE',
+    '_IOC_WRITE',
+    '_IOC_READ',
+    'V4L2_SEL_TGT_CROP',
+    'V4L2_SEL_TGT_CROP_DEFAULT',
+    'V4L2_SEL_TGT_CROP_BOUNDS',
+    'V4L2_SEL_TGT_NATIVE_SIZE',
+    'V4L2_SEL_TGT_COMPOSE',
+    'V4L2_SEL_TGT_COMPOSE_DEFAULT',
+    'V4L2_SEL_TGT_COMPOSE_BOUNDS',
+    'V4L2_SEL_TGT_COMPOSE_PADDED',
+    'V4L2_SEL_FLAG_GE',
+    'V4L2_SEL_FLAG_LE',
+    'V4L2_SEL_FLAG_KEEP_CONFIG',
+    'V4L2_SEL_TGT_CROP_ACTIVE',
+    'V4L2_SEL_TGT_COMPOSE_ACTIVE',
+    'V4L2_SUBDEV_SEL_TGT_CROP_ACTUAL',
+    'V4L2_SUBDEV_SEL_TGT_COMPOSE_ACTUAL',
+    'V4L2_SUBDEV_SEL_TGT_CROP_BOUNDS',
+    'V4L2_SUBDEV_SEL_TGT_COMPOSE_BOUNDS',
+    'V4L2_SUBDEV_SEL_FLAG_SIZE_GE',
+    'V4L2_SUBDEV_SEL_FLAG_SIZE_LE',
+    'V4L2_SUBDEV_SEL_FLAG_KEEP_CONFIG',
+    'V4L2_CTRL_CLASS_USER',
+    'V4L2_CTRL_CLASS_CODEC',
+    'V4L2_CTRL_CLASS_CAMERA',
+    'V4L2_CTRL_CLASS_FM_TX',
+    'V4L2_CTRL_CLASS_FLASH',
+    'V4L2_CTRL_CLASS_JPEG',
+    'V4L2_CTRL_CLASS_IMAGE_SOURCE',
+    'V4L2_CTRL_CLASS_IMAGE_PROC',
+    'V4L2_CTRL_CLASS_DV',
+    'V4L2_CTRL_CLASS_FM_RX',
+    'V4L2_CTRL_CLASS_RF_TUNER',
+    'V4L2_CTRL_CLASS_DETECT',
+    'V4L2_CTRL_CLASS_CODEC_STATELESS',
+    'V4L2_CTRL_CLASS_COLORIMETRY',
+    'V4L2_CID_BASE',
+    'V4L2_CID_USER_BASE',
+    'V4L2_CID_USER_CLASS',
+    'V4L2_CID_BRIGHTNESS',
+    'V4L2_CID_CONTRAST',
+    'V4L2_CID_SATURATION',
+    'V4L2_CID_HUE',
+    'V4L2_CID_AUDIO_VOLUME',
+    'V4L2_CID_AUDIO_BALANCE',
+    'V4L2_CID_AUDIO_BASS',
+    'V4L2_CID_AUDIO_TREBLE',
+    'V4L2_CID_AUDIO_MUTE',
+    'V4L2_CID_AUDIO_LOUDNESS',
+    'V4L2_CID_BLACK_LEVEL',
+    'V4L2_CID_AUTO_WHITE_BALANCE',
+    'V4L2_CID_DO_WHITE_BALANCE',
+    'V4L2_CID_RED_BALANCE',
+    'V4L2_CID_BLUE_BALANCE',
+    'V4L2_CID_GAMMA',
+    'V4L2_CID_WHITENESS',
+    'V4L2_CID_EXPOSURE',
+    'V4L2_CID_AUTOGAIN',
+    'V4L2_CID_GAIN',
+    'V4L2_CID_HFLIP',
+    'V4L2_CID_VFLIP',
+    'V4L2_CID_POWER_LINE_FREQUENCY',
+    'V4L2_CID_HUE_AUTO',
+    'V4L2_CID_WHITE_BALANCE_TEMPERATURE',
+    'V4L2_CID_SHARPNESS',
+    'V4L2_CID_BACKLIGHT_COMPENSATION',
+    'V4L2_CID_CHROMA_AGC',
+    'V4L2_CID_COLOR_KILLER',
+    'V4L2_CID_COLORFX',
+    'V4L2_CID_AUTOBRIGHTNESS',
+    'V4L2_CID_BAND_STOP_FILTER',
+    'V4L2_CID_ROTATE',
+    'V4L2_CID_BG_COLOR',
+    'V4L2_CID_CHROMA_GAIN',
+    'V4L2_CID_ILLUMINATORS_1',
+    'V4L2_CID_ILLUMINATORS_2',
+    'V4L2_CID_MIN_BUFFERS_FOR_CAPTURE',
+    'V4L2_CID_MIN_BUFFERS_FOR_OUTPUT',
+    'V4L2_CID_ALPHA_COMPONENT',
+    'V4L2_CID_COLORFX_CBCR',
+    'V4L2_CID_COLORFX_RGB',
+    'V4L2_CID_LASTP1',
+    'V4L2_CID_USER_MEYE_BASE',
+    'V4L2_CID_USER_BTTV_BASE',
+    'V4L2_CID_USER_S2255_BASE',
+    'V4L2_CID_USER_SI476X_BASE',
+    'V4L2_CID_USER_TI_VPE_BASE',
+    'V4L2_CID_USER_SAA7134_BASE',
+    'V4L2_CID_USER_ADV7180_BASE',
+    'V4L2_CID_USER_TC358743_BASE',
+    'V4L2_CID_USER_MAX217X_BASE',
+    'V4L2_CID_USER_IMX_BASE',
+    'V4L2_CID_USER_ATMEL_ISC_BASE',
+    'V4L2_CID_USER_CODA_BASE',
+    'V4L2_CID_USER_CCS_BASE',
+    'V4L2_CID_USER_ALLEGRO_BASE',
+    'V4L2_CID_USER_ISL7998X_BASE',
+    'V4L2_CID_USER_DW100_BASE',
+    'V4L2_CID_USER_ASPEED_BASE',
+    'V4L2_CID_USER_NPCM_BASE',
+    'V4L2_CID_USER_THP7312_BASE',
+    'V4L2_CID_CODEC_BASE',
+    'V4L2_CID_CODEC_CLASS',
+    'V4L2_CID_MPEG_STREAM_TYPE',
+    'V4L2_CID_MPEG_STREAM_PID_PMT',
+    'V4L2_CID_MPEG_STREAM_PID_AUDIO',
+    'V4L2_CID_MPEG_STREAM_PID_VIDEO',
+    'V4L2_CID_MPEG_STREAM_PID_PCR',
+    'V4L2_CID_MPEG_STREAM_PES_ID_AUDIO',
+    'V4L2_CID_MPEG_STREAM_PES_ID_VIDEO',
+    'V4L2_CID_MPEG_STREAM_VBI_FMT',
+    'V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ',
+    'V4L2_CID_MPEG_AUDIO_ENCODING',
+    'V4L2_CID_MPEG_AUDIO_L1_BITRATE',
+    'V4L2_CID_MPEG_AUDIO_L2_BITRATE',
+    'V4L2_CID_MPEG_AUDIO_L3_BITRATE',
+    'V4L2_CID_MPEG_AUDIO_MODE',
+    'V4L2_CID_MPEG_AUDIO_MODE_EXTENSION',
+    'V4L2_CID_MPEG_AUDIO_EMPHASIS',
+    'V4L2_CID_MPEG_AUDIO_CRC',
+    'V4L2_CID_MPEG_AUDIO_MUTE',
+    'V4L2_CID_MPEG_AUDIO_AAC_BITRATE',
+    'V4L2_CID_MPEG_AUDIO_AC3_BITRATE',
+    'V4L2_CID_MPEG_AUDIO_DEC_PLAYBACK',
+    'V4L2_CID_MPEG_AUDIO_DEC_MULTILINGUAL_PLAYBACK',
+    'V4L2_CID_MPEG_VIDEO_ENCODING',
+    'V4L2_CID_MPEG_VIDEO_ASPECT',
+    'V4L2_CID_MPEG_VIDEO_B_FRAMES',
+    'V4L2_CID_MPEG_VIDEO_GOP_SIZE',
+    'V4L2_CID_MPEG_VIDEO_GOP_CLOSURE',
+    'V4L2_CID_MPEG_VIDEO_PULLDOWN',
+    'V4L2_CID_MPEG_VIDEO_BITRATE_MODE',
+    'V4L2_CID_MPEG_VIDEO_BITRATE',
+    'V4L2_CID_MPEG_VIDEO_BITRATE_PEAK',
+    'V4L2_CID_MPEG_VIDEO_TEMPORAL_DECIMATION',
+    'V4L2_CID_MPEG_VIDEO_MUTE',
+    'V4L2_CID_MPEG_VIDEO_MUTE_YUV',
+    'V4L2_CID_MPEG_VIDEO_DECODER_SLICE_INTERFACE',
+    'V4L2_CID_MPEG_VIDEO_DECODER_MPEG4_DEBLOCK_FILTER',
+    'V4L2_CID_MPEG_VIDEO_CYCLIC_INTRA_REFRESH_MB',
+    'V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE',
+    'V4L2_CID_MPEG_VIDEO_HEADER_MODE',
+    'V4L2_CID_MPEG_VIDEO_MAX_REF_PIC',
+    'V4L2_CID_MPEG_VIDEO_MB_RC_ENABLE',
+    'V4L2_CID_MPEG_VIDEO_MULTI_SLICE_MAX_BYTES',
+    'V4L2_CID_MPEG_VIDEO_MULTI_SLICE_MAX_MB',
+    'V4L2_CID_MPEG_VIDEO_MULTI_SLICE_MODE',
+    'V4L2_CID_MPEG_VIDEO_VBV_SIZE',
+    'V4L2_CID_MPEG_VIDEO_DEC_PTS',
+    'V4L2_CID_MPEG_VIDEO_DEC_FRAME',
+    'V4L2_CID_MPEG_VIDEO_VBV_DELAY',
+    'V4L2_CID_MPEG_VIDEO_REPEAT_SEQ_HEADER',
+    'V4L2_CID_MPEG_VIDEO_MV_H_SEARCH_RANGE',
+    'V4L2_CID_MPEG_VIDEO_MV_V_SEARCH_RANGE',
+    'V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME',
+    'V4L2_CID_MPEG_VIDEO_BASELAYER_PRIORITY_ID',
+    'V4L2_CID_MPEG_VIDEO_AU_DELIMITER',
+    'V4L2_CID_MPEG_VIDEO_LTR_COUNT',
+    'V4L2_CID_MPEG_VIDEO_FRAME_LTR_INDEX',
+    'V4L2_CID_MPEG_VIDEO_USE_LTR_FRAMES',
+    'V4L2_CID_MPEG_VIDEO_DEC_CONCEAL_COLOR',
+    'V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD',
+    'V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE',
+    'V4L2_CID_MPEG_VIDEO_MPEG2_LEVEL',
+    'V4L2_CID_MPEG_VIDEO_MPEG2_PROFILE',
+    'V4L2_CID_FWHT_I_FRAME_QP',
+    'V4L2_CID_FWHT_P_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_H263_I_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_H263_P_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_H263_B_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_H263_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_H263_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_I_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_P_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_B_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_8X8_TRANSFORM',
+    'V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE',
+    'V4L2_CID_MPEG_VIDEO_H264_ENTROPY_MODE',
+    'V4L2_CID_MPEG_VIDEO_H264_I_PERIOD',
+    'V4L2_CID_MPEG_VIDEO_H264_LEVEL',
+    'V4L2_CID_MPEG_VIDEO_H264_LOOP_FILTER_ALPHA',
+    'V4L2_CID_MPEG_VIDEO_H264_LOOP_FILTER_BETA',
+    'V4L2_CID_MPEG_VIDEO_H264_LOOP_FILTER_MODE',
+    'V4L2_CID_MPEG_VIDEO_H264_PROFILE',
+    'V4L2_CID_MPEG_VIDEO_H264_VUI_EXT_SAR_HEIGHT',
+    'V4L2_CID_MPEG_VIDEO_H264_VUI_EXT_SAR_WIDTH',
+    'V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_ENABLE',
+    'V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_IDC',
+    'V4L2_CID_MPEG_VIDEO_H264_SEI_FRAME_PACKING',
+    'V4L2_CID_MPEG_VIDEO_H264_SEI_FP_CURRENT_FRAME_0',
+    'V4L2_CID_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE',
+    'V4L2_CID_MPEG_VIDEO_H264_FMO',
+    'V4L2_CID_MPEG_VIDEO_H264_FMO_MAP_TYPE',
+    'V4L2_CID_MPEG_VIDEO_H264_FMO_SLICE_GROUP',
+    'V4L2_CID_MPEG_VIDEO_H264_FMO_CHANGE_DIRECTION',
+    'V4L2_CID_MPEG_VIDEO_H264_FMO_CHANGE_RATE',
+    'V4L2_CID_MPEG_VIDEO_H264_FMO_RUN_LENGTH',
+    'V4L2_CID_MPEG_VIDEO_H264_ASO',
+    'V4L2_CID_MPEG_VIDEO_H264_ASO_SLICE_ORDER',
+    'V4L2_CID_MPEG_VIDEO_H264_HIERARCHICAL_CODING',
+    'V4L2_CID_MPEG_VIDEO_H264_HIERARCHICAL_CODING_TYPE',
+    'V4L2_CID_MPEG_VIDEO_H264_HIERARCHICAL_CODING_LAYER',
+    'V4L2_CID_MPEG_VIDEO_H264_HIERARCHICAL_CODING_LAYER_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_CONSTRAINED_INTRA_PREDICTION',
+    'V4L2_CID_MPEG_VIDEO_H264_CHROMA_QP_INDEX_OFFSET',
+    'V4L2_CID_MPEG_VIDEO_H264_I_FRAME_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_I_FRAME_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_P_FRAME_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_P_FRAME_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_B_FRAME_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_B_FRAME_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L0_BR',
+    'V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L1_BR',
+    'V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L2_BR',
+    'V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L3_BR',
+    'V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L4_BR',
+    'V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L5_BR',
+    'V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L6_BR',
+    'V4L2_CID_MPEG_VIDEO_MPEG4_I_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_MPEG4_P_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_MPEG4_B_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_MPEG4_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_MPEG4_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_MPEG4_LEVEL',
+    'V4L2_CID_MPEG_VIDEO_MPEG4_PROFILE',
+    'V4L2_CID_MPEG_VIDEO_MPEG4_QPEL',
+    'V4L2_CID_MPEG_VIDEO_VPX_NUM_PARTITIONS',
+    'V4L2_CID_MPEG_VIDEO_VPX_IMD_DISABLE_4X4',
+    'V4L2_CID_MPEG_VIDEO_VPX_NUM_REF_FRAMES',
+    'V4L2_CID_MPEG_VIDEO_VPX_FILTER_LEVEL',
+    'V4L2_CID_MPEG_VIDEO_VPX_FILTER_SHARPNESS',
+    'V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_REF_PERIOD',
+    'V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_SEL',
+    'V4L2_CID_MPEG_VIDEO_VPX_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_VPX_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_VPX_I_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_VPX_P_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_VP8_PROFILE',
+    'V4L2_CID_MPEG_VIDEO_VPX_PROFILE',
+    'V4L2_CID_MPEG_VIDEO_VP9_PROFILE',
+    'V4L2_CID_MPEG_VIDEO_VP9_LEVEL',
+    'V4L2_CID_MPEG_VIDEO_HEVC_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_I_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_P_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_B_FRAME_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_TYPE',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_LAYER',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L0_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L1_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L2_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L3_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L4_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L5_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L6_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_PROFILE',
+    'V4L2_CID_MPEG_VIDEO_HEVC_LEVEL',
+    'V4L2_CID_MPEG_VIDEO_HEVC_FRAME_RATE_RESOLUTION',
+    'V4L2_CID_MPEG_VIDEO_HEVC_TIER',
+    'V4L2_CID_MPEG_VIDEO_HEVC_MAX_PARTITION_DEPTH',
+    'V4L2_CID_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE',
+    'V4L2_CID_MPEG_VIDEO_HEVC_LF_BETA_OFFSET_DIV2',
+    'V4L2_CID_MPEG_VIDEO_HEVC_LF_TC_OFFSET_DIV2',
+    'V4L2_CID_MPEG_VIDEO_HEVC_REFRESH_TYPE',
+    'V4L2_CID_MPEG_VIDEO_HEVC_REFRESH_PERIOD',
+    'V4L2_CID_MPEG_VIDEO_HEVC_LOSSLESS_CU',
+    'V4L2_CID_MPEG_VIDEO_HEVC_CONST_INTRA_PRED',
+    'V4L2_CID_MPEG_VIDEO_HEVC_WAVEFRONT',
+    'V4L2_CID_MPEG_VIDEO_HEVC_GENERAL_PB',
+    'V4L2_CID_MPEG_VIDEO_HEVC_TEMPORAL_ID',
+    'V4L2_CID_MPEG_VIDEO_HEVC_STRONG_SMOOTHING',
+    'V4L2_CID_MPEG_VIDEO_HEVC_MAX_NUM_MERGE_MV_MINUS1',
+    'V4L2_CID_MPEG_VIDEO_HEVC_INTRA_PU_SPLIT',
+    'V4L2_CID_MPEG_VIDEO_HEVC_TMV_PREDICTION',
+    'V4L2_CID_MPEG_VIDEO_HEVC_WITHOUT_STARTCODE',
+    'V4L2_CID_MPEG_VIDEO_HEVC_SIZE_OF_LENGTH_FIELD',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L0_BR',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L1_BR',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L2_BR',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L3_BR',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L4_BR',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L5_BR',
+    'V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L6_BR',
+    'V4L2_CID_MPEG_VIDEO_REF_NUMBER_FOR_PFRAMES',
+    'V4L2_CID_MPEG_VIDEO_PREPEND_SPSPPS_TO_IDR',
+    'V4L2_CID_MPEG_VIDEO_CONSTANT_QUALITY',
+    'V4L2_CID_MPEG_VIDEO_FRAME_SKIP_MODE',
+    'V4L2_CID_MPEG_VIDEO_HEVC_I_FRAME_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_I_FRAME_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_P_FRAME_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_P_FRAME_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_B_FRAME_MIN_QP',
+    'V4L2_CID_MPEG_VIDEO_HEVC_B_FRAME_MAX_QP',
+    'V4L2_CID_MPEG_VIDEO_DEC_DISPLAY_DELAY',
+    'V4L2_CID_MPEG_VIDEO_DEC_DISPLAY_DELAY_ENABLE',
+    'V4L2_CID_MPEG_VIDEO_AV1_PROFILE',
+    'V4L2_CID_MPEG_VIDEO_AV1_LEVEL',
+    'V4L2_CID_CODEC_CX2341X_BASE',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_SPATIAL_FILTER_MODE',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_SPATIAL_FILTER',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_CHROMA_SPATIAL_FILTER_TYPE',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER_MODE',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_LUMA_MEDIAN_FILTER_BOTTOM',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_LUMA_MEDIAN_FILTER_TOP',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_CHROMA_MEDIAN_FILTER_BOTTOM',
+    'V4L2_CID_MPEG_CX2341X_VIDEO_CHROMA_MEDIAN_FILTER_TOP',
+    'V4L2_CID_MPEG_CX2341X_STREAM_INSERT_NAV_PACKETS',
+    'V4L2_CID_CODEC_MFC51_BASE',
+    'V4L2_CID_MPEG_MFC51_VIDEO_DECODER_H264_DISPLAY_DELAY',
+    'V4L2_CID_MPEG_MFC51_VIDEO_DECODER_H264_DISPLAY_DELAY_ENABLE',
+    'V4L2_CID_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE',
+    'V4L2_CID_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE',
+    'V4L2_CID_MPEG_MFC51_VIDEO_PADDING',
+    'V4L2_CID_MPEG_MFC51_VIDEO_PADDING_YUV',
+    'V4L2_CID_MPEG_MFC51_VIDEO_RC_FIXED_TARGET_BIT',
+    'V4L2_CID_MPEG_MFC51_VIDEO_RC_REACTION_COEFF',
+    'V4L2_CID_MPEG_MFC51_VIDEO_H264_ADAPTIVE_RC_ACTIVITY',
+    'V4L2_CID_MPEG_MFC51_VIDEO_H264_ADAPTIVE_RC_DARK',
+    'V4L2_CID_MPEG_MFC51_VIDEO_H264_ADAPTIVE_RC_SMOOTH',
+    'V4L2_CID_MPEG_MFC51_VIDEO_H264_ADAPTIVE_RC_STATIC',
+    'V4L2_CID_MPEG_MFC51_VIDEO_H264_NUM_REF_PIC_FOR_P',
+    'V4L2_CID_CAMERA_CLASS_BASE',
+    'V4L2_CID_CAMERA_CLASS',
+    'V4L2_CID_EXPOSURE_AUTO',
+    'V4L2_CID_EXPOSURE_ABSOLUTE',
+    'V4L2_CID_EXPOSURE_AUTO_PRIORITY',
+    'V4L2_CID_PAN_RELATIVE',
+    'V4L2_CID_TILT_RELATIVE',
+    'V4L2_CID_PAN_RESET',
+    'V4L2_CID_TILT_RESET',
+    'V4L2_CID_PAN_ABSOLUTE',
+    'V4L2_CID_TILT_ABSOLUTE',
+    'V4L2_CID_FOCUS_ABSOLUTE',
+    'V4L2_CID_FOCUS_RELATIVE',
+    'V4L2_CID_FOCUS_AUTO',
+    'V4L2_CID_ZOOM_ABSOLUTE',
+    'V4L2_CID_ZOOM_RELATIVE',
+    'V4L2_CID_ZOOM_CONTINUOUS',
+    'V4L2_CID_PRIVACY',
+    'V4L2_CID_IRIS_ABSOLUTE',
+    'V4L2_CID_IRIS_RELATIVE',
+    'V4L2_CID_AUTO_EXPOSURE_BIAS',
+    'V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE',
+    'V4L2_CID_WIDE_DYNAMIC_RANGE',
+    'V4L2_CID_IMAGE_STABILIZATION',
+    'V4L2_CID_ISO_SENSITIVITY',
+    'V4L2_CID_ISO_SENSITIVITY_AUTO',
+    'V4L2_CID_EXPOSURE_METERING',
+    'V4L2_CID_SCENE_MODE',
+    'V4L2_CID_3A_LOCK',
+    'V4L2_LOCK_EXPOSURE',
+    'V4L2_LOCK_WHITE_BALANCE',
+    'V4L2_LOCK_FOCUS',
+    'V4L2_CID_AUTO_FOCUS_START',
+    'V4L2_CID_AUTO_FOCUS_STOP',
+    'V4L2_CID_AUTO_FOCUS_STATUS',
+    'V4L2_AUTO_FOCUS_STATUS_IDLE',
+    'V4L2_AUTO_FOCUS_STATUS_BUSY',
+    'V4L2_AUTO_FOCUS_STATUS_REACHED',
+    'V4L2_AUTO_FOCUS_STATUS_FAILED',
+    'V4L2_CID_AUTO_FOCUS_RANGE',
+    'V4L2_CID_PAN_SPEED',
+    'V4L2_CID_TILT_SPEED',
+    'V4L2_CID_CAMERA_ORIENTATION',
+    'V4L2_CAMERA_ORIENTATION_FRONT',
+    'V4L2_CAMERA_ORIENTATION_BACK',
+    'V4L2_CAMERA_ORIENTATION_EXTERNAL',
+    'V4L2_CID_CAMERA_SENSOR_ROTATION',
+    'V4L2_CID_HDR_SENSOR_MODE',
+    'V4L2_CID_FM_TX_CLASS_BASE',
+    'V4L2_CID_FM_TX_CLASS',
+    'V4L2_CID_RDS_TX_DEVIATION',
+    'V4L2_CID_RDS_TX_PI',
+    'V4L2_CID_RDS_TX_PTY',
+    'V4L2_CID_RDS_TX_PS_NAME',
+    'V4L2_CID_RDS_TX_RADIO_TEXT',
+    'V4L2_CID_RDS_TX_MONO_STEREO',
+    'V4L2_CID_RDS_TX_ARTIFICIAL_HEAD',
+    'V4L2_CID_RDS_TX_COMPRESSED',
+    'V4L2_CID_RDS_TX_DYNAMIC_PTY',
+    'V4L2_CID_RDS_TX_TRAFFIC_ANNOUNCEMENT',
+    'V4L2_CID_RDS_TX_TRAFFIC_PROGRAM',
+    'V4L2_CID_RDS_TX_MUSIC_SPEECH',
+    'V4L2_CID_RDS_TX_ALT_FREQS_ENABLE',
+    'V4L2_CID_RDS_TX_ALT_FREQS',
+    'V4L2_CID_AUDIO_LIMITER_ENABLED',
+    'V4L2_CID_AUDIO_LIMITER_RELEASE_TIME',
+    'V4L2_CID_AUDIO_LIMITER_DEVIATION',
+    'V4L2_CID_AUDIO_COMPRESSION_ENABLED',
+    'V4L2_CID_AUDIO_COMPRESSION_GAIN',
+    'V4L2_CID_AUDIO_COMPRESSION_THRESHOLD',
+    'V4L2_CID_AUDIO_COMPRESSION_ATTACK_TIME',
+    'V4L2_CID_AUDIO_COMPRESSION_RELEASE_TIME',
+    'V4L2_CID_PILOT_TONE_ENABLED',
+    'V4L2_CID_PILOT_TONE_DEVIATION',
+    'V4L2_CID_PILOT_TONE_FREQUENCY',
+    'V4L2_CID_TUNE_PREEMPHASIS',
+    'V4L2_CID_TUNE_POWER_LEVEL',
+    'V4L2_CID_TUNE_ANTENNA_CAPACITOR',
+    'V4L2_CID_FLASH_CLASS_BASE',
+    'V4L2_CID_FLASH_CLASS',
+    'V4L2_CID_FLASH_LED_MODE',
+    'V4L2_CID_FLASH_STROBE_SOURCE',
+    'V4L2_CID_FLASH_STROBE',
+    'V4L2_CID_FLASH_STROBE_STOP',
+    'V4L2_CID_FLASH_STROBE_STATUS',
+    'V4L2_CID_FLASH_TIMEOUT',
+    'V4L2_CID_FLASH_INTENSITY',
+    'V4L2_CID_FLASH_TORCH_INTENSITY',
+    'V4L2_CID_FLASH_INDICATOR_INTENSITY',
+    'V4L2_CID_FLASH_FAULT',
+    'V4L2_FLASH_FAULT_OVER_VOLTAGE',
+    'V4L2_FLASH_FAULT_TIMEOUT',
+    'V4L2_FLASH_FAULT_OVER_TEMPERATURE',
+    'V4L2_FLASH_FAULT_SHORT_CIRCUIT',
+    'V4L2_FLASH_FAULT_OVER_CURRENT',
+    'V4L2_FLASH_FAULT_INDICATOR',
+    'V4L2_FLASH_FAULT_UNDER_VOLTAGE',
+    'V4L2_FLASH_FAULT_INPUT_VOLTAGE',
+    'V4L2_FLASH_FAULT_LED_OVER_TEMPERATURE',
+    'V4L2_CID_FLASH_CHARGE',
+    'V4L2_CID_FLASH_READY',
+    'V4L2_CID_JPEG_CLASS_BASE',
+    'V4L2_CID_JPEG_CLASS',
+    'V4L2_CID_JPEG_CHROMA_SUBSAMPLING',
+    'V4L2_CID_JPEG_RESTART_INTERVAL',
+    'V4L2_CID_JPEG_COMPRESSION_QUALITY',
+    'V4L2_CID_JPEG_ACTIVE_MARKER',
+    'V4L2_JPEG_ACTIVE_MARKER_APP0',
+    'V4L2_JPEG_ACTIVE_MARKER_APP1',
+    'V4L2_JPEG_ACTIVE_MARKER_COM',
+    'V4L2_JPEG_ACTIVE_MARKER_DQT',
+    'V4L2_JPEG_ACTIVE_MARKER_DHT',
+    'V4L2_CID_IMAGE_SOURCE_CLASS_BASE',
+    'V4L2_CID_IMAGE_SOURCE_CLASS',
+    'V4L2_CID_VBLANK',
+    'V4L2_CID_HBLANK',
+    'V4L2_CID_ANALOGUE_GAIN',
+    'V4L2_CID_TEST_PATTERN_RED',
+    'V4L2_CID_TEST_PATTERN_GREENR',
+    'V4L2_CID_TEST_PATTERN_BLUE',
+    'V4L2_CID_TEST_PATTERN_GREENB',
+    'V4L2_CID_UNIT_CELL_SIZE',
+    'V4L2_CID_NOTIFY_GAINS',
+    'V4L2_CID_IMAGE_PROC_CLASS_BASE',
+    'V4L2_CID_IMAGE_PROC_CLASS',
+    'V4L2_CID_LINK_FREQ',
+    'V4L2_CID_PIXEL_RATE',
+    'V4L2_CID_TEST_PATTERN',
+    'V4L2_CID_DEINTERLACING_MODE',
+    'V4L2_CID_DIGITAL_GAIN',
+    'V4L2_CID_DV_CLASS_BASE',
+    'V4L2_CID_DV_CLASS',
+    'V4L2_CID_DV_TX_HOTPLUG',
+    'V4L2_CID_DV_TX_RXSENSE',
+    'V4L2_CID_DV_TX_EDID_PRESENT',
+    'V4L2_CID_DV_TX_MODE',
+    'V4L2_CID_DV_TX_RGB_RANGE',
+    'V4L2_CID_DV_TX_IT_CONTENT_TYPE',
+    'V4L2_CID_DV_RX_POWER_PRESENT',
+    'V4L2_CID_DV_RX_RGB_RANGE',
+    'V4L2_CID_DV_RX_IT_CONTENT_TYPE',
+    'V4L2_CID_FM_RX_CLASS_BASE',
+    'V4L2_CID_FM_RX_CLASS',
+    'V4L2_CID_TUNE_DEEMPHASIS',
+    'V4L2_CID_RDS_RECEPTION',
+    'V4L2_CID_RDS_RX_PTY',
+    'V4L2_CID_RDS_RX_PS_NAME',
+    'V4L2_CID_RDS_RX_RADIO_TEXT',
+    'V4L2_CID_RDS_RX_TRAFFIC_ANNOUNCEMENT',
+    'V4L2_CID_RDS_RX_TRAFFIC_PROGRAM',
+    'V4L2_CID_RDS_RX_MUSIC_SPEECH',
+    'V4L2_CID_RF_TUNER_CLASS_BASE',
+    'V4L2_CID_RF_TUNER_CLASS',
+    'V4L2_CID_RF_TUNER_BANDWIDTH_AUTO',
+    'V4L2_CID_RF_TUNER_BANDWIDTH',
+    'V4L2_CID_RF_TUNER_RF_GAIN',
+    'V4L2_CID_RF_TUNER_LNA_GAIN_AUTO',
+    'V4L2_CID_RF_TUNER_LNA_GAIN',
+    'V4L2_CID_RF_TUNER_MIXER_GAIN_AUTO',
+    'V4L2_CID_RF_TUNER_MIXER_GAIN',
+    'V4L2_CID_RF_TUNER_IF_GAIN_AUTO',
+    'V4L2_CID_RF_TUNER_IF_GAIN',
+    'V4L2_CID_RF_TUNER_PLL_LOCK',
+    'V4L2_CID_DETECT_CLASS_BASE',
+    'V4L2_CID_DETECT_CLASS',
+    'V4L2_CID_DETECT_MD_MODE',
+    'V4L2_CID_DETECT_MD_GLOBAL_THRESHOLD',
+    'V4L2_CID_DETECT_MD_THRESHOLD_GRID',
+    'V4L2_CID_DETECT_MD_REGION_GRID',
+    'V4L2_CID_CODEC_STATELESS_BASE',
+    'V4L2_CID_CODEC_STATELESS_CLASS',
+    'V4L2_CID_STATELESS_H264_DECODE_MODE',
+    'V4L2_CID_STATELESS_H264_START_CODE',
+    'V4L2_H264_SPS_CONSTRAINT_SET0_FLAG',
+    'V4L2_H264_SPS_CONSTRAINT_SET1_FLAG',
+    'V4L2_H264_SPS_CONSTRAINT_SET2_FLAG',
+    'V4L2_H264_SPS_CONSTRAINT_SET3_FLAG',
+    'V4L2_H264_SPS_CONSTRAINT_SET4_FLAG',
+    'V4L2_H264_SPS_CONSTRAINT_SET5_FLAG',
+    'V4L2_H264_SPS_FLAG_SEPARATE_COLOUR_PLANE',
+    'V4L2_H264_SPS_FLAG_QPPRIME_Y_ZERO_TRANSFORM_BYPASS',
+    'V4L2_H264_SPS_FLAG_DELTA_PIC_ORDER_ALWAYS_ZERO',
+    'V4L2_H264_SPS_FLAG_GAPS_IN_FRAME_NUM_VALUE_ALLOWED',
+    'V4L2_H264_SPS_FLAG_FRAME_MBS_ONLY',
+    'V4L2_H264_SPS_FLAG_MB_ADAPTIVE_FRAME_FIELD',
+    'V4L2_H264_SPS_FLAG_DIRECT_8X8_INFERENCE',
+    'V4L2_CID_STATELESS_H264_SPS',
+    'V4L2_H264_PPS_FLAG_ENTROPY_CODING_MODE',
+    'V4L2_H264_PPS_FLAG_BOTTOM_FIELD_PIC_ORDER_IN_FRAME_PRESENT',
+    'V4L2_H264_PPS_FLAG_WEIGHTED_PRED',
+    'V4L2_H264_PPS_FLAG_DEBLOCKING_FILTER_CONTROL_PRESENT',
+    'V4L2_H264_PPS_FLAG_CONSTRAINED_INTRA_PRED',
+    'V4L2_H264_PPS_FLAG_REDUNDANT_PIC_CNT_PRESENT',
+    'V4L2_H264_PPS_FLAG_TRANSFORM_8X8_MODE',
+    'V4L2_H264_PPS_FLAG_SCALING_MATRIX_PRESENT',
+    'V4L2_CID_STATELESS_H264_PPS',
+    'V4L2_CID_STATELESS_H264_SCALING_MATRIX',
+    'V4L2_CID_STATELESS_H264_PRED_WEIGHTS',
+    'V4L2_H264_SLICE_TYPE_P',
+    'V4L2_H264_SLICE_TYPE_B',
+    'V4L2_H264_SLICE_TYPE_I',
+    'V4L2_H264_SLICE_TYPE_SP',
+    'V4L2_H264_SLICE_TYPE_SI',
+    'V4L2_H264_SLICE_FLAG_DIRECT_SPATIAL_MV_PRED',
+    'V4L2_H264_SLICE_FLAG_SP_FOR_SWITCH',
+    'V4L2_H264_TOP_FIELD_REF',
+    'V4L2_H264_BOTTOM_FIELD_REF',
+    'V4L2_H264_FRAME_REF',
+    'V4L2_H264_NUM_DPB_ENTRIES',
+    'V4L2_H264_REF_LIST_LEN',
+    'V4L2_CID_STATELESS_H264_SLICE_PARAMS',
+    'V4L2_H264_DPB_ENTRY_FLAG_VALID',
+    'V4L2_H264_DPB_ENTRY_FLAG_ACTIVE',
+    'V4L2_H264_DPB_ENTRY_FLAG_LONG_TERM',
+    'V4L2_H264_DPB_ENTRY_FLAG_FIELD',
+    'V4L2_H264_DECODE_PARAM_FLAG_IDR_PIC',
+    'V4L2_H264_DECODE_PARAM_FLAG_FIELD_PIC',
+    'V4L2_H264_DECODE_PARAM_FLAG_BOTTOM_FIELD',
+    'V4L2_H264_DECODE_PARAM_FLAG_PFRAME',
+    'V4L2_H264_DECODE_PARAM_FLAG_BFRAME',
+    'V4L2_CID_STATELESS_H264_DECODE_PARAMS',
+    'V4L2_FWHT_VERSION',
+    'V4L2_FWHT_FL_COMPONENTS_NUM_OFFSET',
+    'V4L2_FWHT_FL_PIXENC_OFFSET',
+    'V4L2_FWHT_FL_PIXENC_YUV',
+    'V4L2_FWHT_FL_PIXENC_RGB',
+    'V4L2_FWHT_FL_PIXENC_HSV',
+    'V4L2_CID_STATELESS_FWHT_PARAMS',
+    'V4L2_VP8_SEGMENT_FLAG_ENABLED',
+    'V4L2_VP8_SEGMENT_FLAG_UPDATE_MAP',
+    'V4L2_VP8_SEGMENT_FLAG_UPDATE_FEATURE_DATA',
+    'V4L2_VP8_SEGMENT_FLAG_DELTA_VALUE_MODE',
+    'V4L2_VP8_LF_ADJ_ENABLE',
+    'V4L2_VP8_LF_DELTA_UPDATE',
+    'V4L2_VP8_LF_FILTER_TYPE_SIMPLE',
+    'V4L2_VP8_COEFF_PROB_CNT',
+    'V4L2_VP8_MV_PROB_CNT',
+    'V4L2_VP8_FRAME_FLAG_KEY_FRAME',
+    'V4L2_VP8_FRAME_FLAG_EXPERIMENTAL',
+    'V4L2_VP8_FRAME_FLAG_SHOW_FRAME',
+    'V4L2_VP8_FRAME_FLAG_MB_NO_SKIP_COEFF',
+    'V4L2_VP8_FRAME_FLAG_SIGN_BIAS_GOLDEN',
+    'V4L2_VP8_FRAME_FLAG_SIGN_BIAS_ALT',
+    'V4L2_CID_STATELESS_VP8_FRAME',
+    'V4L2_MPEG2_SEQ_FLAG_PROGRESSIVE',
+    'V4L2_CID_STATELESS_MPEG2_SEQUENCE',
+    'V4L2_MPEG2_PIC_CODING_TYPE_I',
+    'V4L2_MPEG2_PIC_CODING_TYPE_P',
+    'V4L2_MPEG2_PIC_CODING_TYPE_B',
+    'V4L2_MPEG2_PIC_CODING_TYPE_D',
+    'V4L2_MPEG2_PIC_TOP_FIELD',
+    'V4L2_MPEG2_PIC_BOTTOM_FIELD',
+    'V4L2_MPEG2_PIC_FRAME',
+    'V4L2_MPEG2_PIC_FLAG_TOP_FIELD_FIRST',
+    'V4L2_MPEG2_PIC_FLAG_FRAME_PRED_DCT',
+    'V4L2_MPEG2_PIC_FLAG_CONCEALMENT_MV',
+    'V4L2_MPEG2_PIC_FLAG_Q_SCALE_TYPE',
+    'V4L2_MPEG2_PIC_FLAG_INTRA_VLC',
+    'V4L2_MPEG2_PIC_FLAG_ALT_SCAN',
+    'V4L2_MPEG2_PIC_FLAG_REPEAT_FIRST',
+    'V4L2_MPEG2_PIC_FLAG_PROGRESSIVE',
+    'V4L2_CID_STATELESS_MPEG2_PICTURE',
+    'V4L2_CID_STATELESS_MPEG2_QUANTISATION',
+    'V4L2_CID_STATELESS_HEVC_SPS',
+    'V4L2_CID_STATELESS_HEVC_PPS',
+    'V4L2_CID_STATELESS_HEVC_SLICE_PARAMS',
+    'V4L2_CID_STATELESS_HEVC_SCALING_MATRIX',
+    'V4L2_CID_STATELESS_HEVC_DECODE_PARAMS',
+    'V4L2_CID_STATELESS_HEVC_DECODE_MODE',
+    'V4L2_CID_STATELESS_HEVC_START_CODE',
+    'V4L2_CID_STATELESS_HEVC_ENTRY_POINT_OFFSETS',
+    'V4L2_HEVC_SLICE_TYPE_B',
+    'V4L2_HEVC_SLICE_TYPE_P',
+    'V4L2_HEVC_SLICE_TYPE_I',
+    'V4L2_HEVC_DPB_ENTRY_LONG_TERM_REFERENCE',
+    'V4L2_HEVC_SEI_PIC_STRUCT_FRAME',
+    'V4L2_HEVC_SEI_PIC_STRUCT_TOP_FIELD',
+    'V4L2_HEVC_SEI_PIC_STRUCT_BOTTOM_FIELD',
+    'V4L2_HEVC_SEI_PIC_STRUCT_TOP_BOTTOM',
+    'V4L2_HEVC_SEI_PIC_STRUCT_BOTTOM_TOP',
+    'V4L2_HEVC_SEI_PIC_STRUCT_TOP_BOTTOM_TOP',
+    'V4L2_HEVC_SEI_PIC_STRUCT_BOTTOM_TOP_BOTTOM',
+    'V4L2_HEVC_SEI_PIC_STRUCT_FRAME_DOUBLING',
+    'V4L2_HEVC_SEI_PIC_STRUCT_FRAME_TRIPLING',
+    'V4L2_HEVC_SEI_PIC_STRUCT_TOP_PAIRED_PREVIOUS_BOTTOM',
+    'V4L2_HEVC_SEI_PIC_STRUCT_BOTTOM_PAIRED_PREVIOUS_TOP',
+    'V4L2_HEVC_SEI_PIC_STRUCT_TOP_PAIRED_NEXT_BOTTOM',
+    'V4L2_HEVC_SEI_PIC_STRUCT_BOTTOM_PAIRED_NEXT_TOP',
+    'V4L2_HEVC_DPB_ENTRIES_NUM_MAX',
+    'V4L2_HEVC_DECODE_PARAM_FLAG_IRAP_PIC',
+    'V4L2_HEVC_DECODE_PARAM_FLAG_IDR_PIC',
+    'V4L2_HEVC_DECODE_PARAM_FLAG_NO_OUTPUT_OF_PRIOR',
+    'V4L2_CID_COLORIMETRY_CLASS_BASE',
+    'V4L2_CID_COLORIMETRY_CLASS',
+    'V4L2_CID_COLORIMETRY_HDR10_CLL_INFO',
+    'V4L2_CID_COLORIMETRY_HDR10_MASTERING_DISPLAY',
+    'V4L2_HDR10_MASTERING_PRIMARIES_X_LOW',
+    'V4L2_HDR10_MASTERING_PRIMARIES_X_HIGH',
+    'V4L2_HDR10_MASTERING_PRIMARIES_Y_LOW',
+    'V4L2_HDR10_MASTERING_PRIMARIES_Y_HIGH',
+    'V4L2_HDR10_MASTERING_WHITE_POINT_X_LOW',
+    'V4L2_HDR10_MASTERING_WHITE_POINT_X_HIGH',
+    'V4L2_HDR10_MASTERING_WHITE_POINT_Y_LOW',
+    'V4L2_HDR10_MASTERING_WHITE_POINT_Y_HIGH',
+    'V4L2_HDR10_MASTERING_MAX_LUMA_LOW',
+    'V4L2_HDR10_MASTERING_MAX_LUMA_HIGH',
+    'V4L2_HDR10_MASTERING_MIN_LUMA_LOW',
+    'V4L2_HDR10_MASTERING_MIN_LUMA_HIGH',
+    'V4L2_VP9_LOOP_FILTER_FLAG_DELTA_ENABLED',
+    'V4L2_VP9_LOOP_FILTER_FLAG_DELTA_UPDATE',
+    'V4L2_VP9_SEGMENTATION_FLAG_ENABLED',
+    'V4L2_VP9_SEGMENTATION_FLAG_UPDATE_MAP',
+    'V4L2_VP9_SEGMENTATION_FLAG_TEMPORAL_UPDATE',
+    'V4L2_VP9_SEGMENTATION_FLAG_UPDATE_DATA',
+    'V4L2_VP9_SEGMENTATION_FLAG_ABS_OR_DELTA_UPDATE',
+    'V4L2_VP9_SEG_LVL_ALT_Q',
+    'V4L2_VP9_SEG_LVL_ALT_L',
+    'V4L2_VP9_SEG_LVL_REF_FRAME',
+    'V4L2_VP9_SEG_LVL_SKIP',
+    'V4L2_VP9_SEG_LVL_MAX',
+    'V4L2_VP9_SEGMENT_FEATURE_ENABLED_MASK',
+    'V4L2_VP9_FRAME_FLAG_KEY_FRAME',
+    'V4L2_VP9_FRAME_FLAG_SHOW_FRAME',
+    'V4L2_VP9_FRAME_FLAG_ERROR_RESILIENT',
+    'V4L2_VP9_FRAME_FLAG_INTRA_ONLY',
+    'V4L2_VP9_FRAME_FLAG_ALLOW_HIGH_PREC_MV',
+    'V4L2_VP9_FRAME_FLAG_REFRESH_FRAME_CTX',
+    'V4L2_VP9_FRAME_FLAG_PARALLEL_DEC_MODE',
+    'V4L2_VP9_FRAME_FLAG_X_SUBSAMPLING',
+    'V4L2_VP9_FRAME_FLAG_Y_SUBSAMPLING',
+    'V4L2_VP9_FRAME_FLAG_COLOR_RANGE_FULL_SWING',
+    'V4L2_VP9_SIGN_BIAS_LAST',
+    'V4L2_VP9_SIGN_BIAS_GOLDEN',
+    'V4L2_VP9_SIGN_BIAS_ALT',
+    'V4L2_VP9_RESET_FRAME_CTX_NONE',
+    'V4L2_VP9_RESET_FRAME_CTX_SPEC',
+    'V4L2_VP9_RESET_FRAME_CTX_ALL',
+    'V4L2_VP9_INTERP_FILTER_EIGHTTAP',
+    'V4L2_VP9_INTERP_FILTER_EIGHTTAP_SMOOTH',
+    'V4L2_VP9_INTERP_FILTER_EIGHTTAP_SHARP',
+    'V4L2_VP9_INTERP_FILTER_BILINEAR',
+    'V4L2_VP9_INTERP_FILTER_SWITCHABLE',
+    'V4L2_VP9_REFERENCE_MODE_SINGLE_REFERENCE',
+    'V4L2_VP9_REFERENCE_MODE_COMPOUND_REFERENCE',
+    'V4L2_VP9_REFERENCE_MODE_SELECT',
+    'V4L2_VP9_PROFILE_MAX',
+    'V4L2_CID_STATELESS_VP9_FRAME',
+    'V4L2_VP9_NUM_FRAME_CTX',
+    'V4L2_CID_STATELESS_VP9_COMPRESSED_HDR',
+    'V4L2_VP9_TX_MODE_ONLY_4X4',
+    'V4L2_VP9_TX_MODE_ALLOW_8X8',
+    'V4L2_VP9_TX_MODE_ALLOW_16X16',
+    'V4L2_VP9_TX_MODE_ALLOW_32X32',
+    'V4L2_VP9_TX_MODE_SELECT',
+    'V4L2_AV1_TOTAL_REFS_PER_FRAME',
+    'V4L2_AV1_CDEF_MAX',
+    'V4L2_AV1_NUM_PLANES_MAX',
+    'V4L2_AV1_MAX_SEGMENTS',
+    'V4L2_AV1_MAX_OPERATING_POINTS',
+    'V4L2_AV1_REFS_PER_FRAME',
+    'V4L2_AV1_MAX_NUM_Y_POINTS',
+    'V4L2_AV1_MAX_NUM_CB_POINTS',
+    'V4L2_AV1_MAX_NUM_CR_POINTS',
+    'V4L2_AV1_AR_COEFFS_SIZE',
+    'V4L2_AV1_MAX_NUM_PLANES',
+    'V4L2_AV1_MAX_TILE_COLS',
+    'V4L2_AV1_MAX_TILE_ROWS',
+    'V4L2_AV1_MAX_TILE_COUNT',
+    'V4L2_AV1_SEQUENCE_FLAG_STILL_PICTURE',
+    'V4L2_AV1_SEQUENCE_FLAG_USE_128X128_SUPERBLOCK',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_FILTER_INTRA',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_INTRA_EDGE_FILTER',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_INTERINTRA_COMPOUND',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_MASKED_COMPOUND',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_WARPED_MOTION',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_DUAL_FILTER',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_ORDER_HINT',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_JNT_COMP',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_REF_FRAME_MVS',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_SUPERRES',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_CDEF',
+    'V4L2_AV1_SEQUENCE_FLAG_ENABLE_RESTORATION',
+    'V4L2_AV1_SEQUENCE_FLAG_MONO_CHROME',
+    'V4L2_AV1_SEQUENCE_FLAG_COLOR_RANGE',
+    'V4L2_AV1_SEQUENCE_FLAG_SUBSAMPLING_X',
+    'V4L2_AV1_SEQUENCE_FLAG_SUBSAMPLING_Y',
+    'V4L2_AV1_SEQUENCE_FLAG_FILM_GRAIN_PARAMS_PRESENT',
+    'V4L2_AV1_SEQUENCE_FLAG_SEPARATE_UV_DELTA_Q',
+    'V4L2_CID_STATELESS_AV1_SEQUENCE',
+    'V4L2_CID_STATELESS_AV1_TILE_GROUP_ENTRY',
+    'V4L2_AV1_GLOBAL_MOTION_FLAG_IS_GLOBAL',
+    'V4L2_AV1_GLOBAL_MOTION_FLAG_IS_ROT_ZOOM',
+    'V4L2_AV1_GLOBAL_MOTION_FLAG_IS_TRANSLATION',
+    'V4L2_AV1_LOOP_RESTORATION_FLAG_USES_LR',
+    'V4L2_AV1_LOOP_RESTORATION_FLAG_USES_CHROMA_LR',
+    'V4L2_AV1_SEGMENTATION_FLAG_ENABLED',
+    'V4L2_AV1_SEGMENTATION_FLAG_UPDATE_MAP',
+    'V4L2_AV1_SEGMENTATION_FLAG_TEMPORAL_UPDATE',
+    'V4L2_AV1_SEGMENTATION_FLAG_UPDATE_DATA',
+    'V4L2_AV1_SEGMENTATION_FLAG_SEG_ID_PRE_SKIP',
+    'V4L2_AV1_LOOP_FILTER_FLAG_DELTA_ENABLED',
+    'V4L2_AV1_LOOP_FILTER_FLAG_DELTA_UPDATE',
+    'V4L2_AV1_LOOP_FILTER_FLAG_DELTA_LF_PRESENT',
+    'V4L2_AV1_LOOP_FILTER_FLAG_DELTA_LF_MULTI',
+    'V4L2_AV1_QUANTIZATION_FLAG_DIFF_UV_DELTA',
+    'V4L2_AV1_QUANTIZATION_FLAG_USING_QMATRIX',
+    'V4L2_AV1_QUANTIZATION_FLAG_DELTA_Q_PRESENT',
+    'V4L2_AV1_TILE_INFO_FLAG_UNIFORM_TILE_SPACING',
+    'V4L2_AV1_FRAME_FLAG_SHOW_FRAME',
+    'V4L2_AV1_FRAME_FLAG_SHOWABLE_FRAME',
+    'V4L2_AV1_FRAME_FLAG_ERROR_RESILIENT_MODE',
+    'V4L2_AV1_FRAME_FLAG_DISABLE_CDF_UPDATE',
+    'V4L2_AV1_FRAME_FLAG_ALLOW_SCREEN_CONTENT_TOOLS',
+    'V4L2_AV1_FRAME_FLAG_FORCE_INTEGER_MV',
+    'V4L2_AV1_FRAME_FLAG_ALLOW_INTRABC',
+    'V4L2_AV1_FRAME_FLAG_USE_SUPERRES',
+    'V4L2_AV1_FRAME_FLAG_ALLOW_HIGH_PRECISION_MV',
+    'V4L2_AV1_FRAME_FLAG_IS_MOTION_MODE_SWITCHABLE',
+    'V4L2_AV1_FRAME_FLAG_USE_REF_FRAME_MVS',
+    'V4L2_AV1_FRAME_FLAG_DISABLE_FRAME_END_UPDATE_CDF',
+    'V4L2_AV1_FRAME_FLAG_ALLOW_WARPED_MOTION',
+    'V4L2_AV1_FRAME_FLAG_REFERENCE_SELECT',
+    'V4L2_AV1_FRAME_FLAG_REDUCED_TX_SET',
+    'V4L2_AV1_FRAME_FLAG_SKIP_MODE_ALLOWED',
+    'V4L2_AV1_FRAME_FLAG_SKIP_MODE_PRESENT',
+    'V4L2_AV1_FRAME_FLAG_FRAME_SIZE_OVERRIDE',
+    'V4L2_AV1_FRAME_FLAG_BUFFER_REMOVAL_TIME_PRESENT',
+    'V4L2_AV1_FRAME_FLAG_FRAME_REFS_SHORT_SIGNALING',
+    'V4L2_CID_STATELESS_AV1_FRAME',
+    'V4L2_AV1_FILM_GRAIN_FLAG_APPLY_GRAIN',
+    'V4L2_AV1_FILM_GRAIN_FLAG_UPDATE_GRAIN',
+    'V4L2_AV1_FILM_GRAIN_FLAG_CHROMA_SCALING_FROM_LUMA',
+    'V4L2_AV1_FILM_GRAIN_FLAG_OVERLAP',
+    'V4L2_AV1_FILM_GRAIN_FLAG_CLIP_TO_RESTRICTED_RANGE',
+    'V4L2_CID_STATELESS_AV1_FILM_GRAIN',
+    'V4L2_CTRL_CLASS_MPEG',
+    'V4L2_CID_MPEG_CLASS',
+    'V4L2_CID_MPEG_BASE',
+    'V4L2_CID_MPEG_CX2341X_BASE',
+    'V4L2_CID_MPEG_MFC51_BASE',
+    'V4L2_FOURCC_CONV',
+    'V4L2_TUNER_ADC',
+    'V4L2_COLORSPACE_ADOBERGB',
+    'V4L2_XFER_FUNC_ADOBERGB',
+    'V4L2_CAP_VIDEO_CAPTURE',
+    'V4L2_CAP_VIDEO_OUTPUT',
+    'V4L2_CAP_VIDEO_OVERLAY',
+    'V4L2_CAP_VBI_CAPTURE',
+    'V4L2_CAP_VBI_OUTPUT',
+    'V4L2_CAP_SLICED_VBI_CAPTURE',
+    'V4L2_CAP_SLICED_VBI_OUTPUT',
+    'V4L2_CAP_RDS_CAPTURE',
+    'V4L2_CAP_VIDEO_OUTPUT_OVERLAY',
+    'V4L2_CAP_HW_FREQ_SEEK',
+    'V4L2_CAP_RDS_OUTPUT',
+    'V4L2_CAP_VIDEO_CAPTURE_MPLANE',
+    'V4L2_CAP_VIDEO_OUTPUT_MPLANE',
+    'V4L2_CAP_VIDEO_M2M_MPLANE',
+    'V4L2_CAP_VIDEO_M2M',
+    'V4L2_CAP_TUNER',
+    'V4L2_CAP_AUDIO',
+    'V4L2_CAP_RADIO',
+    'V4L2_CAP_MODULATOR',
+    'V4L2_CAP_SDR_CAPTURE',
+    'V4L2_CAP_EXT_PIX_FORMAT',
+    'V4L2_CAP_SDR_OUTPUT',
+    'V4L2_CAP_META_CAPTURE',
+    'V4L2_CAP_READWRITE',
+    'V4L2_CAP_EDID',
+    'V4L2_CAP_STREAMING',
+    'V4L2_CAP_META_OUTPUT',
+    'V4L2_CAP_TOUCH',
+    'V4L2_CAP_IO_MC',
+    'V4L2_CAP_DEVICE_CAPS',
+    'V4L2_PIX_FMT_RGB332',
+    'V4L2_PIX_FMT_RGB444',
+    'V4L2_PIX_FMT_ARGB444',
+    'V4L2_PIX_FMT_XRGB444',
+    'V4L2_PIX_FMT_RGBA444',
+    'V4L2_PIX_FMT_RGBX444',
+    'V4L2_PIX_FMT_ABGR444',
+    'V4L2_PIX_FMT_XBGR444',
+    'V4L2_PIX_FMT_BGRA444',
+    'V4L2_PIX_FMT_BGRX444',
+    'V4L2_PIX_FMT_RGB555',
+    'V4L2_PIX_FMT_ARGB555',
+    'V4L2_PIX_FMT_XRGB555',
+    'V4L2_PIX_FMT_RGBA555',
+    'V4L2_PIX_FMT_RGBX555',
+    'V4L2_PIX_FMT_ABGR555',
+    'V4L2_PIX_FMT_XBGR555',
+    'V4L2_PIX_FMT_BGRA555',
+    'V4L2_PIX_FMT_BGRX555',
+    'V4L2_PIX_FMT_RGB565',
+    'V4L2_PIX_FMT_RGB555X',
+    'V4L2_PIX_FMT_ARGB555X',
+    'V4L2_PIX_FMT_XRGB555X',
+    'V4L2_PIX_FMT_RGB565X',
+    'V4L2_PIX_FMT_BGR666',
+    'V4L2_PIX_FMT_BGR24',
+    'V4L2_PIX_FMT_RGB24',
+    'V4L2_PIX_FMT_BGR32',
+    'V4L2_PIX_FMT_ABGR32',
+    'V4L2_PIX_FMT_XBGR32',
+    'V4L2_PIX_FMT_BGRA32',
+    'V4L2_PIX_FMT_BGRX32',
+    'V4L2_PIX_FMT_RGB32',
+    'V4L2_PIX_FMT_RGBA32',
+    'V4L2_PIX_FMT_RGBX32',
+    'V4L2_PIX_FMT_ARGB32',
+    'V4L2_PIX_FMT_XRGB32',
+    'V4L2_PIX_FMT_RGBX1010102',
+    'V4L2_PIX_FMT_RGBA1010102',
+    'V4L2_PIX_FMT_ARGB2101010',
+    'V4L2_PIX_FMT_BGR48_12',
+    'V4L2_PIX_FMT_BGR48',
+    'V4L2_PIX_FMT_RGB48',
+    'V4L2_PIX_FMT_ABGR64_12',
+    'V4L2_PIX_FMT_GREY',
+    'V4L2_PIX_FMT_Y4',
+    'V4L2_PIX_FMT_Y6',
+    'V4L2_PIX_FMT_Y10',
+    'V4L2_PIX_FMT_Y12',
+    'V4L2_PIX_FMT_Y012',
+    'V4L2_PIX_FMT_Y14',
+    'V4L2_PIX_FMT_Y16',
+    'V4L2_PIX_FMT_Y16_BE',
+    'V4L2_PIX_FMT_Y10BPACK',
+    'V4L2_PIX_FMT_Y10P',
+    'V4L2_PIX_FMT_IPU3_Y10',
+    'V4L2_PIX_FMT_Y12P',
+    'V4L2_PIX_FMT_Y14P',
+    'V4L2_PIX_FMT_PAL8',
+    'V4L2_PIX_FMT_UV8',
+    'V4L2_PIX_FMT_YUYV',
+    'V4L2_PIX_FMT_YYUV',
+    'V4L2_PIX_FMT_YVYU',
+    'V4L2_PIX_FMT_UYVY',
+    'V4L2_PIX_FMT_VYUY',
+    'V4L2_PIX_FMT_Y41P',
+    'V4L2_PIX_FMT_YUV444',
+    'V4L2_PIX_FMT_YUV555',
+    'V4L2_PIX_FMT_YUV565',
+    'V4L2_PIX_FMT_YUV24',
+    'V4L2_PIX_FMT_YUV32',
+    'V4L2_PIX_FMT_AYUV32',
+    'V4L2_PIX_FMT_XYUV32',
+    'V4L2_PIX_FMT_VUYA32',
+    'V4L2_PIX_FMT_VUYX32',
+    'V4L2_PIX_FMT_YUVA32',
+    'V4L2_PIX_FMT_YUVX32',
+    'V4L2_PIX_FMT_M420',
+    'V4L2_PIX_FMT_YUV48_12',
+    'V4L2_PIX_FMT_Y210',
+    'V4L2_PIX_FMT_Y212',
+    'V4L2_PIX_FMT_Y216',
+    'V4L2_PIX_FMT_NV12',
+    'V4L2_PIX_FMT_NV21',
+    'V4L2_PIX_FMT_NV16',
+    'V4L2_PIX_FMT_NV61',
+    'V4L2_PIX_FMT_NV24',
+    'V4L2_PIX_FMT_NV42',
+    'V4L2_PIX_FMT_P010',
+    'V4L2_PIX_FMT_P012',
+    'V4L2_PIX_FMT_NV12M',
+    'V4L2_PIX_FMT_NV21M',
+    'V4L2_PIX_FMT_NV16M',
+    'V4L2_PIX_FMT_NV61M',
+    'V4L2_PIX_FMT_P012M',
+    'V4L2_PIX_FMT_YUV410',
+    'V4L2_PIX_FMT_YVU410',
+    'V4L2_PIX_FMT_YUV411P',
+    'V4L2_PIX_FMT_YUV420',
+    'V4L2_PIX_FMT_YVU420',
+    'V4L2_PIX_FMT_YUV422P',
+    'V4L2_PIX_FMT_YUV420M',
+    'V4L2_PIX_FMT_YVU420M',
+    'V4L2_PIX_FMT_YUV422M',
+    'V4L2_PIX_FMT_YVU422M',
+    'V4L2_PIX_FMT_YUV444M',
+    'V4L2_PIX_FMT_YVU444M',
+    'V4L2_PIX_FMT_NV12_4L4',
+    'V4L2_PIX_FMT_NV12_16L16',
+    'V4L2_PIX_FMT_NV12_32L32',
+    'V4L2_PIX_FMT_NV15_4L4',
+    'V4L2_PIX_FMT_P010_4L4',
+    'V4L2_PIX_FMT_NV12_8L128',
+    'V4L2_PIX_FMT_NV12_10BE_8L128',
+    'V4L2_PIX_FMT_NV12_COL128',
+    'V4L2_PIX_FMT_NV12_10_COL128',
+    'V4L2_PIX_FMT_NV12MT',
+    'V4L2_PIX_FMT_NV12MT_16X16',
+    'V4L2_PIX_FMT_NV12M_8L128',
+    'V4L2_PIX_FMT_NV12M_10BE_8L128',
+    'V4L2_PIX_FMT_NV12MT_COL128',
+    'V4L2_PIX_FMT_NV12MT_10_COL128',
+    'V4L2_PIX_FMT_SBGGR8',
+    'V4L2_PIX_FMT_SGBRG8',
+    'V4L2_PIX_FMT_SGRBG8',
+    'V4L2_PIX_FMT_SRGGB8',
+    'V4L2_PIX_FMT_SBGGR10',
+    'V4L2_PIX_FMT_SGBRG10',
+    'V4L2_PIX_FMT_SGRBG10',
+    'V4L2_PIX_FMT_SRGGB10',
+    'V4L2_PIX_FMT_SBGGR10P',
+    'V4L2_PIX_FMT_SGBRG10P',
+    'V4L2_PIX_FMT_SGRBG10P',
+    'V4L2_PIX_FMT_SRGGB10P',
+    'V4L2_PIX_FMT_SBGGR10ALAW8',
+    'V4L2_PIX_FMT_SGBRG10ALAW8',
+    'V4L2_PIX_FMT_SGRBG10ALAW8',
+    'V4L2_PIX_FMT_SRGGB10ALAW8',
+    'V4L2_PIX_FMT_SBGGR10DPCM8',
+    'V4L2_PIX_FMT_SGBRG10DPCM8',
+    'V4L2_PIX_FMT_SGRBG10DPCM8',
+    'V4L2_PIX_FMT_SRGGB10DPCM8',
+    'V4L2_PIX_FMT_SBGGR12',
+    'V4L2_PIX_FMT_SGBRG12',
+    'V4L2_PIX_FMT_SGRBG12',
+    'V4L2_PIX_FMT_SRGGB12',
+    'V4L2_PIX_FMT_SBGGR12P',
+    'V4L2_PIX_FMT_SGBRG12P',
+    'V4L2_PIX_FMT_SGRBG12P',
+    'V4L2_PIX_FMT_SRGGB12P',
+    'V4L2_PIX_FMT_SBGGR14',
+    'V4L2_PIX_FMT_SGBRG14',
+    'V4L2_PIX_FMT_SGRBG14',
+    'V4L2_PIX_FMT_SRGGB14',
+    'V4L2_PIX_FMT_SBGGR14P',
+    'V4L2_PIX_FMT_SGBRG14P',
+    'V4L2_PIX_FMT_SGRBG14P',
+    'V4L2_PIX_FMT_SRGGB14P',
+    'V4L2_PIX_FMT_SBGGR16',
+    'V4L2_PIX_FMT_SGBRG16',
+    'V4L2_PIX_FMT_SGRBG16',
+    'V4L2_PIX_FMT_SRGGB16',
+    'V4L2_PIX_FMT_HSV24',
+    'V4L2_PIX_FMT_HSV32',
+    'V4L2_PIX_FMT_MJPEG',
+    'V4L2_PIX_FMT_JPEG',
+    'V4L2_PIX_FMT_DV',
+    'V4L2_PIX_FMT_MPEG',
+    'V4L2_PIX_FMT_H264',
+    'V4L2_PIX_FMT_H264_NO_SC',
+    'V4L2_PIX_FMT_H264_MVC',
+    'V4L2_PIX_FMT_H263',
+    'V4L2_PIX_FMT_MPEG1',
+    'V4L2_PIX_FMT_MPEG2',
+    'V4L2_PIX_FMT_MPEG2_SLICE',
+    'V4L2_PIX_FMT_MPEG4',
+    'V4L2_PIX_FMT_XVID',
+    'V4L2_PIX_FMT_VC1_ANNEX_G',
+    'V4L2_PIX_FMT_VC1_ANNEX_L',
+    'V4L2_PIX_FMT_VP8',
+    'V4L2_PIX_FMT_VP8_FRAME',
+    'V4L2_PIX_FMT_VP9',
+    'V4L2_PIX_FMT_VP9_FRAME',
+    'V4L2_PIX_FMT_HEVC',
+    'V4L2_PIX_FMT_FWHT',
+    'V4L2_PIX_FMT_FWHT_STATELESS',
+    'V4L2_PIX_FMT_H264_SLICE',
+    'V4L2_PIX_FMT_HEVC_SLICE',
+    'V4L2_PIX_FMT_AV1_FRAME',
+    'V4L2_PIX_FMT_SPK',
+    'V4L2_PIX_FMT_RV30',
+    'V4L2_PIX_FMT_RV40',
+    'V4L2_PIX_FMT_CPIA1',
+    'V4L2_PIX_FMT_WNVA',
+    'V4L2_PIX_FMT_SN9C10X',
+    'V4L2_PIX_FMT_SN9C20X_I420',
+    'V4L2_PIX_FMT_PWC1',
+    'V4L2_PIX_FMT_PWC2',
+    'V4L2_PIX_FMT_ET61X251',
+    'V4L2_PIX_FMT_SPCA501',
+    'V4L2_PIX_FMT_SPCA505',
+    'V4L2_PIX_FMT_SPCA508',
+    'V4L2_PIX_FMT_SPCA561',
+    'V4L2_PIX_FMT_PAC207',
+    'V4L2_PIX_FMT_MR97310A',
+    'V4L2_PIX_FMT_JL2005BCD',
+    'V4L2_PIX_FMT_SN9C2028',
+    'V4L2_PIX_FMT_SQ905C',
+    'V4L2_PIX_FMT_PJPG',
+    'V4L2_PIX_FMT_OV511',
+    'V4L2_PIX_FMT_OV518',
+    'V4L2_PIX_FMT_STV0680',
+    'V4L2_PIX_FMT_TM6000',
+    'V4L2_PIX_FMT_CIT_YYVYUY',
+    'V4L2_PIX_FMT_KONICA420',
+    'V4L2_PIX_FMT_JPGL',
+    'V4L2_PIX_FMT_SE401',
+    'V4L2_PIX_FMT_S5C_UYVY_JPG',
+    'V4L2_PIX_FMT_Y8I',
+    'V4L2_PIX_FMT_Y12I',
+    'V4L2_PIX_FMT_Z16',
+    'V4L2_PIX_FMT_MT21C',
+    'V4L2_PIX_FMT_MM21',
+    'V4L2_PIX_FMT_MT2110T',
+    'V4L2_PIX_FMT_MT2110R',
+    'V4L2_PIX_FMT_INZI',
+    'V4L2_PIX_FMT_CNF4',
+    'V4L2_PIX_FMT_HI240',
+    'V4L2_PIX_FMT_QC08C',
+    'V4L2_PIX_FMT_QC10C',
+    'V4L2_PIX_FMT_AJPG',
+    'V4L2_PIX_FMT_HEXTILE',
+    'V4L2_PIX_FMT_IPU3_SBGGR10',
+    'V4L2_PIX_FMT_IPU3_SGBRG10',
+    'V4L2_PIX_FMT_IPU3_SGRBG10',
+    'V4L2_PIX_FMT_IPU3_SRGGB10',
+    'V4L2_PIX_FMT_PISP_COMP1_RGGB',
+    'V4L2_PIX_FMT_PISP_COMP1_GRBG',
+    'V4L2_PIX_FMT_PISP_COMP1_GBRG',
+    'V4L2_PIX_FMT_PISP_COMP1_BGGR',
+    'V4L2_PIX_FMT_PISP_COMP1_MONO',
+    'V4L2_PIX_FMT_PISP_COMP2_RGGB',
+    'V4L2_PIX_FMT_PISP_COMP2_GRBG',
+    'V4L2_PIX_FMT_PISP_COMP2_GBRG',
+    'V4L2_PIX_FMT_PISP_COMP2_BGGR',
+    'V4L2_PIX_FMT_PISP_COMP2_MONO',
+    'V4L2_PIX_FMT_RPI_BE',
+    'V4L2_PIX_FMT_PISP_COMP1_RGGB',
+    'V4L2_PIX_FMT_PISP_COMP1_GRBG',
+    'V4L2_PIX_FMT_PISP_COMP1_GBRG',
+    'V4L2_PIX_FMT_PISP_COMP1_BGGR',
+    'V4L2_PIX_FMT_PISP_COMP2_RGGB',
+    'V4L2_PIX_FMT_PISP_COMP2_GRBG',
+    'V4L2_PIX_FMT_PISP_COMP2_GBRG',
+    'V4L2_PIX_FMT_PISP_COMP2_BGGR',
+    'V4L2_SDR_FMT_CU8',
+    'V4L2_SDR_FMT_CU16LE',
+    'V4L2_SDR_FMT_CS8',
+    'V4L2_SDR_FMT_CS14LE',
+    'V4L2_SDR_FMT_RU12LE',
+    'V4L2_SDR_FMT_PCU16BE',
+    'V4L2_SDR_FMT_PCU18BE',
+    'V4L2_SDR_FMT_PCU20BE',
+    'V4L2_TCH_FMT_DELTA_TD16',
+    'V4L2_TCH_FMT_DELTA_TD08',
+    'V4L2_TCH_FMT_TU16',
+    'V4L2_TCH_FMT_TU08',
+    'V4L2_META_FMT_VSP1_HGO',
+    'V4L2_META_FMT_VSP1_HGT',
+    'V4L2_META_FMT_UVC',
+    'V4L2_META_FMT_D4XX',
+    'V4L2_META_FMT_VIVID',
+    'V4L2_META_FMT_SENSOR_DATA',
+    'V4L2_META_FMT_BCM2835_ISP_STATS',
+    'V4L2_META_FMT_RK_ISP1_PARAMS',
+    'V4L2_META_FMT_RK_ISP1_STAT_3A',
+    'V4L2_META_FMT_RK_ISP1_EXT_PARAMS',
+    'V4L2_META_FMT_RPI_BE_CFG',
+    'V4L2_META_FMT_RPI_FE_CFG',
+    'V4L2_META_FMT_RPI_FE_STATS',
+    'V4L2_PIX_FMT_PRIV_MAGIC',
+    'V4L2_PIX_FMT_FLAG_PREMUL_ALPHA',
+    'V4L2_PIX_FMT_FLAG_SET_CSC',
+    'V4L2_FMT_FLAG_COMPRESSED',
+    'V4L2_FMT_FLAG_EMULATED',
+    'V4L2_FMT_FLAG_CONTINUOUS_BYTESTREAM',
+    'V4L2_FMT_FLAG_DYN_RESOLUTION',
+    'V4L2_FMT_FLAG_ENC_CAP_FRAME_INTERVAL',
+    'V4L2_FMT_FLAG_CSC_COLORSPACE',
+    'V4L2_FMT_FLAG_CSC_XFER_FUNC',
+    'V4L2_FMT_FLAG_CSC_YCBCR_ENC',
+    'V4L2_FMT_FLAG_CSC_HSV_ENC',
+    'V4L2_FMT_FLAG_CSC_QUANTIZATION',
+    'V4L2_FMT_FLAG_META_LINE_BASED',
+    'V4L2_TC_TYPE_24FPS',
+    'V4L2_TC_TYPE_25FPS',
+    'V4L2_TC_TYPE_30FPS',
+    'V4L2_TC_TYPE_50FPS',
+    'V4L2_TC_TYPE_60FPS',
+    'V4L2_TC_FLAG_DROPFRAME',
+    'V4L2_TC_FLAG_COLORFRAME',
+    'V4L2_TC_USERBITS_field',
+    'V4L2_TC_USERBITS_USERDEFINED',
+    'V4L2_TC_USERBITS_8BITCHARS',
+    'V4L2_MEMORY_FLAG_NON_COHERENT',
+    'V4L2_BUF_CAP_SUPPORTS_MMAP',
+    'V4L2_BUF_CAP_SUPPORTS_USERPTR',
+    'V4L2_BUF_CAP_SUPPORTS_DMABUF',
+    'V4L2_BUF_CAP_SUPPORTS_REQUESTS',
+    'V4L2_BUF_CAP_SUPPORTS_ORPHANED_BUFS',
+    'V4L2_BUF_CAP_SUPPORTS_M2M_HOLD_CAPTURE_BUF',
+    'V4L2_BUF_CAP_SUPPORTS_MMAP_CACHE_HINTS',
+    'V4L2_BUF_CAP_SUPPORTS_MAX_NUM_BUFFERS',
+    'V4L2_BUF_CAP_SUPPORTS_REMOVE_BUFS',
+    'V4L2_BUF_FLAG_MAPPED',
+    'V4L2_BUF_FLAG_QUEUED',
+    'V4L2_BUF_FLAG_DONE',
+    'V4L2_BUF_FLAG_KEYFRAME',
+    'V4L2_BUF_FLAG_PFRAME',
+    'V4L2_BUF_FLAG_BFRAME',
+    'V4L2_BUF_FLAG_ERROR',
+    'V4L2_BUF_FLAG_IN_REQUEST',
+    'V4L2_BUF_FLAG_TIMECODE',
+    'V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF',
+    'V4L2_BUF_FLAG_PREPARED',
+    'V4L2_BUF_FLAG_NO_CACHE_INVALIDATE',
+    'V4L2_BUF_FLAG_NO_CACHE_CLEAN',
+    'V4L2_BUF_FLAG_TIMESTAMP_MASK',
+    'V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN',
+    'V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC',
+    'V4L2_BUF_FLAG_TIMESTAMP_COPY',
+    'V4L2_BUF_FLAG_TSTAMP_SRC_MASK',
+    'V4L2_BUF_FLAG_TSTAMP_SRC_EOF',
+    'V4L2_BUF_FLAG_TSTAMP_SRC_SOE',
+    'V4L2_BUF_FLAG_LAST',
+    'V4L2_BUF_FLAG_REQUEST_FD',
+    'V4L2_FBUF_CAP_EXTERNOVERLAY',
+    'V4L2_FBUF_CAP_CHROMAKEY',
+    'V4L2_FBUF_CAP_LIST_CLIPPING',
+    'V4L2_FBUF_CAP_BITMAP_CLIPPING',
+    'V4L2_FBUF_CAP_LOCAL_ALPHA',
+    'V4L2_FBUF_CAP_GLOBAL_ALPHA',
+    'V4L2_FBUF_CAP_LOCAL_INV_ALPHA',
+    'V4L2_FBUF_CAP_SRC_CHROMAKEY',
+    'V4L2_FBUF_FLAG_PRIMARY',
+    'V4L2_FBUF_FLAG_OVERLAY',
+    'V4L2_FBUF_FLAG_CHROMAKEY',
+    'V4L2_FBUF_FLAG_LOCAL_ALPHA',
+    'V4L2_FBUF_FLAG_GLOBAL_ALPHA',
+    'V4L2_FBUF_FLAG_LOCAL_INV_ALPHA',
+    'V4L2_FBUF_FLAG_SRC_CHROMAKEY',
+    'V4L2_MODE_HIGHQUALITY',
+    'V4L2_CAP_TIMEPERFRAME',
+    'V4L2_STD_PAL_B',
+    'V4L2_STD_PAL_B1',
+    'V4L2_STD_PAL_G',
+    'V4L2_STD_PAL_H',
+    'V4L2_STD_PAL_I',
+    'V4L2_STD_PAL_D',
+    'V4L2_STD_PAL_D1',
+    'V4L2_STD_PAL_K',
+    'V4L2_STD_PAL_M',
+    'V4L2_STD_PAL_N',
+    'V4L2_STD_PAL_Nc',
+    'V4L2_STD_PAL_60',
+    'V4L2_STD_NTSC_M',
+    'V4L2_STD_NTSC_M_JP',
+    'V4L2_STD_NTSC_443',
+    'V4L2_STD_NTSC_M_KR',
+    'V4L2_STD_SECAM_B',
+    'V4L2_STD_SECAM_D',
+    'V4L2_STD_SECAM_G',
+    'V4L2_STD_SECAM_H',
+    'V4L2_STD_SECAM_K',
+    'V4L2_STD_SECAM_K1',
+    'V4L2_STD_SECAM_L',
+    'V4L2_STD_SECAM_LC',
+    'V4L2_STD_ATSC_8_VSB',
+    'V4L2_STD_ATSC_16_VSB',
+    'V4L2_STD_NTSC',
+    'V4L2_STD_SECAM_DK',
+    'V4L2_STD_SECAM',
+    'V4L2_STD_PAL_BG',
+    'V4L2_STD_PAL_DK',
+    'V4L2_STD_PAL',
+    'V4L2_STD_B',
+    'V4L2_STD_G',
+    'V4L2_STD_H',
+    'V4L2_STD_L',
+    'V4L2_STD_GH',
+    'V4L2_STD_DK',
+    'V4L2_STD_BG',
+    'V4L2_STD_MN',
+    'V4L2_STD_MTS',
+    'V4L2_STD_525_60',
+    'V4L2_STD_625_50',
+    'V4L2_STD_ATSC',
+    'V4L2_STD_UNKNOWN',
+    'V4L2_STD_ALL',
+    'V4L2_DV_PROGRESSIVE',
+    'V4L2_DV_INTERLACED',
+    'V4L2_DV_VSYNC_POS_POL',
+    'V4L2_DV_HSYNC_POS_POL',
+    'V4L2_DV_BT_STD_CEA861',
+    'V4L2_DV_BT_STD_DMT',
+    'V4L2_DV_BT_STD_CVT',
+    'V4L2_DV_BT_STD_GTF',
+    'V4L2_DV_BT_STD_SDI',
+    'V4L2_DV_FL_REDUCED_BLANKING',
+    'V4L2_DV_FL_CAN_REDUCE_FPS',
+    'V4L2_DV_FL_REDUCED_FPS',
+    'V4L2_DV_FL_HALF_LINE',
+    'V4L2_DV_FL_IS_CE_VIDEO',
+    'V4L2_DV_FL_FIRST_FIELD_EXTRA_LINE',
+    'V4L2_DV_FL_HAS_PICTURE_ASPECT',
+    'V4L2_DV_FL_HAS_CEA861_VIC',
+    'V4L2_DV_FL_HAS_HDMI_VIC',
+    'V4L2_DV_FL_CAN_DETECT_REDUCED_FPS',
+    'V4L2_DV_BT_656_1120',
+    'V4L2_DV_BT_CAP_INTERLACED',
+    'V4L2_DV_BT_CAP_PROGRESSIVE',
+    'V4L2_DV_BT_CAP_REDUCED_BLANKING',
+    'V4L2_DV_BT_CAP_CUSTOM',
+    'V4L2_INPUT_TYPE_TUNER',
+    'V4L2_INPUT_TYPE_CAMERA',
+    'V4L2_INPUT_TYPE_TOUCH',
+    'V4L2_IN_ST_NO_POWER',
+    'V4L2_IN_ST_NO_SIGNAL',
+    'V4L2_IN_ST_NO_COLOR',
+    'V4L2_IN_ST_HFLIP',
+    'V4L2_IN_ST_VFLIP',
+    'V4L2_IN_ST_NO_H_LOCK',
+    'V4L2_IN_ST_COLOR_KILL',
+    'V4L2_IN_ST_NO_V_LOCK',
+    'V4L2_IN_ST_NO_STD_LOCK',
+    'V4L2_IN_ST_NO_SYNC',
+    'V4L2_IN_ST_NO_EQU',
+    'V4L2_IN_ST_NO_CARRIER',
+    'V4L2_IN_ST_MACROVISION',
+    'V4L2_IN_ST_NO_ACCESS',
+    'V4L2_IN_ST_VTR',
+    'V4L2_IN_CAP_DV_TIMINGS',
+    'V4L2_IN_CAP_CUSTOM_TIMINGS',
+    'V4L2_IN_CAP_STD',
+    'V4L2_IN_CAP_NATIVE_SIZE',
+    'V4L2_OUTPUT_TYPE_MODULATOR',
+    'V4L2_OUTPUT_TYPE_ANALOG',
+    'V4L2_OUTPUT_TYPE_ANALOGVGAOVERLAY',
+    'V4L2_OUT_CAP_DV_TIMINGS',
+    'V4L2_OUT_CAP_CUSTOM_TIMINGS',
+    'V4L2_OUT_CAP_STD',
+    'V4L2_OUT_CAP_NATIVE_SIZE',
+    'V4L2_CTRL_ID_MASK',
+    'V4L2_CTRL_MAX_DIMS',
+    'V4L2_CTRL_WHICH_CUR_VAL',
+    'V4L2_CTRL_WHICH_DEF_VAL',
+    'V4L2_CTRL_WHICH_REQUEST_VAL',
+    'V4L2_CTRL_FLAG_DISABLED',
+    'V4L2_CTRL_FLAG_GRABBED',
+    'V4L2_CTRL_FLAG_READ_ONLY',
+    'V4L2_CTRL_FLAG_UPDATE',
+    'V4L2_CTRL_FLAG_INACTIVE',
+    'V4L2_CTRL_FLAG_SLIDER',
+    'V4L2_CTRL_FLAG_WRITE_ONLY',
+    'V4L2_CTRL_FLAG_VOLATILE',
+    'V4L2_CTRL_FLAG_HAS_PAYLOAD',
+    'V4L2_CTRL_FLAG_EXECUTE_ON_WRITE',
+    'V4L2_CTRL_FLAG_MODIFY_LAYOUT',
+    'V4L2_CTRL_FLAG_DYNAMIC_ARRAY',
+    'V4L2_CTRL_FLAG_NEXT_CTRL',
+    'V4L2_CTRL_FLAG_NEXT_COMPOUND',
+    'V4L2_CID_MAX_CTRLS',
+    'V4L2_CID_PRIVATE_BASE',
+    'V4L2_TUNER_CAP_LOW',
+    'V4L2_TUNER_CAP_NORM',
+    'V4L2_TUNER_CAP_HWSEEK_BOUNDED',
+    'V4L2_TUNER_CAP_HWSEEK_WRAP',
+    'V4L2_TUNER_CAP_STEREO',
+    'V4L2_TUNER_CAP_LANG2',
+    'V4L2_TUNER_CAP_SAP',
+    'V4L2_TUNER_CAP_LANG1',
+    'V4L2_TUNER_CAP_RDS',
+    'V4L2_TUNER_CAP_RDS_BLOCK_IO',
+    'V4L2_TUNER_CAP_RDS_CONTROLS',
+    'V4L2_TUNER_CAP_FREQ_BANDS',
+    'V4L2_TUNER_CAP_HWSEEK_PROG_LIM',
+    'V4L2_TUNER_CAP_1HZ',
+    'V4L2_TUNER_SUB_MONO',
+    'V4L2_TUNER_SUB_STEREO',
+    'V4L2_TUNER_SUB_LANG2',
+    'V4L2_TUNER_SUB_SAP',
+    'V4L2_TUNER_SUB_LANG1',
+    'V4L2_TUNER_SUB_RDS',
+    'V4L2_TUNER_MODE_MONO',
+    'V4L2_TUNER_MODE_STEREO',
+    'V4L2_TUNER_MODE_LANG2',
+    'V4L2_TUNER_MODE_SAP',
+    'V4L2_TUNER_MODE_LANG1',
+    'V4L2_TUNER_MODE_LANG1_LANG2',
+    'V4L2_BAND_MODULATION_VSB',
+    'V4L2_BAND_MODULATION_FM',
+    'V4L2_BAND_MODULATION_AM',
+    'V4L2_RDS_BLOCK_MSK',
+    'V4L2_RDS_BLOCK_A',
+    'V4L2_RDS_BLOCK_B',
+    'V4L2_RDS_BLOCK_C',
+    'V4L2_RDS_BLOCK_D',
+    'V4L2_RDS_BLOCK_C_ALT',
+    'V4L2_RDS_BLOCK_INVALID',
+    'V4L2_RDS_BLOCK_CORRECTED',
+    'V4L2_RDS_BLOCK_ERROR',
+    'V4L2_AUDCAP_STEREO',
+    'V4L2_AUDCAP_AVL',
+    'V4L2_AUDMODE_AVL',
+    'V4L2_ENC_IDX_FRAME_I',
+    'V4L2_ENC_IDX_FRAME_P',
+    'V4L2_ENC_IDX_FRAME_B',
+    'V4L2_ENC_IDX_FRAME_MASK',
+    'V4L2_ENC_IDX_ENTRIES',
+    'V4L2_ENC_CMD_START',
+    'V4L2_ENC_CMD_STOP',
+    'V4L2_ENC_CMD_PAUSE',
+    'V4L2_ENC_CMD_RESUME',
+    'V4L2_ENC_CMD_STOP_AT_GOP_END',
+    'V4L2_DEC_CMD_START',
+    'V4L2_DEC_CMD_STOP',
+    'V4L2_DEC_CMD_PAUSE',
+    'V4L2_DEC_CMD_RESUME',
+    'V4L2_DEC_CMD_FLUSH',
+    'V4L2_DEC_CMD_START_MUTE_AUDIO',
+    'V4L2_DEC_CMD_PAUSE_TO_BLACK',
+    'V4L2_DEC_CMD_STOP_TO_BLACK',
+    'V4L2_DEC_CMD_STOP_IMMEDIATELY',
+    'V4L2_DEC_START_FMT_NONE',
+    'V4L2_DEC_START_FMT_GOP',
+    'V4L2_VBI_UNSYNC',
+    'V4L2_VBI_INTERLACED',
+    'V4L2_VBI_ITU_525_F1_START',
+    'V4L2_VBI_ITU_525_F2_START',
+    'V4L2_VBI_ITU_625_F1_START',
+    'V4L2_VBI_ITU_625_F2_START',
+    'V4L2_SLICED_TELETEXT_B',
+    'V4L2_SLICED_VPS',
+    'V4L2_SLICED_CAPTION_525',
+    'V4L2_SLICED_WSS_625',
+    'V4L2_SLICED_VBI_525',
+    'V4L2_SLICED_VBI_625',
+    'V4L2_MPEG_VBI_IVTV_TELETEXT_B',
+    'V4L2_MPEG_VBI_IVTV_CAPTION_525',
+    'V4L2_MPEG_VBI_IVTV_WSS_625',
+    'V4L2_MPEG_VBI_IVTV_VPS',
+    'V4L2_MPEG_VBI_IVTV_MAGIC0',
+    'V4L2_MPEG_VBI_IVTV_MAGIC1',
+    'V4L2_EVENT_ALL',
+    'V4L2_EVENT_VSYNC',
+    'V4L2_EVENT_EOS',
+    'V4L2_EVENT_CTRL',
+    'V4L2_EVENT_FRAME_SYNC',
+    'V4L2_EVENT_SOURCE_CHANGE',
+    'V4L2_EVENT_MOTION_DET',
+    'V4L2_EVENT_PRIVATE_START',
+    'V4L2_EVENT_CTRL_CH_VALUE',
+    'V4L2_EVENT_CTRL_CH_FLAGS',
+    'V4L2_EVENT_CTRL_CH_RANGE',
+    'V4L2_EVENT_CTRL_CH_DIMENSIONS',
+    'V4L2_EVENT_SRC_CH_RESOLUTION',
+    'V4L2_EVENT_MD_FL_HAVE_FRAME_SEQ',
+    'V4L2_EVENT_SUB_FL_SEND_INITIAL',
+    'V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK',
+    'V4L2_CHIP_MATCH_BRIDGE',
+    'V4L2_CHIP_MATCH_SUBDEV',
+    'V4L2_CHIP_MATCH_HOST',
+    'V4L2_CHIP_MATCH_I2C_DRIVER',
+    'V4L2_CHIP_MATCH_I2C_ADDR',
+    'V4L2_CHIP_MATCH_AC97',
+    'V4L2_CHIP_FL_READABLE',
+    'V4L2_CHIP_FL_WRITABLE',
+    'VIDIOC_QUERYCAP',
+    'VIDIOC_ENUM_FMT',
+    'VIDIOC_G_FMT',
+    'VIDIOC_S_FMT',
+    'VIDIOC_REQBUFS',
+    'VIDIOC_QUERYBUF',
+    'VIDIOC_G_FBUF',
+    'VIDIOC_S_FBUF',
+    'VIDIOC_OVERLAY',
+    'VIDIOC_QBUF',
+    'VIDIOC_EXPBUF',
+    'VIDIOC_DQBUF',
+    'VIDIOC_STREAMON',
+    'VIDIOC_STREAMOFF',
+    'VIDIOC_G_PARM',
+    'VIDIOC_S_PARM',
+    'VIDIOC_ENUMSTD',
+    'VIDIOC_ENUMINPUT',
+    'VIDIOC_G_CTRL',
+    'VIDIOC_S_CTRL',
+    'VIDIOC_G_TUNER',
+    'VIDIOC_S_TUNER',
+    'VIDIOC_G_AUDIO',
+    'VIDIOC_S_AUDIO',
+    'VIDIOC_QUERYCTRL',
+    'VIDIOC_QUERYMENU',
+    'VIDIOC_G_INPUT',
+    'VIDIOC_S_INPUT',
+    'VIDIOC_G_EDID',
+    'VIDIOC_S_EDID',
+    'VIDIOC_G_OUTPUT',
+    'VIDIOC_S_OUTPUT',
+    'VIDIOC_ENUMOUTPUT',
+    'VIDIOC_G_AUDOUT',
+    'VIDIOC_S_AUDOUT',
+    'VIDIOC_G_MODULATOR',
+    'VIDIOC_S_MODULATOR',
+    'VIDIOC_G_FREQUENCY',
+    'VIDIOC_S_FREQUENCY',
+    'VIDIOC_CROPCAP',
+    'VIDIOC_G_CROP',
+    'VIDIOC_S_CROP',
+    'VIDIOC_G_JPEGCOMP',
+    'VIDIOC_S_JPEGCOMP',
+    'VIDIOC_TRY_FMT',
+    'VIDIOC_ENUMAUDIO',
+    'VIDIOC_ENUMAUDOUT',
+    'VIDIOC_G_PRIORITY',
+    'VIDIOC_S_PRIORITY',
+    'VIDIOC_G_SLICED_VBI_CAP',
+    'VIDIOC_LOG_STATUS',
+    'VIDIOC_G_EXT_CTRLS',
+    'VIDIOC_S_EXT_CTRLS',
+    'VIDIOC_TRY_EXT_CTRLS',
+    'VIDIOC_G_ENC_INDEX',
+    'VIDIOC_ENCODER_CMD',
+    'VIDIOC_TRY_ENCODER_CMD',
+    'VIDIOC_DBG_S_REGISTER',
+    'VIDIOC_DBG_G_REGISTER',
+    'VIDIOC_S_HW_FREQ_SEEK',
+    'VIDIOC_S_DV_TIMINGS',
+    'VIDIOC_G_DV_TIMINGS',
+    'VIDIOC_DQEVENT',
+    'VIDIOC_SUBSCRIBE_EVENT',
+    'VIDIOC_UNSUBSCRIBE_EVENT',
+    'VIDIOC_CREATE_BUFS',
+    'VIDIOC_PREPARE_BUF',
+    'VIDIOC_G_SELECTION',
+    'VIDIOC_S_SELECTION',
+    'VIDIOC_DECODER_CMD',
+    'VIDIOC_TRY_DECODER_CMD',
+    'VIDIOC_QUERY_DV_TIMINGS',
+    'VIDIOC_DV_TIMINGS_CAP',
+    'VIDIOC_ENUM_FREQ_BANDS',
+    'VIDIOC_DBG_G_CHIP_INFO',
+    'VIDIOC_QUERY_EXT_CTRL',
+    'VIDIOC_REMOVE_BUFS',
+    'BASE_VIDIOC_PRIVATE',
+    'V4L2_CAP_ASYNCIO',
+    'VIDEO_MAX_PLANES',
+    'V4L2_MAX_PLANES',
+    'VIDIOC_MAX_PLANES',
+    'timeval',
+    'timespec'
+]
+
+# Type aliases for kernel types
+__u8 = c_uint8
+__u16 = c_uint16
+__u32 = c_uint32
+__u64 = c_uint64
+__s8 = c_int8
+__s16 = c_int16
+__s32 = c_int32
+__s64 = c_int64
+
+# Typedefs
+__u_char = c_uint8
+__u_short = c_uint16
+__u_int = c_uint32
+__u_long = c_ulong
+__int8_t = c_int8
+__uint8_t = c_uint8
+__int16_t = c_int16
+__uint16_t = c_uint16
+__int32_t = c_int
+__uint32_t = c_uint32
+__int64_t = c_long
+__uint64_t = c_ulong
+__int_least8_t = c_void_p
+__uint_least8_t = c_void_p
+__int_least16_t = c_void_p
+__uint_least16_t = c_void_p
+__int_least32_t = c_void_p
+__uint_least32_t = c_void_p
+__int_least64_t = c_void_p
+__uint_least64_t = c_void_p
+__quad_t = c_long
+__u_quad_t = c_ulong
+__intmax_t = c_long
+__uintmax_t = c_ulong
+__dev_t = c_ulong
+__uid_t = c_uint32
+__gid_t = c_uint32
+__ino_t = c_ulong
+__ino64_t = c_ulong
+__mode_t = c_uint32
+__nlink_t = c_ulong
+__off_t = c_long
+__off64_t = c_long
+__pid_t = c_int
+__fsid_t = c_void_p
+__clock_t = c_long
+__rlim_t = c_ulong
+__rlim64_t = c_ulong
+__id_t = c_uint32
+__time_t = c_long
+__useconds_t = c_uint32
+__suseconds_t = c_long
+__suseconds64_t = c_long
+__daddr_t = c_int
+__key_t = c_int
+__clockid_t = c_int
+__timer_t = c_void_p
+__blksize_t = c_long
+__blkcnt_t = c_long
+__blkcnt64_t = c_long
+__fsblkcnt_t = c_ulong
+__fsblkcnt64_t = c_ulong
+__fsfilcnt_t = c_ulong
+__fsfilcnt64_t = c_ulong
+__fsword_t = c_long
+__ssize_t = c_long
+__syscall_slong_t = c_long
+__syscall_ulong_t = c_ulong
+__loff_t = c_void_p
+__intptr_t = c_long
+__socklen_t = c_uint32
+__sig_atomic_t = c_int
+time_t = c_void_p
+suseconds_t = c_void_p
+sigset_t = c_void_p
+__fd_mask = c_long
+fd_mask = c_void_p
+__itimer_which_t = c_int
+__kernel_key_t = c_int
+__kernel_mqd_t = c_int
+__kernel_old_uid_t = c_uint16
+__kernel_old_gid_t = c_uint16
+__kernel_old_dev_t = c_ulong
+__kernel_long_t = c_long
+__kernel_ulong_t = c_ulong
+__kernel_ino_t = c_void_p
+__kernel_mode_t = c_uint32
+__kernel_pid_t = c_int
+__kernel_ipc_pid_t = c_int
+__kernel_uid_t = c_uint32
+__kernel_gid_t = c_uint32
+__kernel_suseconds_t = c_void_p
+__kernel_daddr_t = c_int
+__kernel_uid32_t = c_uint32
+__kernel_gid32_t = c_uint32
+__kernel_size_t = c_void_p
+__kernel_ssize_t = c_void_p
+__kernel_ptrdiff_t = c_void_p
+__kernel_off_t = c_void_p
+__kernel_loff_t = c_longlong
+__kernel_old_time_t = c_void_p
+__kernel_time_t = c_void_p
+__kernel_time64_t = c_longlong
+__kernel_clock_t = c_void_p
+__kernel_timer_t = c_int
+__kernel_clockid_t = c_int
+__kernel_caddr_t = c_char_p
+__kernel_uid16_t = c_uint16
+__kernel_gid16_t = c_uint16
+__le16 = c_uint16
+__be16 = c_uint16
+__le32 = c_uint32
+__be32 = c_uint32
+__le64 = c_uint64
+__be64 = c_uint64
+__sum16 = c_uint16
+__wsum = c_uint32
+__poll_t = c_uint
+v4l2_std_id = c_uint64
+
+class v4l2_power_line_frequency(IntEnum):
+    V4L2_CID_POWER_LINE_FREQUENCY_DISABLED = 0
+    V4L2_CID_POWER_LINE_FREQUENCY_50HZ = 1
+    V4L2_CID_POWER_LINE_FREQUENCY_60HZ = 2
+    V4L2_CID_POWER_LINE_FREQUENCY_AUTO = 3
+
+V4L2_CID_POWER_LINE_FREQUENCY_DISABLED = v4l2_power_line_frequency.V4L2_CID_POWER_LINE_FREQUENCY_DISABLED
+V4L2_CID_POWER_LINE_FREQUENCY_50HZ = v4l2_power_line_frequency.V4L2_CID_POWER_LINE_FREQUENCY_50HZ
+V4L2_CID_POWER_LINE_FREQUENCY_60HZ = v4l2_power_line_frequency.V4L2_CID_POWER_LINE_FREQUENCY_60HZ
+V4L2_CID_POWER_LINE_FREQUENCY_AUTO = v4l2_power_line_frequency.V4L2_CID_POWER_LINE_FREQUENCY_AUTO
+
+class v4l2_colorfx(IntEnum):
+    V4L2_COLORFX_NONE = 0
+    V4L2_COLORFX_BW = 1
+    V4L2_COLORFX_SEPIA = 2
+    V4L2_COLORFX_NEGATIVE = 3
+    V4L2_COLORFX_EMBOSS = 4
+    V4L2_COLORFX_SKETCH = 5
+    V4L2_COLORFX_SKY_BLUE = 6
+    V4L2_COLORFX_GRASS_GREEN = 7
+    V4L2_COLORFX_SKIN_WHITEN = 8
+    V4L2_COLORFX_VIVID = 9
+    V4L2_COLORFX_AQUA = 10
+    V4L2_COLORFX_ART_FREEZE = 11
+    V4L2_COLORFX_SILHOUETTE = 12
+    V4L2_COLORFX_SOLARIZATION = 13
+    V4L2_COLORFX_ANTIQUE = 14
+    V4L2_COLORFX_SET_CBCR = 15
+    V4L2_COLORFX_SET_RGB = 16
+
+V4L2_COLORFX_NONE = v4l2_colorfx.V4L2_COLORFX_NONE
+V4L2_COLORFX_BW = v4l2_colorfx.V4L2_COLORFX_BW
+V4L2_COLORFX_SEPIA = v4l2_colorfx.V4L2_COLORFX_SEPIA
+V4L2_COLORFX_NEGATIVE = v4l2_colorfx.V4L2_COLORFX_NEGATIVE
+V4L2_COLORFX_EMBOSS = v4l2_colorfx.V4L2_COLORFX_EMBOSS
+V4L2_COLORFX_SKETCH = v4l2_colorfx.V4L2_COLORFX_SKETCH
+V4L2_COLORFX_SKY_BLUE = v4l2_colorfx.V4L2_COLORFX_SKY_BLUE
+V4L2_COLORFX_GRASS_GREEN = v4l2_colorfx.V4L2_COLORFX_GRASS_GREEN
+V4L2_COLORFX_SKIN_WHITEN = v4l2_colorfx.V4L2_COLORFX_SKIN_WHITEN
+V4L2_COLORFX_VIVID = v4l2_colorfx.V4L2_COLORFX_VIVID
+V4L2_COLORFX_AQUA = v4l2_colorfx.V4L2_COLORFX_AQUA
+V4L2_COLORFX_ART_FREEZE = v4l2_colorfx.V4L2_COLORFX_ART_FREEZE
+V4L2_COLORFX_SILHOUETTE = v4l2_colorfx.V4L2_COLORFX_SILHOUETTE
+V4L2_COLORFX_SOLARIZATION = v4l2_colorfx.V4L2_COLORFX_SOLARIZATION
+V4L2_COLORFX_ANTIQUE = v4l2_colorfx.V4L2_COLORFX_ANTIQUE
+V4L2_COLORFX_SET_CBCR = v4l2_colorfx.V4L2_COLORFX_SET_CBCR
+V4L2_COLORFX_SET_RGB = v4l2_colorfx.V4L2_COLORFX_SET_RGB
+
+class v4l2_mpeg_stream_type(IntEnum):
+    V4L2_MPEG_STREAM_TYPE_MPEG2_PS = 0
+    V4L2_MPEG_STREAM_TYPE_MPEG2_TS = 1
+    V4L2_MPEG_STREAM_TYPE_MPEG1_SS = 2
+    V4L2_MPEG_STREAM_TYPE_MPEG2_DVD = 3
+    V4L2_MPEG_STREAM_TYPE_MPEG1_VCD = 4
+    V4L2_MPEG_STREAM_TYPE_MPEG2_SVCD = 5
+
+V4L2_MPEG_STREAM_TYPE_MPEG2_PS = v4l2_mpeg_stream_type.V4L2_MPEG_STREAM_TYPE_MPEG2_PS
+V4L2_MPEG_STREAM_TYPE_MPEG2_TS = v4l2_mpeg_stream_type.V4L2_MPEG_STREAM_TYPE_MPEG2_TS
+V4L2_MPEG_STREAM_TYPE_MPEG1_SS = v4l2_mpeg_stream_type.V4L2_MPEG_STREAM_TYPE_MPEG1_SS
+V4L2_MPEG_STREAM_TYPE_MPEG2_DVD = v4l2_mpeg_stream_type.V4L2_MPEG_STREAM_TYPE_MPEG2_DVD
+V4L2_MPEG_STREAM_TYPE_MPEG1_VCD = v4l2_mpeg_stream_type.V4L2_MPEG_STREAM_TYPE_MPEG1_VCD
+V4L2_MPEG_STREAM_TYPE_MPEG2_SVCD = v4l2_mpeg_stream_type.V4L2_MPEG_STREAM_TYPE_MPEG2_SVCD
+
+class v4l2_mpeg_stream_vbi_fmt(IntEnum):
+    V4L2_MPEG_STREAM_VBI_FMT_NONE = 0
+    V4L2_MPEG_STREAM_VBI_FMT_IVTV = 1
+
+V4L2_MPEG_STREAM_VBI_FMT_NONE = v4l2_mpeg_stream_vbi_fmt.V4L2_MPEG_STREAM_VBI_FMT_NONE
+V4L2_MPEG_STREAM_VBI_FMT_IVTV = v4l2_mpeg_stream_vbi_fmt.V4L2_MPEG_STREAM_VBI_FMT_IVTV
+
+class v4l2_mpeg_audio_sampling_freq(IntEnum):
+    V4L2_MPEG_AUDIO_SAMPLING_FREQ_44100 = 0
+    V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000 = 1
+    V4L2_MPEG_AUDIO_SAMPLING_FREQ_32000 = 2
+
+V4L2_MPEG_AUDIO_SAMPLING_FREQ_44100 = v4l2_mpeg_audio_sampling_freq.V4L2_MPEG_AUDIO_SAMPLING_FREQ_44100
+V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000 = v4l2_mpeg_audio_sampling_freq.V4L2_MPEG_AUDIO_SAMPLING_FREQ_48000
+V4L2_MPEG_AUDIO_SAMPLING_FREQ_32000 = v4l2_mpeg_audio_sampling_freq.V4L2_MPEG_AUDIO_SAMPLING_FREQ_32000
+
+class v4l2_mpeg_audio_encoding(IntEnum):
+    V4L2_MPEG_AUDIO_ENCODING_LAYER_1 = 0
+    V4L2_MPEG_AUDIO_ENCODING_LAYER_2 = 1
+    V4L2_MPEG_AUDIO_ENCODING_LAYER_3 = 2
+    V4L2_MPEG_AUDIO_ENCODING_AAC = 3
+    V4L2_MPEG_AUDIO_ENCODING_AC3 = 4
+
+V4L2_MPEG_AUDIO_ENCODING_LAYER_1 = v4l2_mpeg_audio_encoding.V4L2_MPEG_AUDIO_ENCODING_LAYER_1
+V4L2_MPEG_AUDIO_ENCODING_LAYER_2 = v4l2_mpeg_audio_encoding.V4L2_MPEG_AUDIO_ENCODING_LAYER_2
+V4L2_MPEG_AUDIO_ENCODING_LAYER_3 = v4l2_mpeg_audio_encoding.V4L2_MPEG_AUDIO_ENCODING_LAYER_3
+V4L2_MPEG_AUDIO_ENCODING_AAC = v4l2_mpeg_audio_encoding.V4L2_MPEG_AUDIO_ENCODING_AAC
+V4L2_MPEG_AUDIO_ENCODING_AC3 = v4l2_mpeg_audio_encoding.V4L2_MPEG_AUDIO_ENCODING_AC3
+
+class v4l2_mpeg_audio_l1_bitrate(IntEnum):
+    V4L2_MPEG_AUDIO_L1_BITRATE_32K = 0
+    V4L2_MPEG_AUDIO_L1_BITRATE_64K = 1
+    V4L2_MPEG_AUDIO_L1_BITRATE_96K = 2
+    V4L2_MPEG_AUDIO_L1_BITRATE_128K = 3
+    V4L2_MPEG_AUDIO_L1_BITRATE_160K = 4
+    V4L2_MPEG_AUDIO_L1_BITRATE_192K = 5
+    V4L2_MPEG_AUDIO_L1_BITRATE_224K = 6
+    V4L2_MPEG_AUDIO_L1_BITRATE_256K = 7
+    V4L2_MPEG_AUDIO_L1_BITRATE_288K = 8
+    V4L2_MPEG_AUDIO_L1_BITRATE_320K = 9
+    V4L2_MPEG_AUDIO_L1_BITRATE_352K = 10
+    V4L2_MPEG_AUDIO_L1_BITRATE_384K = 11
+    V4L2_MPEG_AUDIO_L1_BITRATE_416K = 12
+    V4L2_MPEG_AUDIO_L1_BITRATE_448K = 13
+
+V4L2_MPEG_AUDIO_L1_BITRATE_32K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_32K
+V4L2_MPEG_AUDIO_L1_BITRATE_64K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_64K
+V4L2_MPEG_AUDIO_L1_BITRATE_96K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_96K
+V4L2_MPEG_AUDIO_L1_BITRATE_128K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_128K
+V4L2_MPEG_AUDIO_L1_BITRATE_160K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_160K
+V4L2_MPEG_AUDIO_L1_BITRATE_192K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_192K
+V4L2_MPEG_AUDIO_L1_BITRATE_224K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_224K
+V4L2_MPEG_AUDIO_L1_BITRATE_256K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_256K
+V4L2_MPEG_AUDIO_L1_BITRATE_288K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_288K
+V4L2_MPEG_AUDIO_L1_BITRATE_320K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_320K
+V4L2_MPEG_AUDIO_L1_BITRATE_352K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_352K
+V4L2_MPEG_AUDIO_L1_BITRATE_384K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_384K
+V4L2_MPEG_AUDIO_L1_BITRATE_416K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_416K
+V4L2_MPEG_AUDIO_L1_BITRATE_448K = v4l2_mpeg_audio_l1_bitrate.V4L2_MPEG_AUDIO_L1_BITRATE_448K
+
+class v4l2_mpeg_audio_l2_bitrate(IntEnum):
+    V4L2_MPEG_AUDIO_L2_BITRATE_32K = 0
+    V4L2_MPEG_AUDIO_L2_BITRATE_48K = 1
+    V4L2_MPEG_AUDIO_L2_BITRATE_56K = 2
+    V4L2_MPEG_AUDIO_L2_BITRATE_64K = 3
+    V4L2_MPEG_AUDIO_L2_BITRATE_80K = 4
+    V4L2_MPEG_AUDIO_L2_BITRATE_96K = 5
+    V4L2_MPEG_AUDIO_L2_BITRATE_112K = 6
+    V4L2_MPEG_AUDIO_L2_BITRATE_128K = 7
+    V4L2_MPEG_AUDIO_L2_BITRATE_160K = 8
+    V4L2_MPEG_AUDIO_L2_BITRATE_192K = 9
+    V4L2_MPEG_AUDIO_L2_BITRATE_224K = 10
+    V4L2_MPEG_AUDIO_L2_BITRATE_256K = 11
+    V4L2_MPEG_AUDIO_L2_BITRATE_320K = 12
+    V4L2_MPEG_AUDIO_L2_BITRATE_384K = 13
+
+V4L2_MPEG_AUDIO_L2_BITRATE_32K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_32K
+V4L2_MPEG_AUDIO_L2_BITRATE_48K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_48K
+V4L2_MPEG_AUDIO_L2_BITRATE_56K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_56K
+V4L2_MPEG_AUDIO_L2_BITRATE_64K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_64K
+V4L2_MPEG_AUDIO_L2_BITRATE_80K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_80K
+V4L2_MPEG_AUDIO_L2_BITRATE_96K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_96K
+V4L2_MPEG_AUDIO_L2_BITRATE_112K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_112K
+V4L2_MPEG_AUDIO_L2_BITRATE_128K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_128K
+V4L2_MPEG_AUDIO_L2_BITRATE_160K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_160K
+V4L2_MPEG_AUDIO_L2_BITRATE_192K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_192K
+V4L2_MPEG_AUDIO_L2_BITRATE_224K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_224K
+V4L2_MPEG_AUDIO_L2_BITRATE_256K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_256K
+V4L2_MPEG_AUDIO_L2_BITRATE_320K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_320K
+V4L2_MPEG_AUDIO_L2_BITRATE_384K = v4l2_mpeg_audio_l2_bitrate.V4L2_MPEG_AUDIO_L2_BITRATE_384K
+
+class v4l2_mpeg_audio_l3_bitrate(IntEnum):
+    V4L2_MPEG_AUDIO_L3_BITRATE_32K = 0
+    V4L2_MPEG_AUDIO_L3_BITRATE_40K = 1
+    V4L2_MPEG_AUDIO_L3_BITRATE_48K = 2
+    V4L2_MPEG_AUDIO_L3_BITRATE_56K = 3
+    V4L2_MPEG_AUDIO_L3_BITRATE_64K = 4
+    V4L2_MPEG_AUDIO_L3_BITRATE_80K = 5
+    V4L2_MPEG_AUDIO_L3_BITRATE_96K = 6
+    V4L2_MPEG_AUDIO_L3_BITRATE_112K = 7
+    V4L2_MPEG_AUDIO_L3_BITRATE_128K = 8
+    V4L2_MPEG_AUDIO_L3_BITRATE_160K = 9
+    V4L2_MPEG_AUDIO_L3_BITRATE_192K = 10
+    V4L2_MPEG_AUDIO_L3_BITRATE_224K = 11
+    V4L2_MPEG_AUDIO_L3_BITRATE_256K = 12
+    V4L2_MPEG_AUDIO_L3_BITRATE_320K = 13
+
+V4L2_MPEG_AUDIO_L3_BITRATE_32K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_32K
+V4L2_MPEG_AUDIO_L3_BITRATE_40K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_40K
+V4L2_MPEG_AUDIO_L3_BITRATE_48K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_48K
+V4L2_MPEG_AUDIO_L3_BITRATE_56K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_56K
+V4L2_MPEG_AUDIO_L3_BITRATE_64K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_64K
+V4L2_MPEG_AUDIO_L3_BITRATE_80K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_80K
+V4L2_MPEG_AUDIO_L3_BITRATE_96K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_96K
+V4L2_MPEG_AUDIO_L3_BITRATE_112K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_112K
+V4L2_MPEG_AUDIO_L3_BITRATE_128K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_128K
+V4L2_MPEG_AUDIO_L3_BITRATE_160K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_160K
+V4L2_MPEG_AUDIO_L3_BITRATE_192K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_192K
+V4L2_MPEG_AUDIO_L3_BITRATE_224K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_224K
+V4L2_MPEG_AUDIO_L3_BITRATE_256K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_256K
+V4L2_MPEG_AUDIO_L3_BITRATE_320K = v4l2_mpeg_audio_l3_bitrate.V4L2_MPEG_AUDIO_L3_BITRATE_320K
+
+class v4l2_mpeg_audio_mode(IntEnum):
+    V4L2_MPEG_AUDIO_MODE_STEREO = 0
+    V4L2_MPEG_AUDIO_MODE_JOINT_STEREO = 1
+    V4L2_MPEG_AUDIO_MODE_DUAL = 2
+    V4L2_MPEG_AUDIO_MODE_MONO = 3
+
+V4L2_MPEG_AUDIO_MODE_STEREO = v4l2_mpeg_audio_mode.V4L2_MPEG_AUDIO_MODE_STEREO
+V4L2_MPEG_AUDIO_MODE_JOINT_STEREO = v4l2_mpeg_audio_mode.V4L2_MPEG_AUDIO_MODE_JOINT_STEREO
+V4L2_MPEG_AUDIO_MODE_DUAL = v4l2_mpeg_audio_mode.V4L2_MPEG_AUDIO_MODE_DUAL
+V4L2_MPEG_AUDIO_MODE_MONO = v4l2_mpeg_audio_mode.V4L2_MPEG_AUDIO_MODE_MONO
+
+class v4l2_mpeg_audio_mode_extension(IntEnum):
+    V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_4 = 0
+    V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_8 = 1
+    V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_12 = 2
+    V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_16 = 3
+
+V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_4 = v4l2_mpeg_audio_mode_extension.V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_4
+V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_8 = v4l2_mpeg_audio_mode_extension.V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_8
+V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_12 = v4l2_mpeg_audio_mode_extension.V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_12
+V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_16 = v4l2_mpeg_audio_mode_extension.V4L2_MPEG_AUDIO_MODE_EXTENSION_BOUND_16
+
+class v4l2_mpeg_audio_emphasis(IntEnum):
+    V4L2_MPEG_AUDIO_EMPHASIS_NONE = 0
+    V4L2_MPEG_AUDIO_EMPHASIS_50_DIV_15_uS = 1
+    V4L2_MPEG_AUDIO_EMPHASIS_CCITT_J17 = 2
+
+V4L2_MPEG_AUDIO_EMPHASIS_NONE = v4l2_mpeg_audio_emphasis.V4L2_MPEG_AUDIO_EMPHASIS_NONE
+V4L2_MPEG_AUDIO_EMPHASIS_50_DIV_15_uS = v4l2_mpeg_audio_emphasis.V4L2_MPEG_AUDIO_EMPHASIS_50_DIV_15_uS
+V4L2_MPEG_AUDIO_EMPHASIS_CCITT_J17 = v4l2_mpeg_audio_emphasis.V4L2_MPEG_AUDIO_EMPHASIS_CCITT_J17
+
+class v4l2_mpeg_audio_crc(IntEnum):
+    V4L2_MPEG_AUDIO_CRC_NONE = 0
+    V4L2_MPEG_AUDIO_CRC_CRC16 = 1
+
+V4L2_MPEG_AUDIO_CRC_NONE = v4l2_mpeg_audio_crc.V4L2_MPEG_AUDIO_CRC_NONE
+V4L2_MPEG_AUDIO_CRC_CRC16 = v4l2_mpeg_audio_crc.V4L2_MPEG_AUDIO_CRC_CRC16
+
+class v4l2_mpeg_audio_ac3_bitrate(IntEnum):
+    V4L2_MPEG_AUDIO_AC3_BITRATE_32K = 0
+    V4L2_MPEG_AUDIO_AC3_BITRATE_40K = 1
+    V4L2_MPEG_AUDIO_AC3_BITRATE_48K = 2
+    V4L2_MPEG_AUDIO_AC3_BITRATE_56K = 3
+    V4L2_MPEG_AUDIO_AC3_BITRATE_64K = 4
+    V4L2_MPEG_AUDIO_AC3_BITRATE_80K = 5
+    V4L2_MPEG_AUDIO_AC3_BITRATE_96K = 6
+    V4L2_MPEG_AUDIO_AC3_BITRATE_112K = 7
+    V4L2_MPEG_AUDIO_AC3_BITRATE_128K = 8
+    V4L2_MPEG_AUDIO_AC3_BITRATE_160K = 9
+    V4L2_MPEG_AUDIO_AC3_BITRATE_192K = 10
+    V4L2_MPEG_AUDIO_AC3_BITRATE_224K = 11
+    V4L2_MPEG_AUDIO_AC3_BITRATE_256K = 12
+    V4L2_MPEG_AUDIO_AC3_BITRATE_320K = 13
+    V4L2_MPEG_AUDIO_AC3_BITRATE_384K = 14
+    V4L2_MPEG_AUDIO_AC3_BITRATE_448K = 15
+    V4L2_MPEG_AUDIO_AC3_BITRATE_512K = 16
+    V4L2_MPEG_AUDIO_AC3_BITRATE_576K = 17
+    V4L2_MPEG_AUDIO_AC3_BITRATE_640K = 18
+
+V4L2_MPEG_AUDIO_AC3_BITRATE_32K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_32K
+V4L2_MPEG_AUDIO_AC3_BITRATE_40K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_40K
+V4L2_MPEG_AUDIO_AC3_BITRATE_48K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_48K
+V4L2_MPEG_AUDIO_AC3_BITRATE_56K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_56K
+V4L2_MPEG_AUDIO_AC3_BITRATE_64K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_64K
+V4L2_MPEG_AUDIO_AC3_BITRATE_80K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_80K
+V4L2_MPEG_AUDIO_AC3_BITRATE_96K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_96K
+V4L2_MPEG_AUDIO_AC3_BITRATE_112K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_112K
+V4L2_MPEG_AUDIO_AC3_BITRATE_128K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_128K
+V4L2_MPEG_AUDIO_AC3_BITRATE_160K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_160K
+V4L2_MPEG_AUDIO_AC3_BITRATE_192K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_192K
+V4L2_MPEG_AUDIO_AC3_BITRATE_224K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_224K
+V4L2_MPEG_AUDIO_AC3_BITRATE_256K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_256K
+V4L2_MPEG_AUDIO_AC3_BITRATE_320K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_320K
+V4L2_MPEG_AUDIO_AC3_BITRATE_384K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_384K
+V4L2_MPEG_AUDIO_AC3_BITRATE_448K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_448K
+V4L2_MPEG_AUDIO_AC3_BITRATE_512K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_512K
+V4L2_MPEG_AUDIO_AC3_BITRATE_576K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_576K
+V4L2_MPEG_AUDIO_AC3_BITRATE_640K = v4l2_mpeg_audio_ac3_bitrate.V4L2_MPEG_AUDIO_AC3_BITRATE_640K
+
+class v4l2_mpeg_audio_dec_playback(IntEnum):
+    V4L2_MPEG_AUDIO_DEC_PLAYBACK_AUTO = 0
+    V4L2_MPEG_AUDIO_DEC_PLAYBACK_STEREO = 1
+    V4L2_MPEG_AUDIO_DEC_PLAYBACK_LEFT = 2
+    V4L2_MPEG_AUDIO_DEC_PLAYBACK_RIGHT = 3
+    V4L2_MPEG_AUDIO_DEC_PLAYBACK_MONO = 4
+    V4L2_MPEG_AUDIO_DEC_PLAYBACK_SWAPPED_STEREO = 5
+
+V4L2_MPEG_AUDIO_DEC_PLAYBACK_AUTO = v4l2_mpeg_audio_dec_playback.V4L2_MPEG_AUDIO_DEC_PLAYBACK_AUTO
+V4L2_MPEG_AUDIO_DEC_PLAYBACK_STEREO = v4l2_mpeg_audio_dec_playback.V4L2_MPEG_AUDIO_DEC_PLAYBACK_STEREO
+V4L2_MPEG_AUDIO_DEC_PLAYBACK_LEFT = v4l2_mpeg_audio_dec_playback.V4L2_MPEG_AUDIO_DEC_PLAYBACK_LEFT
+V4L2_MPEG_AUDIO_DEC_PLAYBACK_RIGHT = v4l2_mpeg_audio_dec_playback.V4L2_MPEG_AUDIO_DEC_PLAYBACK_RIGHT
+V4L2_MPEG_AUDIO_DEC_PLAYBACK_MONO = v4l2_mpeg_audio_dec_playback.V4L2_MPEG_AUDIO_DEC_PLAYBACK_MONO
+V4L2_MPEG_AUDIO_DEC_PLAYBACK_SWAPPED_STEREO = v4l2_mpeg_audio_dec_playback.V4L2_MPEG_AUDIO_DEC_PLAYBACK_SWAPPED_STEREO
+
+class v4l2_mpeg_video_encoding(IntEnum):
+    V4L2_MPEG_VIDEO_ENCODING_MPEG_1 = 0
+    V4L2_MPEG_VIDEO_ENCODING_MPEG_2 = 1
+    V4L2_MPEG_VIDEO_ENCODING_MPEG_4_AVC = 2
+
+V4L2_MPEG_VIDEO_ENCODING_MPEG_1 = v4l2_mpeg_video_encoding.V4L2_MPEG_VIDEO_ENCODING_MPEG_1
+V4L2_MPEG_VIDEO_ENCODING_MPEG_2 = v4l2_mpeg_video_encoding.V4L2_MPEG_VIDEO_ENCODING_MPEG_2
+V4L2_MPEG_VIDEO_ENCODING_MPEG_4_AVC = v4l2_mpeg_video_encoding.V4L2_MPEG_VIDEO_ENCODING_MPEG_4_AVC
+
+class v4l2_mpeg_video_aspect(IntEnum):
+    V4L2_MPEG_VIDEO_ASPECT_1x1 = 0
+    V4L2_MPEG_VIDEO_ASPECT_4x3 = 1
+    V4L2_MPEG_VIDEO_ASPECT_16x9 = 2
+    V4L2_MPEG_VIDEO_ASPECT_221x100 = 3
+
+V4L2_MPEG_VIDEO_ASPECT_1x1 = v4l2_mpeg_video_aspect.V4L2_MPEG_VIDEO_ASPECT_1x1
+V4L2_MPEG_VIDEO_ASPECT_4x3 = v4l2_mpeg_video_aspect.V4L2_MPEG_VIDEO_ASPECT_4x3
+V4L2_MPEG_VIDEO_ASPECT_16x9 = v4l2_mpeg_video_aspect.V4L2_MPEG_VIDEO_ASPECT_16x9
+V4L2_MPEG_VIDEO_ASPECT_221x100 = v4l2_mpeg_video_aspect.V4L2_MPEG_VIDEO_ASPECT_221x100
+
+class v4l2_mpeg_video_bitrate_mode(IntEnum):
+    V4L2_MPEG_VIDEO_BITRATE_MODE_VBR = 0
+    V4L2_MPEG_VIDEO_BITRATE_MODE_CBR = 1
+    V4L2_MPEG_VIDEO_BITRATE_MODE_CQ = 2
+
+V4L2_MPEG_VIDEO_BITRATE_MODE_VBR = v4l2_mpeg_video_bitrate_mode.V4L2_MPEG_VIDEO_BITRATE_MODE_VBR
+V4L2_MPEG_VIDEO_BITRATE_MODE_CBR = v4l2_mpeg_video_bitrate_mode.V4L2_MPEG_VIDEO_BITRATE_MODE_CBR
+V4L2_MPEG_VIDEO_BITRATE_MODE_CQ = v4l2_mpeg_video_bitrate_mode.V4L2_MPEG_VIDEO_BITRATE_MODE_CQ
+
+class v4l2_mpeg_video_header_mode(IntEnum):
+    V4L2_MPEG_VIDEO_HEADER_MODE_SEPARATE = 0
+    V4L2_MPEG_VIDEO_HEADER_MODE_JOINED_WITH_1ST_FRAME = 1
+
+V4L2_MPEG_VIDEO_HEADER_MODE_SEPARATE = v4l2_mpeg_video_header_mode.V4L2_MPEG_VIDEO_HEADER_MODE_SEPARATE
+V4L2_MPEG_VIDEO_HEADER_MODE_JOINED_WITH_1ST_FRAME = v4l2_mpeg_video_header_mode.V4L2_MPEG_VIDEO_HEADER_MODE_JOINED_WITH_1ST_FRAME
+
+class v4l2_mpeg_video_multi_slice_mode(IntEnum):
+    V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_SINGLE = 0
+    V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_MAX_MB = 1
+    V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_MAX_BYTES = 2
+    V4L2_MPEG_VIDEO_MULTI_SICE_MODE_MAX_MB = 1
+    V4L2_MPEG_VIDEO_MULTI_SICE_MODE_MAX_BYTES = 2
+
+V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_SINGLE = v4l2_mpeg_video_multi_slice_mode.V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_SINGLE
+V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_MAX_MB = v4l2_mpeg_video_multi_slice_mode.V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_MAX_MB
+V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_MAX_BYTES = v4l2_mpeg_video_multi_slice_mode.V4L2_MPEG_VIDEO_MULTI_SLICE_MODE_MAX_BYTES
+V4L2_MPEG_VIDEO_MULTI_SICE_MODE_MAX_MB = v4l2_mpeg_video_multi_slice_mode.V4L2_MPEG_VIDEO_MULTI_SICE_MODE_MAX_MB
+V4L2_MPEG_VIDEO_MULTI_SICE_MODE_MAX_BYTES = v4l2_mpeg_video_multi_slice_mode.V4L2_MPEG_VIDEO_MULTI_SICE_MODE_MAX_BYTES
+
+class v4l2_mpeg_video_intra_refresh_period_type(IntEnum):
+    V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE_RANDOM = 0
+    V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE_CYCLIC = 1
+
+V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE_RANDOM = v4l2_mpeg_video_intra_refresh_period_type.V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE_RANDOM
+V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE_CYCLIC = v4l2_mpeg_video_intra_refresh_period_type.V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE_CYCLIC
+
+class v4l2_mpeg_video_mpeg2_level(IntEnum):
+    V4L2_MPEG_VIDEO_MPEG2_LEVEL_LOW = 0
+    V4L2_MPEG_VIDEO_MPEG2_LEVEL_MAIN = 1
+    V4L2_MPEG_VIDEO_MPEG2_LEVEL_HIGH_1440 = 2
+    V4L2_MPEG_VIDEO_MPEG2_LEVEL_HIGH = 3
+
+V4L2_MPEG_VIDEO_MPEG2_LEVEL_LOW = v4l2_mpeg_video_mpeg2_level.V4L2_MPEG_VIDEO_MPEG2_LEVEL_LOW
+V4L2_MPEG_VIDEO_MPEG2_LEVEL_MAIN = v4l2_mpeg_video_mpeg2_level.V4L2_MPEG_VIDEO_MPEG2_LEVEL_MAIN
+V4L2_MPEG_VIDEO_MPEG2_LEVEL_HIGH_1440 = v4l2_mpeg_video_mpeg2_level.V4L2_MPEG_VIDEO_MPEG2_LEVEL_HIGH_1440
+V4L2_MPEG_VIDEO_MPEG2_LEVEL_HIGH = v4l2_mpeg_video_mpeg2_level.V4L2_MPEG_VIDEO_MPEG2_LEVEL_HIGH
+
+class v4l2_mpeg_video_mpeg2_profile(IntEnum):
+    V4L2_MPEG_VIDEO_MPEG2_PROFILE_SIMPLE = 0
+    V4L2_MPEG_VIDEO_MPEG2_PROFILE_MAIN = 1
+    V4L2_MPEG_VIDEO_MPEG2_PROFILE_SNR_SCALABLE = 2
+    V4L2_MPEG_VIDEO_MPEG2_PROFILE_SPATIALLY_SCALABLE = 3
+    V4L2_MPEG_VIDEO_MPEG2_PROFILE_HIGH = 4
+    V4L2_MPEG_VIDEO_MPEG2_PROFILE_MULTIVIEW = 5
+
+V4L2_MPEG_VIDEO_MPEG2_PROFILE_SIMPLE = v4l2_mpeg_video_mpeg2_profile.V4L2_MPEG_VIDEO_MPEG2_PROFILE_SIMPLE
+V4L2_MPEG_VIDEO_MPEG2_PROFILE_MAIN = v4l2_mpeg_video_mpeg2_profile.V4L2_MPEG_VIDEO_MPEG2_PROFILE_MAIN
+V4L2_MPEG_VIDEO_MPEG2_PROFILE_SNR_SCALABLE = v4l2_mpeg_video_mpeg2_profile.V4L2_MPEG_VIDEO_MPEG2_PROFILE_SNR_SCALABLE
+V4L2_MPEG_VIDEO_MPEG2_PROFILE_SPATIALLY_SCALABLE = v4l2_mpeg_video_mpeg2_profile.V4L2_MPEG_VIDEO_MPEG2_PROFILE_SPATIALLY_SCALABLE
+V4L2_MPEG_VIDEO_MPEG2_PROFILE_HIGH = v4l2_mpeg_video_mpeg2_profile.V4L2_MPEG_VIDEO_MPEG2_PROFILE_HIGH
+V4L2_MPEG_VIDEO_MPEG2_PROFILE_MULTIVIEW = v4l2_mpeg_video_mpeg2_profile.V4L2_MPEG_VIDEO_MPEG2_PROFILE_MULTIVIEW
+
+class v4l2_mpeg_video_h264_entropy_mode(IntEnum):
+    V4L2_MPEG_VIDEO_H264_ENTROPY_MODE_CAVLC = 0
+    V4L2_MPEG_VIDEO_H264_ENTROPY_MODE_CABAC = 1
+
+V4L2_MPEG_VIDEO_H264_ENTROPY_MODE_CAVLC = v4l2_mpeg_video_h264_entropy_mode.V4L2_MPEG_VIDEO_H264_ENTROPY_MODE_CAVLC
+V4L2_MPEG_VIDEO_H264_ENTROPY_MODE_CABAC = v4l2_mpeg_video_h264_entropy_mode.V4L2_MPEG_VIDEO_H264_ENTROPY_MODE_CABAC
+
+class v4l2_mpeg_video_h264_level(IntEnum):
+    V4L2_MPEG_VIDEO_H264_LEVEL_1_0 = 0
+    V4L2_MPEG_VIDEO_H264_LEVEL_1B = 1
+    V4L2_MPEG_VIDEO_H264_LEVEL_1_1 = 2
+    V4L2_MPEG_VIDEO_H264_LEVEL_1_2 = 3
+    V4L2_MPEG_VIDEO_H264_LEVEL_1_3 = 4
+    V4L2_MPEG_VIDEO_H264_LEVEL_2_0 = 5
+    V4L2_MPEG_VIDEO_H264_LEVEL_2_1 = 6
+    V4L2_MPEG_VIDEO_H264_LEVEL_2_2 = 7
+    V4L2_MPEG_VIDEO_H264_LEVEL_3_0 = 8
+    V4L2_MPEG_VIDEO_H264_LEVEL_3_1 = 9
+    V4L2_MPEG_VIDEO_H264_LEVEL_3_2 = 10
+    V4L2_MPEG_VIDEO_H264_LEVEL_4_0 = 11
+    V4L2_MPEG_VIDEO_H264_LEVEL_4_1 = 12
+    V4L2_MPEG_VIDEO_H264_LEVEL_4_2 = 13
+    V4L2_MPEG_VIDEO_H264_LEVEL_5_0 = 14
+    V4L2_MPEG_VIDEO_H264_LEVEL_5_1 = 15
+    V4L2_MPEG_VIDEO_H264_LEVEL_5_2 = 16
+    V4L2_MPEG_VIDEO_H264_LEVEL_6_0 = 17
+    V4L2_MPEG_VIDEO_H264_LEVEL_6_1 = 18
+    V4L2_MPEG_VIDEO_H264_LEVEL_6_2 = 19
+
+V4L2_MPEG_VIDEO_H264_LEVEL_1_0 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_1_0
+V4L2_MPEG_VIDEO_H264_LEVEL_1B = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_1B
+V4L2_MPEG_VIDEO_H264_LEVEL_1_1 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_1_1
+V4L2_MPEG_VIDEO_H264_LEVEL_1_2 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_1_2
+V4L2_MPEG_VIDEO_H264_LEVEL_1_3 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_1_3
+V4L2_MPEG_VIDEO_H264_LEVEL_2_0 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_2_0
+V4L2_MPEG_VIDEO_H264_LEVEL_2_1 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_2_1
+V4L2_MPEG_VIDEO_H264_LEVEL_2_2 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_2_2
+V4L2_MPEG_VIDEO_H264_LEVEL_3_0 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_3_0
+V4L2_MPEG_VIDEO_H264_LEVEL_3_1 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_3_1
+V4L2_MPEG_VIDEO_H264_LEVEL_3_2 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_3_2
+V4L2_MPEG_VIDEO_H264_LEVEL_4_0 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_4_0
+V4L2_MPEG_VIDEO_H264_LEVEL_4_1 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_4_1
+V4L2_MPEG_VIDEO_H264_LEVEL_4_2 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_4_2
+V4L2_MPEG_VIDEO_H264_LEVEL_5_0 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_5_0
+V4L2_MPEG_VIDEO_H264_LEVEL_5_1 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_5_1
+V4L2_MPEG_VIDEO_H264_LEVEL_5_2 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_5_2
+V4L2_MPEG_VIDEO_H264_LEVEL_6_0 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_6_0
+V4L2_MPEG_VIDEO_H264_LEVEL_6_1 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_6_1
+V4L2_MPEG_VIDEO_H264_LEVEL_6_2 = v4l2_mpeg_video_h264_level.V4L2_MPEG_VIDEO_H264_LEVEL_6_2
+
+class v4l2_mpeg_video_h264_loop_filter_mode(IntEnum):
+    V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_ENABLED = 0
+    V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_DISABLED = 1
+    V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_DISABLED_AT_SLICE_BOUNDARY = 2
+
+V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_ENABLED = v4l2_mpeg_video_h264_loop_filter_mode.V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_ENABLED
+V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_DISABLED = v4l2_mpeg_video_h264_loop_filter_mode.V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_DISABLED
+V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_DISABLED_AT_SLICE_BOUNDARY = v4l2_mpeg_video_h264_loop_filter_mode.V4L2_MPEG_VIDEO_H264_LOOP_FILTER_MODE_DISABLED_AT_SLICE_BOUNDARY
+
+class v4l2_mpeg_video_h264_profile(IntEnum):
+    V4L2_MPEG_VIDEO_H264_PROFILE_BASELINE = 0
+    V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_BASELINE = 1
+    V4L2_MPEG_VIDEO_H264_PROFILE_MAIN = 2
+    V4L2_MPEG_VIDEO_H264_PROFILE_EXTENDED = 3
+    V4L2_MPEG_VIDEO_H264_PROFILE_HIGH = 4
+    V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_10 = 5
+    V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_422 = 6
+    V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_444_PREDICTIVE = 7
+    V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_10_INTRA = 8
+    V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_422_INTRA = 9
+    V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_444_INTRA = 10
+    V4L2_MPEG_VIDEO_H264_PROFILE_CAVLC_444_INTRA = 11
+    V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_BASELINE = 12
+    V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_HIGH = 13
+    V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_HIGH_INTRA = 14
+    V4L2_MPEG_VIDEO_H264_PROFILE_STEREO_HIGH = 15
+    V4L2_MPEG_VIDEO_H264_PROFILE_MULTIVIEW_HIGH = 16
+    V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_HIGH = 17
+
+V4L2_MPEG_VIDEO_H264_PROFILE_BASELINE = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_BASELINE
+V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_BASELINE = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_BASELINE
+V4L2_MPEG_VIDEO_H264_PROFILE_MAIN = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_MAIN
+V4L2_MPEG_VIDEO_H264_PROFILE_EXTENDED = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_EXTENDED
+V4L2_MPEG_VIDEO_H264_PROFILE_HIGH = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_HIGH
+V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_10 = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_10
+V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_422 = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_422
+V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_444_PREDICTIVE = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_444_PREDICTIVE
+V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_10_INTRA = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_10_INTRA
+V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_422_INTRA = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_422_INTRA
+V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_444_INTRA = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_HIGH_444_INTRA
+V4L2_MPEG_VIDEO_H264_PROFILE_CAVLC_444_INTRA = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_CAVLC_444_INTRA
+V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_BASELINE = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_BASELINE
+V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_HIGH = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_HIGH
+V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_HIGH_INTRA = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_SCALABLE_HIGH_INTRA
+V4L2_MPEG_VIDEO_H264_PROFILE_STEREO_HIGH = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_STEREO_HIGH
+V4L2_MPEG_VIDEO_H264_PROFILE_MULTIVIEW_HIGH = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_MULTIVIEW_HIGH
+V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_HIGH = v4l2_mpeg_video_h264_profile.V4L2_MPEG_VIDEO_H264_PROFILE_CONSTRAINED_HIGH
+
+class v4l2_mpeg_video_h264_vui_sar_idc(IntEnum):
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_UNSPECIFIED = 0
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_1x1 = 1
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_12x11 = 2
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_10x11 = 3
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_16x11 = 4
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_40x33 = 5
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_24x11 = 6
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_20x11 = 7
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_32x11 = 8
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_80x33 = 9
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_18x11 = 10
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_15x11 = 11
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_64x33 = 12
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_160x99 = 13
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_4x3 = 14
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_3x2 = 15
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_2x1 = 16
+    V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_EXTENDED = 17
+
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_UNSPECIFIED = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_UNSPECIFIED
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_1x1 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_1x1
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_12x11 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_12x11
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_10x11 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_10x11
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_16x11 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_16x11
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_40x33 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_40x33
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_24x11 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_24x11
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_20x11 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_20x11
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_32x11 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_32x11
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_80x33 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_80x33
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_18x11 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_18x11
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_15x11 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_15x11
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_64x33 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_64x33
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_160x99 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_160x99
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_4x3 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_4x3
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_3x2 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_3x2
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_2x1 = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_2x1
+V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_EXTENDED = v4l2_mpeg_video_h264_vui_sar_idc.V4L2_MPEG_VIDEO_H264_VUI_SAR_IDC_EXTENDED
+
+class v4l2_mpeg_video_h264_sei_fp_arrangement_type(IntEnum):
+    V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_CHECKERBOARD = 0
+    V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_COLUMN = 1
+    V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_ROW = 2
+    V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_SIDE_BY_SIDE = 3
+    V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_TOP_BOTTOM = 4
+    V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_TEMPORAL = 5
+
+V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_CHECKERBOARD = v4l2_mpeg_video_h264_sei_fp_arrangement_type.V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_CHECKERBOARD
+V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_COLUMN = v4l2_mpeg_video_h264_sei_fp_arrangement_type.V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_COLUMN
+V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_ROW = v4l2_mpeg_video_h264_sei_fp_arrangement_type.V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_ROW
+V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_SIDE_BY_SIDE = v4l2_mpeg_video_h264_sei_fp_arrangement_type.V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_SIDE_BY_SIDE
+V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_TOP_BOTTOM = v4l2_mpeg_video_h264_sei_fp_arrangement_type.V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_TOP_BOTTOM
+V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_TEMPORAL = v4l2_mpeg_video_h264_sei_fp_arrangement_type.V4L2_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE_TEMPORAL
+
+class v4l2_mpeg_video_h264_fmo_map_type(IntEnum):
+    V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_INTERLEAVED_SLICES = 0
+    V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_SCATTERED_SLICES = 1
+    V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_FOREGROUND_WITH_LEFT_OVER = 2
+    V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_BOX_OUT = 3
+    V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_RASTER_SCAN = 4
+    V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_WIPE_SCAN = 5
+    V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_EXPLICIT = 6
+
+V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_INTERLEAVED_SLICES = v4l2_mpeg_video_h264_fmo_map_type.V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_INTERLEAVED_SLICES
+V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_SCATTERED_SLICES = v4l2_mpeg_video_h264_fmo_map_type.V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_SCATTERED_SLICES
+V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_FOREGROUND_WITH_LEFT_OVER = v4l2_mpeg_video_h264_fmo_map_type.V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_FOREGROUND_WITH_LEFT_OVER
+V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_BOX_OUT = v4l2_mpeg_video_h264_fmo_map_type.V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_BOX_OUT
+V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_RASTER_SCAN = v4l2_mpeg_video_h264_fmo_map_type.V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_RASTER_SCAN
+V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_WIPE_SCAN = v4l2_mpeg_video_h264_fmo_map_type.V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_WIPE_SCAN
+V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_EXPLICIT = v4l2_mpeg_video_h264_fmo_map_type.V4L2_MPEG_VIDEO_H264_FMO_MAP_TYPE_EXPLICIT
+
+class v4l2_mpeg_video_h264_fmo_change_dir(IntEnum):
+    V4L2_MPEG_VIDEO_H264_FMO_CHANGE_DIR_RIGHT = 0
+    V4L2_MPEG_VIDEO_H264_FMO_CHANGE_DIR_LEFT = 1
+
+V4L2_MPEG_VIDEO_H264_FMO_CHANGE_DIR_RIGHT = v4l2_mpeg_video_h264_fmo_change_dir.V4L2_MPEG_VIDEO_H264_FMO_CHANGE_DIR_RIGHT
+V4L2_MPEG_VIDEO_H264_FMO_CHANGE_DIR_LEFT = v4l2_mpeg_video_h264_fmo_change_dir.V4L2_MPEG_VIDEO_H264_FMO_CHANGE_DIR_LEFT
+
+class v4l2_mpeg_video_h264_hierarchical_coding_type(IntEnum):
+    V4L2_MPEG_VIDEO_H264_HIERARCHICAL_CODING_B = 0
+    V4L2_MPEG_VIDEO_H264_HIERARCHICAL_CODING_P = 1
+
+V4L2_MPEG_VIDEO_H264_HIERARCHICAL_CODING_B = v4l2_mpeg_video_h264_hierarchical_coding_type.V4L2_MPEG_VIDEO_H264_HIERARCHICAL_CODING_B
+V4L2_MPEG_VIDEO_H264_HIERARCHICAL_CODING_P = v4l2_mpeg_video_h264_hierarchical_coding_type.V4L2_MPEG_VIDEO_H264_HIERARCHICAL_CODING_P
+
+class v4l2_mpeg_video_mpeg4_level(IntEnum):
+    V4L2_MPEG_VIDEO_MPEG4_LEVEL_0 = 0
+    V4L2_MPEG_VIDEO_MPEG4_LEVEL_0B = 1
+    V4L2_MPEG_VIDEO_MPEG4_LEVEL_1 = 2
+    V4L2_MPEG_VIDEO_MPEG4_LEVEL_2 = 3
+    V4L2_MPEG_VIDEO_MPEG4_LEVEL_3 = 4
+    V4L2_MPEG_VIDEO_MPEG4_LEVEL_3B = 5
+    V4L2_MPEG_VIDEO_MPEG4_LEVEL_4 = 6
+    V4L2_MPEG_VIDEO_MPEG4_LEVEL_5 = 7
+
+V4L2_MPEG_VIDEO_MPEG4_LEVEL_0 = v4l2_mpeg_video_mpeg4_level.V4L2_MPEG_VIDEO_MPEG4_LEVEL_0
+V4L2_MPEG_VIDEO_MPEG4_LEVEL_0B = v4l2_mpeg_video_mpeg4_level.V4L2_MPEG_VIDEO_MPEG4_LEVEL_0B
+V4L2_MPEG_VIDEO_MPEG4_LEVEL_1 = v4l2_mpeg_video_mpeg4_level.V4L2_MPEG_VIDEO_MPEG4_LEVEL_1
+V4L2_MPEG_VIDEO_MPEG4_LEVEL_2 = v4l2_mpeg_video_mpeg4_level.V4L2_MPEG_VIDEO_MPEG4_LEVEL_2
+V4L2_MPEG_VIDEO_MPEG4_LEVEL_3 = v4l2_mpeg_video_mpeg4_level.V4L2_MPEG_VIDEO_MPEG4_LEVEL_3
+V4L2_MPEG_VIDEO_MPEG4_LEVEL_3B = v4l2_mpeg_video_mpeg4_level.V4L2_MPEG_VIDEO_MPEG4_LEVEL_3B
+V4L2_MPEG_VIDEO_MPEG4_LEVEL_4 = v4l2_mpeg_video_mpeg4_level.V4L2_MPEG_VIDEO_MPEG4_LEVEL_4
+V4L2_MPEG_VIDEO_MPEG4_LEVEL_5 = v4l2_mpeg_video_mpeg4_level.V4L2_MPEG_VIDEO_MPEG4_LEVEL_5
+
+class v4l2_mpeg_video_mpeg4_profile(IntEnum):
+    V4L2_MPEG_VIDEO_MPEG4_PROFILE_SIMPLE = 0
+    V4L2_MPEG_VIDEO_MPEG4_PROFILE_ADVANCED_SIMPLE = 1
+    V4L2_MPEG_VIDEO_MPEG4_PROFILE_CORE = 2
+    V4L2_MPEG_VIDEO_MPEG4_PROFILE_SIMPLE_SCALABLE = 3
+    V4L2_MPEG_VIDEO_MPEG4_PROFILE_ADVANCED_CODING_EFFICIENCY = 4
+
+V4L2_MPEG_VIDEO_MPEG4_PROFILE_SIMPLE = v4l2_mpeg_video_mpeg4_profile.V4L2_MPEG_VIDEO_MPEG4_PROFILE_SIMPLE
+V4L2_MPEG_VIDEO_MPEG4_PROFILE_ADVANCED_SIMPLE = v4l2_mpeg_video_mpeg4_profile.V4L2_MPEG_VIDEO_MPEG4_PROFILE_ADVANCED_SIMPLE
+V4L2_MPEG_VIDEO_MPEG4_PROFILE_CORE = v4l2_mpeg_video_mpeg4_profile.V4L2_MPEG_VIDEO_MPEG4_PROFILE_CORE
+V4L2_MPEG_VIDEO_MPEG4_PROFILE_SIMPLE_SCALABLE = v4l2_mpeg_video_mpeg4_profile.V4L2_MPEG_VIDEO_MPEG4_PROFILE_SIMPLE_SCALABLE
+V4L2_MPEG_VIDEO_MPEG4_PROFILE_ADVANCED_CODING_EFFICIENCY = v4l2_mpeg_video_mpeg4_profile.V4L2_MPEG_VIDEO_MPEG4_PROFILE_ADVANCED_CODING_EFFICIENCY
+
+class v4l2_vp8_num_partitions(IntEnum):
+    V4L2_CID_MPEG_VIDEO_VPX_1_PARTITION = 0
+    V4L2_CID_MPEG_VIDEO_VPX_2_PARTITIONS = 1
+    V4L2_CID_MPEG_VIDEO_VPX_4_PARTITIONS = 2
+    V4L2_CID_MPEG_VIDEO_VPX_8_PARTITIONS = 3
+
+V4L2_CID_MPEG_VIDEO_VPX_1_PARTITION = v4l2_vp8_num_partitions.V4L2_CID_MPEG_VIDEO_VPX_1_PARTITION
+V4L2_CID_MPEG_VIDEO_VPX_2_PARTITIONS = v4l2_vp8_num_partitions.V4L2_CID_MPEG_VIDEO_VPX_2_PARTITIONS
+V4L2_CID_MPEG_VIDEO_VPX_4_PARTITIONS = v4l2_vp8_num_partitions.V4L2_CID_MPEG_VIDEO_VPX_4_PARTITIONS
+V4L2_CID_MPEG_VIDEO_VPX_8_PARTITIONS = v4l2_vp8_num_partitions.V4L2_CID_MPEG_VIDEO_VPX_8_PARTITIONS
+
+class v4l2_vp8_num_ref_frames(IntEnum):
+    V4L2_CID_MPEG_VIDEO_VPX_1_REF_FRAME = 0
+    V4L2_CID_MPEG_VIDEO_VPX_2_REF_FRAME = 1
+    V4L2_CID_MPEG_VIDEO_VPX_3_REF_FRAME = 2
+
+V4L2_CID_MPEG_VIDEO_VPX_1_REF_FRAME = v4l2_vp8_num_ref_frames.V4L2_CID_MPEG_VIDEO_VPX_1_REF_FRAME
+V4L2_CID_MPEG_VIDEO_VPX_2_REF_FRAME = v4l2_vp8_num_ref_frames.V4L2_CID_MPEG_VIDEO_VPX_2_REF_FRAME
+V4L2_CID_MPEG_VIDEO_VPX_3_REF_FRAME = v4l2_vp8_num_ref_frames.V4L2_CID_MPEG_VIDEO_VPX_3_REF_FRAME
+
+class v4l2_vp8_golden_frame_sel(IntEnum):
+    V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_USE_PREV = 0
+    V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_USE_REF_PERIOD = 1
+
+V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_USE_PREV = v4l2_vp8_golden_frame_sel.V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_USE_PREV
+V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_USE_REF_PERIOD = v4l2_vp8_golden_frame_sel.V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_USE_REF_PERIOD
+
+class v4l2_mpeg_video_vp8_profile(IntEnum):
+    V4L2_MPEG_VIDEO_VP8_PROFILE_0 = 0
+    V4L2_MPEG_VIDEO_VP8_PROFILE_1 = 1
+    V4L2_MPEG_VIDEO_VP8_PROFILE_2 = 2
+    V4L2_MPEG_VIDEO_VP8_PROFILE_3 = 3
+
+V4L2_MPEG_VIDEO_VP8_PROFILE_0 = v4l2_mpeg_video_vp8_profile.V4L2_MPEG_VIDEO_VP8_PROFILE_0
+V4L2_MPEG_VIDEO_VP8_PROFILE_1 = v4l2_mpeg_video_vp8_profile.V4L2_MPEG_VIDEO_VP8_PROFILE_1
+V4L2_MPEG_VIDEO_VP8_PROFILE_2 = v4l2_mpeg_video_vp8_profile.V4L2_MPEG_VIDEO_VP8_PROFILE_2
+V4L2_MPEG_VIDEO_VP8_PROFILE_3 = v4l2_mpeg_video_vp8_profile.V4L2_MPEG_VIDEO_VP8_PROFILE_3
+
+class v4l2_mpeg_video_vp9_profile(IntEnum):
+    V4L2_MPEG_VIDEO_VP9_PROFILE_0 = 0
+    V4L2_MPEG_VIDEO_VP9_PROFILE_1 = 1
+    V4L2_MPEG_VIDEO_VP9_PROFILE_2 = 2
+    V4L2_MPEG_VIDEO_VP9_PROFILE_3 = 3
+
+V4L2_MPEG_VIDEO_VP9_PROFILE_0 = v4l2_mpeg_video_vp9_profile.V4L2_MPEG_VIDEO_VP9_PROFILE_0
+V4L2_MPEG_VIDEO_VP9_PROFILE_1 = v4l2_mpeg_video_vp9_profile.V4L2_MPEG_VIDEO_VP9_PROFILE_1
+V4L2_MPEG_VIDEO_VP9_PROFILE_2 = v4l2_mpeg_video_vp9_profile.V4L2_MPEG_VIDEO_VP9_PROFILE_2
+V4L2_MPEG_VIDEO_VP9_PROFILE_3 = v4l2_mpeg_video_vp9_profile.V4L2_MPEG_VIDEO_VP9_PROFILE_3
+
+class v4l2_mpeg_video_vp9_level(IntEnum):
+    V4L2_MPEG_VIDEO_VP9_LEVEL_1_0 = 0
+    V4L2_MPEG_VIDEO_VP9_LEVEL_1_1 = 1
+    V4L2_MPEG_VIDEO_VP9_LEVEL_2_0 = 2
+    V4L2_MPEG_VIDEO_VP9_LEVEL_2_1 = 3
+    V4L2_MPEG_VIDEO_VP9_LEVEL_3_0 = 4
+    V4L2_MPEG_VIDEO_VP9_LEVEL_3_1 = 5
+    V4L2_MPEG_VIDEO_VP9_LEVEL_4_0 = 6
+    V4L2_MPEG_VIDEO_VP9_LEVEL_4_1 = 7
+    V4L2_MPEG_VIDEO_VP9_LEVEL_5_0 = 8
+    V4L2_MPEG_VIDEO_VP9_LEVEL_5_1 = 9
+    V4L2_MPEG_VIDEO_VP9_LEVEL_5_2 = 10
+    V4L2_MPEG_VIDEO_VP9_LEVEL_6_0 = 11
+    V4L2_MPEG_VIDEO_VP9_LEVEL_6_1 = 12
+    V4L2_MPEG_VIDEO_VP9_LEVEL_6_2 = 13
+
+V4L2_MPEG_VIDEO_VP9_LEVEL_1_0 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_1_0
+V4L2_MPEG_VIDEO_VP9_LEVEL_1_1 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_1_1
+V4L2_MPEG_VIDEO_VP9_LEVEL_2_0 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_2_0
+V4L2_MPEG_VIDEO_VP9_LEVEL_2_1 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_2_1
+V4L2_MPEG_VIDEO_VP9_LEVEL_3_0 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_3_0
+V4L2_MPEG_VIDEO_VP9_LEVEL_3_1 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_3_1
+V4L2_MPEG_VIDEO_VP9_LEVEL_4_0 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_4_0
+V4L2_MPEG_VIDEO_VP9_LEVEL_4_1 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_4_1
+V4L2_MPEG_VIDEO_VP9_LEVEL_5_0 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_5_0
+V4L2_MPEG_VIDEO_VP9_LEVEL_5_1 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_5_1
+V4L2_MPEG_VIDEO_VP9_LEVEL_5_2 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_5_2
+V4L2_MPEG_VIDEO_VP9_LEVEL_6_0 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_6_0
+V4L2_MPEG_VIDEO_VP9_LEVEL_6_1 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_6_1
+V4L2_MPEG_VIDEO_VP9_LEVEL_6_2 = v4l2_mpeg_video_vp9_level.V4L2_MPEG_VIDEO_VP9_LEVEL_6_2
+
+class v4l2_mpeg_video_hevc_hier_coding_type(IntEnum):
+    V4L2_MPEG_VIDEO_HEVC_HIERARCHICAL_CODING_B = 0
+    V4L2_MPEG_VIDEO_HEVC_HIERARCHICAL_CODING_P = 1
+
+V4L2_MPEG_VIDEO_HEVC_HIERARCHICAL_CODING_B = v4l2_mpeg_video_hevc_hier_coding_type.V4L2_MPEG_VIDEO_HEVC_HIERARCHICAL_CODING_B
+V4L2_MPEG_VIDEO_HEVC_HIERARCHICAL_CODING_P = v4l2_mpeg_video_hevc_hier_coding_type.V4L2_MPEG_VIDEO_HEVC_HIERARCHICAL_CODING_P
+
+class v4l2_mpeg_video_hevc_profile(IntEnum):
+    V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN = 0
+    V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN_STILL_PICTURE = 1
+    V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN_10 = 2
+
+V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN = v4l2_mpeg_video_hevc_profile.V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN
+V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN_STILL_PICTURE = v4l2_mpeg_video_hevc_profile.V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN_STILL_PICTURE
+V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN_10 = v4l2_mpeg_video_hevc_profile.V4L2_MPEG_VIDEO_HEVC_PROFILE_MAIN_10
+
+class v4l2_mpeg_video_hevc_level(IntEnum):
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_1 = 0
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_2 = 1
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_2_1 = 2
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_3 = 3
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_3_1 = 4
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_4 = 5
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_4_1 = 6
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_5 = 7
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_5_1 = 8
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_5_2 = 9
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_6 = 10
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_6_1 = 11
+    V4L2_MPEG_VIDEO_HEVC_LEVEL_6_2 = 12
+
+V4L2_MPEG_VIDEO_HEVC_LEVEL_1 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_1
+V4L2_MPEG_VIDEO_HEVC_LEVEL_2 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_2
+V4L2_MPEG_VIDEO_HEVC_LEVEL_2_1 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_2_1
+V4L2_MPEG_VIDEO_HEVC_LEVEL_3 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_3
+V4L2_MPEG_VIDEO_HEVC_LEVEL_3_1 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_3_1
+V4L2_MPEG_VIDEO_HEVC_LEVEL_4 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_4
+V4L2_MPEG_VIDEO_HEVC_LEVEL_4_1 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_4_1
+V4L2_MPEG_VIDEO_HEVC_LEVEL_5 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_5
+V4L2_MPEG_VIDEO_HEVC_LEVEL_5_1 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_5_1
+V4L2_MPEG_VIDEO_HEVC_LEVEL_5_2 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_5_2
+V4L2_MPEG_VIDEO_HEVC_LEVEL_6 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_6
+V4L2_MPEG_VIDEO_HEVC_LEVEL_6_1 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_6_1
+V4L2_MPEG_VIDEO_HEVC_LEVEL_6_2 = v4l2_mpeg_video_hevc_level.V4L2_MPEG_VIDEO_HEVC_LEVEL_6_2
+
+class v4l2_mpeg_video_hevc_tier(IntEnum):
+    V4L2_MPEG_VIDEO_HEVC_TIER_MAIN = 0
+    V4L2_MPEG_VIDEO_HEVC_TIER_HIGH = 1
+
+V4L2_MPEG_VIDEO_HEVC_TIER_MAIN = v4l2_mpeg_video_hevc_tier.V4L2_MPEG_VIDEO_HEVC_TIER_MAIN
+V4L2_MPEG_VIDEO_HEVC_TIER_HIGH = v4l2_mpeg_video_hevc_tier.V4L2_MPEG_VIDEO_HEVC_TIER_HIGH
+
+class v4l2_cid_mpeg_video_hevc_loop_filter_mode(IntEnum):
+    V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_DISABLED = 0
+    V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_ENABLED = 1
+    V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_DISABLED_AT_SLICE_BOUNDARY = 2
+
+V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_DISABLED = v4l2_cid_mpeg_video_hevc_loop_filter_mode.V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_DISABLED
+V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_ENABLED = v4l2_cid_mpeg_video_hevc_loop_filter_mode.V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_ENABLED
+V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_DISABLED_AT_SLICE_BOUNDARY = v4l2_cid_mpeg_video_hevc_loop_filter_mode.V4L2_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE_DISABLED_AT_SLICE_BOUNDARY
+
+class v4l2_cid_mpeg_video_hevc_refresh_type(IntEnum):
+    V4L2_MPEG_VIDEO_HEVC_REFRESH_NONE = 0
+    V4L2_MPEG_VIDEO_HEVC_REFRESH_CRA = 1
+    V4L2_MPEG_VIDEO_HEVC_REFRESH_IDR = 2
+
+V4L2_MPEG_VIDEO_HEVC_REFRESH_NONE = v4l2_cid_mpeg_video_hevc_refresh_type.V4L2_MPEG_VIDEO_HEVC_REFRESH_NONE
+V4L2_MPEG_VIDEO_HEVC_REFRESH_CRA = v4l2_cid_mpeg_video_hevc_refresh_type.V4L2_MPEG_VIDEO_HEVC_REFRESH_CRA
+V4L2_MPEG_VIDEO_HEVC_REFRESH_IDR = v4l2_cid_mpeg_video_hevc_refresh_type.V4L2_MPEG_VIDEO_HEVC_REFRESH_IDR
+
+class v4l2_cid_mpeg_video_hevc_size_of_length_field(IntEnum):
+    V4L2_MPEG_VIDEO_HEVC_SIZE_0 = 0
+    V4L2_MPEG_VIDEO_HEVC_SIZE_1 = 1
+    V4L2_MPEG_VIDEO_HEVC_SIZE_2 = 2
+    V4L2_MPEG_VIDEO_HEVC_SIZE_4 = 3
+
+V4L2_MPEG_VIDEO_HEVC_SIZE_0 = v4l2_cid_mpeg_video_hevc_size_of_length_field.V4L2_MPEG_VIDEO_HEVC_SIZE_0
+V4L2_MPEG_VIDEO_HEVC_SIZE_1 = v4l2_cid_mpeg_video_hevc_size_of_length_field.V4L2_MPEG_VIDEO_HEVC_SIZE_1
+V4L2_MPEG_VIDEO_HEVC_SIZE_2 = v4l2_cid_mpeg_video_hevc_size_of_length_field.V4L2_MPEG_VIDEO_HEVC_SIZE_2
+V4L2_MPEG_VIDEO_HEVC_SIZE_4 = v4l2_cid_mpeg_video_hevc_size_of_length_field.V4L2_MPEG_VIDEO_HEVC_SIZE_4
+
+class v4l2_mpeg_video_frame_skip_mode(IntEnum):
+    V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_DISABLED = 0
+    V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_LEVEL_LIMIT = 1
+    V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_BUF_LIMIT = 2
+
+V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_DISABLED = v4l2_mpeg_video_frame_skip_mode.V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_DISABLED
+V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_LEVEL_LIMIT = v4l2_mpeg_video_frame_skip_mode.V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_LEVEL_LIMIT
+V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_BUF_LIMIT = v4l2_mpeg_video_frame_skip_mode.V4L2_MPEG_VIDEO_FRAME_SKIP_MODE_BUF_LIMIT
+
+class v4l2_mpeg_video_av1_profile(IntEnum):
+    V4L2_MPEG_VIDEO_AV1_PROFILE_MAIN = 0
+    V4L2_MPEG_VIDEO_AV1_PROFILE_HIGH = 1
+    V4L2_MPEG_VIDEO_AV1_PROFILE_PROFESSIONAL = 2
+
+V4L2_MPEG_VIDEO_AV1_PROFILE_MAIN = v4l2_mpeg_video_av1_profile.V4L2_MPEG_VIDEO_AV1_PROFILE_MAIN
+V4L2_MPEG_VIDEO_AV1_PROFILE_HIGH = v4l2_mpeg_video_av1_profile.V4L2_MPEG_VIDEO_AV1_PROFILE_HIGH
+V4L2_MPEG_VIDEO_AV1_PROFILE_PROFESSIONAL = v4l2_mpeg_video_av1_profile.V4L2_MPEG_VIDEO_AV1_PROFILE_PROFESSIONAL
+
+class v4l2_mpeg_video_av1_level(IntEnum):
+    V4L2_MPEG_VIDEO_AV1_LEVEL_2_0 = 0
+    V4L2_MPEG_VIDEO_AV1_LEVEL_2_1 = 1
+    V4L2_MPEG_VIDEO_AV1_LEVEL_2_2 = 2
+    V4L2_MPEG_VIDEO_AV1_LEVEL_2_3 = 3
+    V4L2_MPEG_VIDEO_AV1_LEVEL_3_0 = 4
+    V4L2_MPEG_VIDEO_AV1_LEVEL_3_1 = 5
+    V4L2_MPEG_VIDEO_AV1_LEVEL_3_2 = 6
+    V4L2_MPEG_VIDEO_AV1_LEVEL_3_3 = 7
+    V4L2_MPEG_VIDEO_AV1_LEVEL_4_0 = 8
+    V4L2_MPEG_VIDEO_AV1_LEVEL_4_1 = 9
+    V4L2_MPEG_VIDEO_AV1_LEVEL_4_2 = 10
+    V4L2_MPEG_VIDEO_AV1_LEVEL_4_3 = 11
+    V4L2_MPEG_VIDEO_AV1_LEVEL_5_0 = 12
+    V4L2_MPEG_VIDEO_AV1_LEVEL_5_1 = 13
+    V4L2_MPEG_VIDEO_AV1_LEVEL_5_2 = 14
+    V4L2_MPEG_VIDEO_AV1_LEVEL_5_3 = 15
+    V4L2_MPEG_VIDEO_AV1_LEVEL_6_0 = 16
+    V4L2_MPEG_VIDEO_AV1_LEVEL_6_1 = 17
+    V4L2_MPEG_VIDEO_AV1_LEVEL_6_2 = 18
+    V4L2_MPEG_VIDEO_AV1_LEVEL_6_3 = 19
+    V4L2_MPEG_VIDEO_AV1_LEVEL_7_0 = 20
+    V4L2_MPEG_VIDEO_AV1_LEVEL_7_1 = 21
+    V4L2_MPEG_VIDEO_AV1_LEVEL_7_2 = 22
+    V4L2_MPEG_VIDEO_AV1_LEVEL_7_3 = 23
+
+V4L2_MPEG_VIDEO_AV1_LEVEL_2_0 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_2_0
+V4L2_MPEG_VIDEO_AV1_LEVEL_2_1 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_2_1
+V4L2_MPEG_VIDEO_AV1_LEVEL_2_2 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_2_2
+V4L2_MPEG_VIDEO_AV1_LEVEL_2_3 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_2_3
+V4L2_MPEG_VIDEO_AV1_LEVEL_3_0 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_3_0
+V4L2_MPEG_VIDEO_AV1_LEVEL_3_1 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_3_1
+V4L2_MPEG_VIDEO_AV1_LEVEL_3_2 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_3_2
+V4L2_MPEG_VIDEO_AV1_LEVEL_3_3 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_3_3
+V4L2_MPEG_VIDEO_AV1_LEVEL_4_0 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_4_0
+V4L2_MPEG_VIDEO_AV1_LEVEL_4_1 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_4_1
+V4L2_MPEG_VIDEO_AV1_LEVEL_4_2 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_4_2
+V4L2_MPEG_VIDEO_AV1_LEVEL_4_3 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_4_3
+V4L2_MPEG_VIDEO_AV1_LEVEL_5_0 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_5_0
+V4L2_MPEG_VIDEO_AV1_LEVEL_5_1 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_5_1
+V4L2_MPEG_VIDEO_AV1_LEVEL_5_2 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_5_2
+V4L2_MPEG_VIDEO_AV1_LEVEL_5_3 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_5_3
+V4L2_MPEG_VIDEO_AV1_LEVEL_6_0 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_6_0
+V4L2_MPEG_VIDEO_AV1_LEVEL_6_1 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_6_1
+V4L2_MPEG_VIDEO_AV1_LEVEL_6_2 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_6_2
+V4L2_MPEG_VIDEO_AV1_LEVEL_6_3 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_6_3
+V4L2_MPEG_VIDEO_AV1_LEVEL_7_0 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_7_0
+V4L2_MPEG_VIDEO_AV1_LEVEL_7_1 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_7_1
+V4L2_MPEG_VIDEO_AV1_LEVEL_7_2 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_7_2
+V4L2_MPEG_VIDEO_AV1_LEVEL_7_3 = v4l2_mpeg_video_av1_level.V4L2_MPEG_VIDEO_AV1_LEVEL_7_3
+
+class v4l2_mpeg_cx2341x_video_spatial_filter_mode(IntEnum):
+    V4L2_MPEG_CX2341X_VIDEO_SPATIAL_FILTER_MODE_MANUAL = 0
+    V4L2_MPEG_CX2341X_VIDEO_SPATIAL_FILTER_MODE_AUTO = 1
+
+V4L2_MPEG_CX2341X_VIDEO_SPATIAL_FILTER_MODE_MANUAL = v4l2_mpeg_cx2341x_video_spatial_filter_mode.V4L2_MPEG_CX2341X_VIDEO_SPATIAL_FILTER_MODE_MANUAL
+V4L2_MPEG_CX2341X_VIDEO_SPATIAL_FILTER_MODE_AUTO = v4l2_mpeg_cx2341x_video_spatial_filter_mode.V4L2_MPEG_CX2341X_VIDEO_SPATIAL_FILTER_MODE_AUTO
+
+class v4l2_mpeg_cx2341x_video_luma_spatial_filter_type(IntEnum):
+    V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_OFF = 0
+    V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_1D_HOR = 1
+    V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_1D_VERT = 2
+    V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_2D_HV_SEPARABLE = 3
+    V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_2D_SYM_NON_SEPARABLE = 4
+
+V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_OFF = v4l2_mpeg_cx2341x_video_luma_spatial_filter_type.V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_OFF
+V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_1D_HOR = v4l2_mpeg_cx2341x_video_luma_spatial_filter_type.V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_1D_HOR
+V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_1D_VERT = v4l2_mpeg_cx2341x_video_luma_spatial_filter_type.V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_1D_VERT
+V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_2D_HV_SEPARABLE = v4l2_mpeg_cx2341x_video_luma_spatial_filter_type.V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_2D_HV_SEPARABLE
+V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_2D_SYM_NON_SEPARABLE = v4l2_mpeg_cx2341x_video_luma_spatial_filter_type.V4L2_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE_2D_SYM_NON_SEPARABLE
+
+class v4l2_mpeg_cx2341x_video_chroma_spatial_filter_type(IntEnum):
+    V4L2_MPEG_CX2341X_VIDEO_CHROMA_SPATIAL_FILTER_TYPE_OFF = 0
+    V4L2_MPEG_CX2341X_VIDEO_CHROMA_SPATIAL_FILTER_TYPE_1D_HOR = 1
+
+V4L2_MPEG_CX2341X_VIDEO_CHROMA_SPATIAL_FILTER_TYPE_OFF = v4l2_mpeg_cx2341x_video_chroma_spatial_filter_type.V4L2_MPEG_CX2341X_VIDEO_CHROMA_SPATIAL_FILTER_TYPE_OFF
+V4L2_MPEG_CX2341X_VIDEO_CHROMA_SPATIAL_FILTER_TYPE_1D_HOR = v4l2_mpeg_cx2341x_video_chroma_spatial_filter_type.V4L2_MPEG_CX2341X_VIDEO_CHROMA_SPATIAL_FILTER_TYPE_1D_HOR
+
+class v4l2_mpeg_cx2341x_video_temporal_filter_mode(IntEnum):
+    V4L2_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER_MODE_MANUAL = 0
+    V4L2_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER_MODE_AUTO = 1
+
+V4L2_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER_MODE_MANUAL = v4l2_mpeg_cx2341x_video_temporal_filter_mode.V4L2_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER_MODE_MANUAL
+V4L2_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER_MODE_AUTO = v4l2_mpeg_cx2341x_video_temporal_filter_mode.V4L2_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER_MODE_AUTO
+
+class v4l2_mpeg_cx2341x_video_median_filter_type(IntEnum):
+    V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_OFF = 0
+    V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_HOR = 1
+    V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_VERT = 2
+    V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_HOR_VERT = 3
+    V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_DIAG = 4
+
+V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_OFF = v4l2_mpeg_cx2341x_video_median_filter_type.V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_OFF
+V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_HOR = v4l2_mpeg_cx2341x_video_median_filter_type.V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_HOR
+V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_VERT = v4l2_mpeg_cx2341x_video_median_filter_type.V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_VERT
+V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_HOR_VERT = v4l2_mpeg_cx2341x_video_median_filter_type.V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_HOR_VERT
+V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_DIAG = v4l2_mpeg_cx2341x_video_median_filter_type.V4L2_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE_DIAG
+
+class v4l2_mpeg_mfc51_video_frame_skip_mode(IntEnum):
+    V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_DISABLED = 0
+    V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_LEVEL_LIMIT = 1
+    V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_BUF_LIMIT = 2
+
+V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_DISABLED = v4l2_mpeg_mfc51_video_frame_skip_mode.V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_DISABLED
+V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_LEVEL_LIMIT = v4l2_mpeg_mfc51_video_frame_skip_mode.V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_LEVEL_LIMIT
+V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_BUF_LIMIT = v4l2_mpeg_mfc51_video_frame_skip_mode.V4L2_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE_BUF_LIMIT
+
+class v4l2_mpeg_mfc51_video_force_frame_type(IntEnum):
+    V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_DISABLED = 0
+    V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_I_FRAME = 1
+    V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_NOT_CODED = 2
+
+V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_DISABLED = v4l2_mpeg_mfc51_video_force_frame_type.V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_DISABLED
+V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_I_FRAME = v4l2_mpeg_mfc51_video_force_frame_type.V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_I_FRAME
+V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_NOT_CODED = v4l2_mpeg_mfc51_video_force_frame_type.V4L2_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE_NOT_CODED
+
+class v4l2_exposure_auto_type(IntEnum):
+    V4L2_EXPOSURE_AUTO = 0
+    V4L2_EXPOSURE_MANUAL = 1
+    V4L2_EXPOSURE_SHUTTER_PRIORITY = 2
+    V4L2_EXPOSURE_APERTURE_PRIORITY = 3
+
+V4L2_EXPOSURE_AUTO = v4l2_exposure_auto_type.V4L2_EXPOSURE_AUTO
+V4L2_EXPOSURE_MANUAL = v4l2_exposure_auto_type.V4L2_EXPOSURE_MANUAL
+V4L2_EXPOSURE_SHUTTER_PRIORITY = v4l2_exposure_auto_type.V4L2_EXPOSURE_SHUTTER_PRIORITY
+V4L2_EXPOSURE_APERTURE_PRIORITY = v4l2_exposure_auto_type.V4L2_EXPOSURE_APERTURE_PRIORITY
+
+class v4l2_auto_n_preset_white_balance(IntEnum):
+    V4L2_WHITE_BALANCE_MANUAL = 0
+    V4L2_WHITE_BALANCE_AUTO = 1
+    V4L2_WHITE_BALANCE_INCANDESCENT = 2
+    V4L2_WHITE_BALANCE_FLUORESCENT = 3
+    V4L2_WHITE_BALANCE_FLUORESCENT_H = 4
+    V4L2_WHITE_BALANCE_HORIZON = 5
+    V4L2_WHITE_BALANCE_DAYLIGHT = 6
+    V4L2_WHITE_BALANCE_FLASH = 7
+    V4L2_WHITE_BALANCE_CLOUDY = 8
+    V4L2_WHITE_BALANCE_SHADE = 9
+
+V4L2_WHITE_BALANCE_MANUAL = v4l2_auto_n_preset_white_balance.V4L2_WHITE_BALANCE_MANUAL
+V4L2_WHITE_BALANCE_AUTO = v4l2_auto_n_preset_white_balance.V4L2_WHITE_BALANCE_AUTO
+V4L2_WHITE_BALANCE_INCANDESCENT = v4l2_auto_n_preset_white_balance.V4L2_WHITE_BALANCE_INCANDESCENT
+V4L2_WHITE_BALANCE_FLUORESCENT = v4l2_auto_n_preset_white_balance.V4L2_WHITE_BALANCE_FLUORESCENT
+V4L2_WHITE_BALANCE_FLUORESCENT_H = v4l2_auto_n_preset_white_balance.V4L2_WHITE_BALANCE_FLUORESCENT_H
+V4L2_WHITE_BALANCE_HORIZON = v4l2_auto_n_preset_white_balance.V4L2_WHITE_BALANCE_HORIZON
+V4L2_WHITE_BALANCE_DAYLIGHT = v4l2_auto_n_preset_white_balance.V4L2_WHITE_BALANCE_DAYLIGHT
+V4L2_WHITE_BALANCE_FLASH = v4l2_auto_n_preset_white_balance.V4L2_WHITE_BALANCE_FLASH
+V4L2_WHITE_BALANCE_CLOUDY = v4l2_auto_n_preset_white_balance.V4L2_WHITE_BALANCE_CLOUDY
+V4L2_WHITE_BALANCE_SHADE = v4l2_auto_n_preset_white_balance.V4L2_WHITE_BALANCE_SHADE
+
+class v4l2_iso_sensitivity_auto_type(IntEnum):
+    V4L2_ISO_SENSITIVITY_MANUAL = 0
+    V4L2_ISO_SENSITIVITY_AUTO = 1
+
+V4L2_ISO_SENSITIVITY_MANUAL = v4l2_iso_sensitivity_auto_type.V4L2_ISO_SENSITIVITY_MANUAL
+V4L2_ISO_SENSITIVITY_AUTO = v4l2_iso_sensitivity_auto_type.V4L2_ISO_SENSITIVITY_AUTO
+
+class v4l2_exposure_metering(IntEnum):
+    V4L2_EXPOSURE_METERING_AVERAGE = 0
+    V4L2_EXPOSURE_METERING_CENTER_WEIGHTED = 1
+    V4L2_EXPOSURE_METERING_SPOT = 2
+    V4L2_EXPOSURE_METERING_MATRIX = 3
+
+V4L2_EXPOSURE_METERING_AVERAGE = v4l2_exposure_metering.V4L2_EXPOSURE_METERING_AVERAGE
+V4L2_EXPOSURE_METERING_CENTER_WEIGHTED = v4l2_exposure_metering.V4L2_EXPOSURE_METERING_CENTER_WEIGHTED
+V4L2_EXPOSURE_METERING_SPOT = v4l2_exposure_metering.V4L2_EXPOSURE_METERING_SPOT
+V4L2_EXPOSURE_METERING_MATRIX = v4l2_exposure_metering.V4L2_EXPOSURE_METERING_MATRIX
+
+class v4l2_scene_mode(IntEnum):
+    V4L2_SCENE_MODE_NONE = 0
+    V4L2_SCENE_MODE_BACKLIGHT = 1
+    V4L2_SCENE_MODE_BEACH_SNOW = 2
+    V4L2_SCENE_MODE_CANDLE_LIGHT = 3
+    V4L2_SCENE_MODE_DAWN_DUSK = 4
+    V4L2_SCENE_MODE_FALL_COLORS = 5
+    V4L2_SCENE_MODE_FIREWORKS = 6
+    V4L2_SCENE_MODE_LANDSCAPE = 7
+    V4L2_SCENE_MODE_NIGHT = 8
+    V4L2_SCENE_MODE_PARTY_INDOOR = 9
+    V4L2_SCENE_MODE_PORTRAIT = 10
+    V4L2_SCENE_MODE_SPORTS = 11
+    V4L2_SCENE_MODE_SUNSET = 12
+    V4L2_SCENE_MODE_TEXT = 13
+
+V4L2_SCENE_MODE_NONE = v4l2_scene_mode.V4L2_SCENE_MODE_NONE
+V4L2_SCENE_MODE_BACKLIGHT = v4l2_scene_mode.V4L2_SCENE_MODE_BACKLIGHT
+V4L2_SCENE_MODE_BEACH_SNOW = v4l2_scene_mode.V4L2_SCENE_MODE_BEACH_SNOW
+V4L2_SCENE_MODE_CANDLE_LIGHT = v4l2_scene_mode.V4L2_SCENE_MODE_CANDLE_LIGHT
+V4L2_SCENE_MODE_DAWN_DUSK = v4l2_scene_mode.V4L2_SCENE_MODE_DAWN_DUSK
+V4L2_SCENE_MODE_FALL_COLORS = v4l2_scene_mode.V4L2_SCENE_MODE_FALL_COLORS
+V4L2_SCENE_MODE_FIREWORKS = v4l2_scene_mode.V4L2_SCENE_MODE_FIREWORKS
+V4L2_SCENE_MODE_LANDSCAPE = v4l2_scene_mode.V4L2_SCENE_MODE_LANDSCAPE
+V4L2_SCENE_MODE_NIGHT = v4l2_scene_mode.V4L2_SCENE_MODE_NIGHT
+V4L2_SCENE_MODE_PARTY_INDOOR = v4l2_scene_mode.V4L2_SCENE_MODE_PARTY_INDOOR
+V4L2_SCENE_MODE_PORTRAIT = v4l2_scene_mode.V4L2_SCENE_MODE_PORTRAIT
+V4L2_SCENE_MODE_SPORTS = v4l2_scene_mode.V4L2_SCENE_MODE_SPORTS
+V4L2_SCENE_MODE_SUNSET = v4l2_scene_mode.V4L2_SCENE_MODE_SUNSET
+V4L2_SCENE_MODE_TEXT = v4l2_scene_mode.V4L2_SCENE_MODE_TEXT
+
+class v4l2_auto_focus_range(IntEnum):
+    V4L2_AUTO_FOCUS_RANGE_AUTO = 0
+    V4L2_AUTO_FOCUS_RANGE_NORMAL = 1
+    V4L2_AUTO_FOCUS_RANGE_MACRO = 2
+    V4L2_AUTO_FOCUS_RANGE_INFINITY = 3
+
+V4L2_AUTO_FOCUS_RANGE_AUTO = v4l2_auto_focus_range.V4L2_AUTO_FOCUS_RANGE_AUTO
+V4L2_AUTO_FOCUS_RANGE_NORMAL = v4l2_auto_focus_range.V4L2_AUTO_FOCUS_RANGE_NORMAL
+V4L2_AUTO_FOCUS_RANGE_MACRO = v4l2_auto_focus_range.V4L2_AUTO_FOCUS_RANGE_MACRO
+V4L2_AUTO_FOCUS_RANGE_INFINITY = v4l2_auto_focus_range.V4L2_AUTO_FOCUS_RANGE_INFINITY
+
+class v4l2_preemphasis(IntEnum):
+    V4L2_PREEMPHASIS_DISABLED = 0
+    V4L2_PREEMPHASIS_50_uS = 1
+    V4L2_PREEMPHASIS_75_uS = 2
+
+V4L2_PREEMPHASIS_DISABLED = v4l2_preemphasis.V4L2_PREEMPHASIS_DISABLED
+V4L2_PREEMPHASIS_50_uS = v4l2_preemphasis.V4L2_PREEMPHASIS_50_uS
+V4L2_PREEMPHASIS_75_uS = v4l2_preemphasis.V4L2_PREEMPHASIS_75_uS
+
+class v4l2_flash_led_mode(IntEnum):
+    V4L2_FLASH_LED_MODE_NONE = 0
+    V4L2_FLASH_LED_MODE_FLASH = 1
+    V4L2_FLASH_LED_MODE_TORCH = 2
+
+V4L2_FLASH_LED_MODE_NONE = v4l2_flash_led_mode.V4L2_FLASH_LED_MODE_NONE
+V4L2_FLASH_LED_MODE_FLASH = v4l2_flash_led_mode.V4L2_FLASH_LED_MODE_FLASH
+V4L2_FLASH_LED_MODE_TORCH = v4l2_flash_led_mode.V4L2_FLASH_LED_MODE_TORCH
+
+class v4l2_flash_strobe_source(IntEnum):
+    V4L2_FLASH_STROBE_SOURCE_SOFTWARE = 0
+    V4L2_FLASH_STROBE_SOURCE_EXTERNAL = 1
+
+V4L2_FLASH_STROBE_SOURCE_SOFTWARE = v4l2_flash_strobe_source.V4L2_FLASH_STROBE_SOURCE_SOFTWARE
+V4L2_FLASH_STROBE_SOURCE_EXTERNAL = v4l2_flash_strobe_source.V4L2_FLASH_STROBE_SOURCE_EXTERNAL
+
+class v4l2_jpeg_chroma_subsampling(IntEnum):
+    V4L2_JPEG_CHROMA_SUBSAMPLING_444 = 0
+    V4L2_JPEG_CHROMA_SUBSAMPLING_422 = 1
+    V4L2_JPEG_CHROMA_SUBSAMPLING_420 = 2
+    V4L2_JPEG_CHROMA_SUBSAMPLING_411 = 3
+    V4L2_JPEG_CHROMA_SUBSAMPLING_410 = 4
+    V4L2_JPEG_CHROMA_SUBSAMPLING_GRAY = 5
+
+V4L2_JPEG_CHROMA_SUBSAMPLING_444 = v4l2_jpeg_chroma_subsampling.V4L2_JPEG_CHROMA_SUBSAMPLING_444
+V4L2_JPEG_CHROMA_SUBSAMPLING_422 = v4l2_jpeg_chroma_subsampling.V4L2_JPEG_CHROMA_SUBSAMPLING_422
+V4L2_JPEG_CHROMA_SUBSAMPLING_420 = v4l2_jpeg_chroma_subsampling.V4L2_JPEG_CHROMA_SUBSAMPLING_420
+V4L2_JPEG_CHROMA_SUBSAMPLING_411 = v4l2_jpeg_chroma_subsampling.V4L2_JPEG_CHROMA_SUBSAMPLING_411
+V4L2_JPEG_CHROMA_SUBSAMPLING_410 = v4l2_jpeg_chroma_subsampling.V4L2_JPEG_CHROMA_SUBSAMPLING_410
+V4L2_JPEG_CHROMA_SUBSAMPLING_GRAY = v4l2_jpeg_chroma_subsampling.V4L2_JPEG_CHROMA_SUBSAMPLING_GRAY
+
+class v4l2_dv_tx_mode(IntEnum):
+    V4L2_DV_TX_MODE_DVI_D = 0
+    V4L2_DV_TX_MODE_HDMI = 1
+
+V4L2_DV_TX_MODE_DVI_D = v4l2_dv_tx_mode.V4L2_DV_TX_MODE_DVI_D
+V4L2_DV_TX_MODE_HDMI = v4l2_dv_tx_mode.V4L2_DV_TX_MODE_HDMI
+
+class v4l2_dv_rgb_range(IntEnum):
+    V4L2_DV_RGB_RANGE_AUTO = 0
+    V4L2_DV_RGB_RANGE_LIMITED = 1
+    V4L2_DV_RGB_RANGE_FULL = 2
+
+V4L2_DV_RGB_RANGE_AUTO = v4l2_dv_rgb_range.V4L2_DV_RGB_RANGE_AUTO
+V4L2_DV_RGB_RANGE_LIMITED = v4l2_dv_rgb_range.V4L2_DV_RGB_RANGE_LIMITED
+V4L2_DV_RGB_RANGE_FULL = v4l2_dv_rgb_range.V4L2_DV_RGB_RANGE_FULL
+
+class v4l2_dv_it_content_type(IntEnum):
+    V4L2_DV_IT_CONTENT_TYPE_GRAPHICS = 0
+    V4L2_DV_IT_CONTENT_TYPE_PHOTO = 1
+    V4L2_DV_IT_CONTENT_TYPE_CINEMA = 2
+    V4L2_DV_IT_CONTENT_TYPE_GAME = 3
+    V4L2_DV_IT_CONTENT_TYPE_NO_ITC = 4
+
+V4L2_DV_IT_CONTENT_TYPE_GRAPHICS = v4l2_dv_it_content_type.V4L2_DV_IT_CONTENT_TYPE_GRAPHICS
+V4L2_DV_IT_CONTENT_TYPE_PHOTO = v4l2_dv_it_content_type.V4L2_DV_IT_CONTENT_TYPE_PHOTO
+V4L2_DV_IT_CONTENT_TYPE_CINEMA = v4l2_dv_it_content_type.V4L2_DV_IT_CONTENT_TYPE_CINEMA
+V4L2_DV_IT_CONTENT_TYPE_GAME = v4l2_dv_it_content_type.V4L2_DV_IT_CONTENT_TYPE_GAME
+V4L2_DV_IT_CONTENT_TYPE_NO_ITC = v4l2_dv_it_content_type.V4L2_DV_IT_CONTENT_TYPE_NO_ITC
+
+class v4l2_deemphasis(IntEnum):
+    V4L2_DEEMPHASIS_DISABLED = V4L2_PREEMPHASIS_DISABLED
+    V4L2_DEEMPHASIS_50_uS = V4L2_PREEMPHASIS_50_uS
+    V4L2_DEEMPHASIS_75_uS = V4L2_PREEMPHASIS_75_uS
+
+V4L2_DEEMPHASIS_DISABLED = v4l2_deemphasis.V4L2_DEEMPHASIS_DISABLED
+V4L2_DEEMPHASIS_50_uS = v4l2_deemphasis.V4L2_DEEMPHASIS_50_uS
+V4L2_DEEMPHASIS_75_uS = v4l2_deemphasis.V4L2_DEEMPHASIS_75_uS
+
+class v4l2_detect_md_mode(IntEnum):
+    V4L2_DETECT_MD_MODE_DISABLED = 0
+    V4L2_DETECT_MD_MODE_GLOBAL = 1
+    V4L2_DETECT_MD_MODE_THRESHOLD_GRID = 2
+    V4L2_DETECT_MD_MODE_REGION_GRID = 3
+
+V4L2_DETECT_MD_MODE_DISABLED = v4l2_detect_md_mode.V4L2_DETECT_MD_MODE_DISABLED
+V4L2_DETECT_MD_MODE_GLOBAL = v4l2_detect_md_mode.V4L2_DETECT_MD_MODE_GLOBAL
+V4L2_DETECT_MD_MODE_THRESHOLD_GRID = v4l2_detect_md_mode.V4L2_DETECT_MD_MODE_THRESHOLD_GRID
+V4L2_DETECT_MD_MODE_REGION_GRID = v4l2_detect_md_mode.V4L2_DETECT_MD_MODE_REGION_GRID
+
+class v4l2_stateless_h264_decode_mode(IntEnum):
+    V4L2_STATELESS_H264_DECODE_MODE_SLICE_BASED = 0
+    V4L2_STATELESS_H264_DECODE_MODE_FRAME_BASED = 1
+
+V4L2_STATELESS_H264_DECODE_MODE_SLICE_BASED = v4l2_stateless_h264_decode_mode.V4L2_STATELESS_H264_DECODE_MODE_SLICE_BASED
+V4L2_STATELESS_H264_DECODE_MODE_FRAME_BASED = v4l2_stateless_h264_decode_mode.V4L2_STATELESS_H264_DECODE_MODE_FRAME_BASED
+
+class v4l2_stateless_h264_start_code(IntEnum):
+    V4L2_STATELESS_H264_START_CODE_NONE = 0
+    V4L2_STATELESS_H264_START_CODE_ANNEX_B = 1
+
+V4L2_STATELESS_H264_START_CODE_NONE = v4l2_stateless_h264_start_code.V4L2_STATELESS_H264_START_CODE_NONE
+V4L2_STATELESS_H264_START_CODE_ANNEX_B = v4l2_stateless_h264_start_code.V4L2_STATELESS_H264_START_CODE_ANNEX_B
+
+class v4l2_stateless_hevc_decode_mode(IntEnum):
+    V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED = 0
+    V4L2_STATELESS_HEVC_DECODE_MODE_FRAME_BASED = 1
+
+V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED = v4l2_stateless_hevc_decode_mode.V4L2_STATELESS_HEVC_DECODE_MODE_SLICE_BASED
+V4L2_STATELESS_HEVC_DECODE_MODE_FRAME_BASED = v4l2_stateless_hevc_decode_mode.V4L2_STATELESS_HEVC_DECODE_MODE_FRAME_BASED
+
+class v4l2_stateless_hevc_start_code(IntEnum):
+    V4L2_STATELESS_HEVC_START_CODE_NONE = 0
+    V4L2_STATELESS_HEVC_START_CODE_ANNEX_B = 1
+
+V4L2_STATELESS_HEVC_START_CODE_NONE = v4l2_stateless_hevc_start_code.V4L2_STATELESS_HEVC_START_CODE_NONE
+V4L2_STATELESS_HEVC_START_CODE_ANNEX_B = v4l2_stateless_hevc_start_code.V4L2_STATELESS_HEVC_START_CODE_ANNEX_B
+
+class v4l2_av1_warp_model(IntEnum):
+    V4L2_AV1_WARP_MODEL_IDENTITY = 0
+    V4L2_AV1_WARP_MODEL_TRANSLATION = 1
+    V4L2_AV1_WARP_MODEL_ROTZOOM = 2
+    V4L2_AV1_WARP_MODEL_AFFINE = 3
+
+V4L2_AV1_WARP_MODEL_IDENTITY = v4l2_av1_warp_model.V4L2_AV1_WARP_MODEL_IDENTITY
+V4L2_AV1_WARP_MODEL_TRANSLATION = v4l2_av1_warp_model.V4L2_AV1_WARP_MODEL_TRANSLATION
+V4L2_AV1_WARP_MODEL_ROTZOOM = v4l2_av1_warp_model.V4L2_AV1_WARP_MODEL_ROTZOOM
+V4L2_AV1_WARP_MODEL_AFFINE = v4l2_av1_warp_model.V4L2_AV1_WARP_MODEL_AFFINE
+
+class v4l2_av1_reference_frame(IntEnum):
+    V4L2_AV1_REF_INTRA_FRAME = 0
+    V4L2_AV1_REF_LAST_FRAME = 1
+    V4L2_AV1_REF_LAST2_FRAME = 2
+    V4L2_AV1_REF_LAST3_FRAME = 3
+    V4L2_AV1_REF_GOLDEN_FRAME = 4
+    V4L2_AV1_REF_BWDREF_FRAME = 5
+    V4L2_AV1_REF_ALTREF2_FRAME = 6
+    V4L2_AV1_REF_ALTREF_FRAME = 7
+
+V4L2_AV1_REF_INTRA_FRAME = v4l2_av1_reference_frame.V4L2_AV1_REF_INTRA_FRAME
+V4L2_AV1_REF_LAST_FRAME = v4l2_av1_reference_frame.V4L2_AV1_REF_LAST_FRAME
+V4L2_AV1_REF_LAST2_FRAME = v4l2_av1_reference_frame.V4L2_AV1_REF_LAST2_FRAME
+V4L2_AV1_REF_LAST3_FRAME = v4l2_av1_reference_frame.V4L2_AV1_REF_LAST3_FRAME
+V4L2_AV1_REF_GOLDEN_FRAME = v4l2_av1_reference_frame.V4L2_AV1_REF_GOLDEN_FRAME
+V4L2_AV1_REF_BWDREF_FRAME = v4l2_av1_reference_frame.V4L2_AV1_REF_BWDREF_FRAME
+V4L2_AV1_REF_ALTREF2_FRAME = v4l2_av1_reference_frame.V4L2_AV1_REF_ALTREF2_FRAME
+V4L2_AV1_REF_ALTREF_FRAME = v4l2_av1_reference_frame.V4L2_AV1_REF_ALTREF_FRAME
+
+class v4l2_av1_frame_restoration_type(IntEnum):
+    V4L2_AV1_FRAME_RESTORE_NONE = 0
+    V4L2_AV1_FRAME_RESTORE_WIENER = 1
+    V4L2_AV1_FRAME_RESTORE_SGRPROJ = 2
+    V4L2_AV1_FRAME_RESTORE_SWITCHABLE = 3
+
+V4L2_AV1_FRAME_RESTORE_NONE = v4l2_av1_frame_restoration_type.V4L2_AV1_FRAME_RESTORE_NONE
+V4L2_AV1_FRAME_RESTORE_WIENER = v4l2_av1_frame_restoration_type.V4L2_AV1_FRAME_RESTORE_WIENER
+V4L2_AV1_FRAME_RESTORE_SGRPROJ = v4l2_av1_frame_restoration_type.V4L2_AV1_FRAME_RESTORE_SGRPROJ
+V4L2_AV1_FRAME_RESTORE_SWITCHABLE = v4l2_av1_frame_restoration_type.V4L2_AV1_FRAME_RESTORE_SWITCHABLE
+
+class v4l2_av1_segment_feature(IntEnum):
+    V4L2_AV1_SEG_LVL_ALT_Q = 0
+    V4L2_AV1_SEG_LVL_ALT_LF_Y_V = 1
+    V4L2_AV1_SEG_LVL_REF_FRAME = 5
+    V4L2_AV1_SEG_LVL_REF_SKIP = 6
+    V4L2_AV1_SEG_LVL_REF_GLOBALMV = 7
+    V4L2_AV1_SEG_LVL_MAX = 8
+
+V4L2_AV1_SEG_LVL_ALT_Q = v4l2_av1_segment_feature.V4L2_AV1_SEG_LVL_ALT_Q
+V4L2_AV1_SEG_LVL_ALT_LF_Y_V = v4l2_av1_segment_feature.V4L2_AV1_SEG_LVL_ALT_LF_Y_V
+V4L2_AV1_SEG_LVL_REF_FRAME = v4l2_av1_segment_feature.V4L2_AV1_SEG_LVL_REF_FRAME
+V4L2_AV1_SEG_LVL_REF_SKIP = v4l2_av1_segment_feature.V4L2_AV1_SEG_LVL_REF_SKIP
+V4L2_AV1_SEG_LVL_REF_GLOBALMV = v4l2_av1_segment_feature.V4L2_AV1_SEG_LVL_REF_GLOBALMV
+V4L2_AV1_SEG_LVL_MAX = v4l2_av1_segment_feature.V4L2_AV1_SEG_LVL_MAX
+
+class v4l2_av1_frame_type(IntEnum):
+    V4L2_AV1_KEY_FRAME = 0
+    V4L2_AV1_INTER_FRAME = 1
+    V4L2_AV1_INTRA_ONLY_FRAME = 2
+    V4L2_AV1_SWITCH_FRAME = 3
+
+V4L2_AV1_KEY_FRAME = v4l2_av1_frame_type.V4L2_AV1_KEY_FRAME
+V4L2_AV1_INTER_FRAME = v4l2_av1_frame_type.V4L2_AV1_INTER_FRAME
+V4L2_AV1_INTRA_ONLY_FRAME = v4l2_av1_frame_type.V4L2_AV1_INTRA_ONLY_FRAME
+V4L2_AV1_SWITCH_FRAME = v4l2_av1_frame_type.V4L2_AV1_SWITCH_FRAME
+
+class v4l2_av1_interpolation_filter(IntEnum):
+    V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP = 0
+    V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP_SMOOTH = 1
+    V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP_SHARP = 2
+    V4L2_AV1_INTERPOLATION_FILTER_BILINEAR = 3
+    V4L2_AV1_INTERPOLATION_FILTER_SWITCHABLE = 4
+
+V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP = v4l2_av1_interpolation_filter.V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP
+V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP_SMOOTH = v4l2_av1_interpolation_filter.V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP_SMOOTH
+V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP_SHARP = v4l2_av1_interpolation_filter.V4L2_AV1_INTERPOLATION_FILTER_EIGHTTAP_SHARP
+V4L2_AV1_INTERPOLATION_FILTER_BILINEAR = v4l2_av1_interpolation_filter.V4L2_AV1_INTERPOLATION_FILTER_BILINEAR
+V4L2_AV1_INTERPOLATION_FILTER_SWITCHABLE = v4l2_av1_interpolation_filter.V4L2_AV1_INTERPOLATION_FILTER_SWITCHABLE
+
+class v4l2_av1_tx_mode(IntEnum):
+    V4L2_AV1_TX_MODE_ONLY_4X4 = 0
+    V4L2_AV1_TX_MODE_LARGEST = 1
+    V4L2_AV1_TX_MODE_SELECT = 2
+
+V4L2_AV1_TX_MODE_ONLY_4X4 = v4l2_av1_tx_mode.V4L2_AV1_TX_MODE_ONLY_4X4
+V4L2_AV1_TX_MODE_LARGEST = v4l2_av1_tx_mode.V4L2_AV1_TX_MODE_LARGEST
+V4L2_AV1_TX_MODE_SELECT = v4l2_av1_tx_mode.V4L2_AV1_TX_MODE_SELECT
+
+class v4l2_field(IntEnum):
+    V4L2_FIELD_ANY = 0
+    V4L2_FIELD_NONE = 1
+    V4L2_FIELD_TOP = 2
+    V4L2_FIELD_BOTTOM = 3
+    V4L2_FIELD_INTERLACED = 4
+    V4L2_FIELD_SEQ_TB = 5
+    V4L2_FIELD_SEQ_BT = 6
+    V4L2_FIELD_ALTERNATE = 7
+    V4L2_FIELD_INTERLACED_TB = 8
+    V4L2_FIELD_INTERLACED_BT = 9
+
+V4L2_FIELD_ANY = v4l2_field.V4L2_FIELD_ANY
+V4L2_FIELD_NONE = v4l2_field.V4L2_FIELD_NONE
+V4L2_FIELD_TOP = v4l2_field.V4L2_FIELD_TOP
+V4L2_FIELD_BOTTOM = v4l2_field.V4L2_FIELD_BOTTOM
+V4L2_FIELD_INTERLACED = v4l2_field.V4L2_FIELD_INTERLACED
+V4L2_FIELD_SEQ_TB = v4l2_field.V4L2_FIELD_SEQ_TB
+V4L2_FIELD_SEQ_BT = v4l2_field.V4L2_FIELD_SEQ_BT
+V4L2_FIELD_ALTERNATE = v4l2_field.V4L2_FIELD_ALTERNATE
+V4L2_FIELD_INTERLACED_TB = v4l2_field.V4L2_FIELD_INTERLACED_TB
+V4L2_FIELD_INTERLACED_BT = v4l2_field.V4L2_FIELD_INTERLACED_BT
+
+class v4l2_buf_type(IntEnum):
+    V4L2_BUF_TYPE_VIDEO_CAPTURE = 1
+    V4L2_BUF_TYPE_VIDEO_OUTPUT = 2
+    V4L2_BUF_TYPE_VIDEO_OVERLAY = 3
+    V4L2_BUF_TYPE_VBI_CAPTURE = 4
+    V4L2_BUF_TYPE_VBI_OUTPUT = 5
+    V4L2_BUF_TYPE_SLICED_VBI_CAPTURE = 6
+    V4L2_BUF_TYPE_SLICED_VBI_OUTPUT = 7
+    V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY = 8
+    V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE = 9
+    V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE = 10
+    V4L2_BUF_TYPE_SDR_CAPTURE = 11
+    V4L2_BUF_TYPE_SDR_OUTPUT = 12
+    V4L2_BUF_TYPE_META_CAPTURE = 13
+    V4L2_BUF_TYPE_META_OUTPUT = 14
+    V4L2_BUF_TYPE_PRIVATE = 0x80
+
+V4L2_BUF_TYPE_VIDEO_CAPTURE = v4l2_buf_type.V4L2_BUF_TYPE_VIDEO_CAPTURE
+V4L2_BUF_TYPE_VIDEO_OUTPUT = v4l2_buf_type.V4L2_BUF_TYPE_VIDEO_OUTPUT
+V4L2_BUF_TYPE_VIDEO_OVERLAY = v4l2_buf_type.V4L2_BUF_TYPE_VIDEO_OVERLAY
+V4L2_BUF_TYPE_VBI_CAPTURE = v4l2_buf_type.V4L2_BUF_TYPE_VBI_CAPTURE
+V4L2_BUF_TYPE_VBI_OUTPUT = v4l2_buf_type.V4L2_BUF_TYPE_VBI_OUTPUT
+V4L2_BUF_TYPE_SLICED_VBI_CAPTURE = v4l2_buf_type.V4L2_BUF_TYPE_SLICED_VBI_CAPTURE
+V4L2_BUF_TYPE_SLICED_VBI_OUTPUT = v4l2_buf_type.V4L2_BUF_TYPE_SLICED_VBI_OUTPUT
+V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY = v4l2_buf_type.V4L2_BUF_TYPE_VIDEO_OUTPUT_OVERLAY
+V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE = v4l2_buf_type.V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE
+V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE = v4l2_buf_type.V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE
+V4L2_BUF_TYPE_SDR_CAPTURE = v4l2_buf_type.V4L2_BUF_TYPE_SDR_CAPTURE
+V4L2_BUF_TYPE_SDR_OUTPUT = v4l2_buf_type.V4L2_BUF_TYPE_SDR_OUTPUT
+V4L2_BUF_TYPE_META_CAPTURE = v4l2_buf_type.V4L2_BUF_TYPE_META_CAPTURE
+V4L2_BUF_TYPE_META_OUTPUT = v4l2_buf_type.V4L2_BUF_TYPE_META_OUTPUT
+V4L2_BUF_TYPE_PRIVATE = v4l2_buf_type.V4L2_BUF_TYPE_PRIVATE
+
+class v4l2_tuner_type(IntEnum):
+    V4L2_TUNER_RADIO = 1
+    V4L2_TUNER_ANALOG_TV = 2
+    V4L2_TUNER_DIGITAL_TV = 3
+    V4L2_TUNER_SDR = 4
+    V4L2_TUNER_RF = 5
+
+V4L2_TUNER_RADIO = v4l2_tuner_type.V4L2_TUNER_RADIO
+V4L2_TUNER_ANALOG_TV = v4l2_tuner_type.V4L2_TUNER_ANALOG_TV
+V4L2_TUNER_DIGITAL_TV = v4l2_tuner_type.V4L2_TUNER_DIGITAL_TV
+V4L2_TUNER_SDR = v4l2_tuner_type.V4L2_TUNER_SDR
+V4L2_TUNER_RF = v4l2_tuner_type.V4L2_TUNER_RF
+
+class v4l2_memory(IntEnum):
+    V4L2_MEMORY_MMAP = 1
+    V4L2_MEMORY_USERPTR = 2
+    V4L2_MEMORY_OVERLAY = 3
+    V4L2_MEMORY_DMABUF = 4
+
+V4L2_MEMORY_MMAP = v4l2_memory.V4L2_MEMORY_MMAP
+V4L2_MEMORY_USERPTR = v4l2_memory.V4L2_MEMORY_USERPTR
+V4L2_MEMORY_OVERLAY = v4l2_memory.V4L2_MEMORY_OVERLAY
+V4L2_MEMORY_DMABUF = v4l2_memory.V4L2_MEMORY_DMABUF
+
+class v4l2_colorspace(IntEnum):
+    V4L2_COLORSPACE_DEFAULT = 0
+    V4L2_COLORSPACE_SMPTE170M = 1
+    V4L2_COLORSPACE_SMPTE240M = 2
+    V4L2_COLORSPACE_REC709 = 3
+    V4L2_COLORSPACE_BT878 = 4
+    V4L2_COLORSPACE_470_SYSTEM_M = 5
+    V4L2_COLORSPACE_470_SYSTEM_BG = 6
+    V4L2_COLORSPACE_JPEG = 7
+    V4L2_COLORSPACE_SRGB = 8
+    V4L2_COLORSPACE_OPRGB = 9
+    V4L2_COLORSPACE_BT2020 = 10
+    V4L2_COLORSPACE_RAW = 11
+    V4L2_COLORSPACE_DCI_P3 = 12
+
+V4L2_COLORSPACE_DEFAULT = v4l2_colorspace.V4L2_COLORSPACE_DEFAULT
+V4L2_COLORSPACE_SMPTE170M = v4l2_colorspace.V4L2_COLORSPACE_SMPTE170M
+V4L2_COLORSPACE_SMPTE240M = v4l2_colorspace.V4L2_COLORSPACE_SMPTE240M
+V4L2_COLORSPACE_REC709 = v4l2_colorspace.V4L2_COLORSPACE_REC709
+V4L2_COLORSPACE_BT878 = v4l2_colorspace.V4L2_COLORSPACE_BT878
+V4L2_COLORSPACE_470_SYSTEM_M = v4l2_colorspace.V4L2_COLORSPACE_470_SYSTEM_M
+V4L2_COLORSPACE_470_SYSTEM_BG = v4l2_colorspace.V4L2_COLORSPACE_470_SYSTEM_BG
+V4L2_COLORSPACE_JPEG = v4l2_colorspace.V4L2_COLORSPACE_JPEG
+V4L2_COLORSPACE_SRGB = v4l2_colorspace.V4L2_COLORSPACE_SRGB
+V4L2_COLORSPACE_OPRGB = v4l2_colorspace.V4L2_COLORSPACE_OPRGB
+V4L2_COLORSPACE_BT2020 = v4l2_colorspace.V4L2_COLORSPACE_BT2020
+V4L2_COLORSPACE_RAW = v4l2_colorspace.V4L2_COLORSPACE_RAW
+V4L2_COLORSPACE_DCI_P3 = v4l2_colorspace.V4L2_COLORSPACE_DCI_P3
+
+class v4l2_xfer_func(IntEnum):
+    V4L2_XFER_FUNC_DEFAULT = 0
+    V4L2_XFER_FUNC_709 = 1
+    V4L2_XFER_FUNC_SRGB = 2
+    V4L2_XFER_FUNC_OPRGB = 3
+    V4L2_XFER_FUNC_SMPTE240M = 4
+    V4L2_XFER_FUNC_NONE = 5
+    V4L2_XFER_FUNC_DCI_P3 = 6
+    V4L2_XFER_FUNC_SMPTE2084 = 7
+
+V4L2_XFER_FUNC_DEFAULT = v4l2_xfer_func.V4L2_XFER_FUNC_DEFAULT
+V4L2_XFER_FUNC_709 = v4l2_xfer_func.V4L2_XFER_FUNC_709
+V4L2_XFER_FUNC_SRGB = v4l2_xfer_func.V4L2_XFER_FUNC_SRGB
+V4L2_XFER_FUNC_OPRGB = v4l2_xfer_func.V4L2_XFER_FUNC_OPRGB
+V4L2_XFER_FUNC_SMPTE240M = v4l2_xfer_func.V4L2_XFER_FUNC_SMPTE240M
+V4L2_XFER_FUNC_NONE = v4l2_xfer_func.V4L2_XFER_FUNC_NONE
+V4L2_XFER_FUNC_DCI_P3 = v4l2_xfer_func.V4L2_XFER_FUNC_DCI_P3
+V4L2_XFER_FUNC_SMPTE2084 = v4l2_xfer_func.V4L2_XFER_FUNC_SMPTE2084
+
+class v4l2_ycbcr_encoding(IntEnum):
+    V4L2_YCBCR_ENC_DEFAULT = 0
+    V4L2_YCBCR_ENC_601 = 1
+    V4L2_YCBCR_ENC_709 = 2
+    V4L2_YCBCR_ENC_XV601 = 3
+    V4L2_YCBCR_ENC_XV709 = 4
+    V4L2_YCBCR_ENC_SYCC = 5
+    V4L2_YCBCR_ENC_BT2020 = 6
+    V4L2_YCBCR_ENC_BT2020_CONST_LUM = 7
+    V4L2_YCBCR_ENC_SMPTE240M = 8
+
+V4L2_YCBCR_ENC_DEFAULT = v4l2_ycbcr_encoding.V4L2_YCBCR_ENC_DEFAULT
+V4L2_YCBCR_ENC_601 = v4l2_ycbcr_encoding.V4L2_YCBCR_ENC_601
+V4L2_YCBCR_ENC_709 = v4l2_ycbcr_encoding.V4L2_YCBCR_ENC_709
+V4L2_YCBCR_ENC_XV601 = v4l2_ycbcr_encoding.V4L2_YCBCR_ENC_XV601
+V4L2_YCBCR_ENC_XV709 = v4l2_ycbcr_encoding.V4L2_YCBCR_ENC_XV709
+V4L2_YCBCR_ENC_SYCC = v4l2_ycbcr_encoding.V4L2_YCBCR_ENC_SYCC
+V4L2_YCBCR_ENC_BT2020 = v4l2_ycbcr_encoding.V4L2_YCBCR_ENC_BT2020
+V4L2_YCBCR_ENC_BT2020_CONST_LUM = v4l2_ycbcr_encoding.V4L2_YCBCR_ENC_BT2020_CONST_LUM
+V4L2_YCBCR_ENC_SMPTE240M = v4l2_ycbcr_encoding.V4L2_YCBCR_ENC_SMPTE240M
+
+class v4l2_hsv_encoding(IntEnum):
+    V4L2_HSV_ENC_180 = 128
+    V4L2_HSV_ENC_256 = 129
+
+V4L2_HSV_ENC_180 = v4l2_hsv_encoding.V4L2_HSV_ENC_180
+V4L2_HSV_ENC_256 = v4l2_hsv_encoding.V4L2_HSV_ENC_256
+
+class v4l2_quantization(IntEnum):
+    V4L2_QUANTIZATION_DEFAULT = 0
+    V4L2_QUANTIZATION_FULL_RANGE = 1
+    V4L2_QUANTIZATION_LIM_RANGE = 2
+
+V4L2_QUANTIZATION_DEFAULT = v4l2_quantization.V4L2_QUANTIZATION_DEFAULT
+V4L2_QUANTIZATION_FULL_RANGE = v4l2_quantization.V4L2_QUANTIZATION_FULL_RANGE
+V4L2_QUANTIZATION_LIM_RANGE = v4l2_quantization.V4L2_QUANTIZATION_LIM_RANGE
+
+class v4l2_priority(IntEnum):
+    V4L2_PRIORITY_UNSET = 0
+    V4L2_PRIORITY_BACKGROUND = 1
+    V4L2_PRIORITY_INTERACTIVE = 2
+    V4L2_PRIORITY_RECORD = 3
+    V4L2_PRIORITY_DEFAULT = V4L2_PRIORITY_INTERACTIVE
+
+V4L2_PRIORITY_UNSET = v4l2_priority.V4L2_PRIORITY_UNSET
+V4L2_PRIORITY_BACKGROUND = v4l2_priority.V4L2_PRIORITY_BACKGROUND
+V4L2_PRIORITY_INTERACTIVE = v4l2_priority.V4L2_PRIORITY_INTERACTIVE
+V4L2_PRIORITY_RECORD = v4l2_priority.V4L2_PRIORITY_RECORD
+V4L2_PRIORITY_DEFAULT = v4l2_priority.V4L2_PRIORITY_DEFAULT
+
+class v4l2_frmsizetypes(IntEnum):
+    V4L2_FRMSIZE_TYPE_DISCRETE = 1
+    V4L2_FRMSIZE_TYPE_CONTINUOUS = 2
+    V4L2_FRMSIZE_TYPE_STEPWISE = 3
+
+V4L2_FRMSIZE_TYPE_DISCRETE = v4l2_frmsizetypes.V4L2_FRMSIZE_TYPE_DISCRETE
+V4L2_FRMSIZE_TYPE_CONTINUOUS = v4l2_frmsizetypes.V4L2_FRMSIZE_TYPE_CONTINUOUS
+V4L2_FRMSIZE_TYPE_STEPWISE = v4l2_frmsizetypes.V4L2_FRMSIZE_TYPE_STEPWISE
+
+class v4l2_frmivaltypes(IntEnum):
+    V4L2_FRMIVAL_TYPE_DISCRETE = 1
+    V4L2_FRMIVAL_TYPE_CONTINUOUS = 2
+    V4L2_FRMIVAL_TYPE_STEPWISE = 3
+
+V4L2_FRMIVAL_TYPE_DISCRETE = v4l2_frmivaltypes.V4L2_FRMIVAL_TYPE_DISCRETE
+V4L2_FRMIVAL_TYPE_CONTINUOUS = v4l2_frmivaltypes.V4L2_FRMIVAL_TYPE_CONTINUOUS
+V4L2_FRMIVAL_TYPE_STEPWISE = v4l2_frmivaltypes.V4L2_FRMIVAL_TYPE_STEPWISE
+
+class v4l2_ctrl_type(IntEnum):
+    V4L2_CTRL_TYPE_INTEGER = 1
+    V4L2_CTRL_TYPE_BOOLEAN = 2
+    V4L2_CTRL_TYPE_MENU = 3
+    V4L2_CTRL_TYPE_BUTTON = 4
+    V4L2_CTRL_TYPE_INTEGER64 = 5
+    V4L2_CTRL_TYPE_CTRL_CLASS = 6
+    V4L2_CTRL_TYPE_STRING = 7
+    V4L2_CTRL_TYPE_BITMASK = 8
+    V4L2_CTRL_TYPE_INTEGER_MENU = 9
+    V4L2_CTRL_COMPOUND_TYPES = 0x0100
+    V4L2_CTRL_TYPE_U8 = 0x0100
+    V4L2_CTRL_TYPE_U16 = 0x0101
+    V4L2_CTRL_TYPE_U32 = 0x0102
+    V4L2_CTRL_TYPE_AREA = 0x0106
+    V4L2_CTRL_TYPE_HDR10_CLL_INFO = 0x0110
+    V4L2_CTRL_TYPE_HDR10_MASTERING_DISPLAY = 0x0111
+    V4L2_CTRL_TYPE_H264_SPS = 0x0200
+    V4L2_CTRL_TYPE_H264_PPS = 0x0201
+    V4L2_CTRL_TYPE_H264_SCALING_MATRIX = 0x0202
+    V4L2_CTRL_TYPE_H264_SLICE_PARAMS = 0x0203
+    V4L2_CTRL_TYPE_H264_DECODE_PARAMS = 0x0204
+    V4L2_CTRL_TYPE_H264_PRED_WEIGHTS = 0x0205
+    V4L2_CTRL_TYPE_FWHT_PARAMS = 0x0220
+    V4L2_CTRL_TYPE_VP8_FRAME = 0x0240
+    V4L2_CTRL_TYPE_MPEG2_QUANTISATION = 0x0250
+    V4L2_CTRL_TYPE_MPEG2_SEQUENCE = 0x0251
+    V4L2_CTRL_TYPE_MPEG2_PICTURE = 0x0252
+    V4L2_CTRL_TYPE_VP9_COMPRESSED_HDR = 0x0260
+    V4L2_CTRL_TYPE_VP9_FRAME = 0x0261
+    V4L2_CTRL_TYPE_HEVC_SPS = 0x0270
+    V4L2_CTRL_TYPE_HEVC_PPS = 0x0271
+    V4L2_CTRL_TYPE_HEVC_SLICE_PARAMS = 0x0272
+    V4L2_CTRL_TYPE_HEVC_SCALING_MATRIX = 0x0273
+    V4L2_CTRL_TYPE_HEVC_DECODE_PARAMS = 0x0274
+    V4L2_CTRL_TYPE_AV1_SEQUENCE = 0x280
+    V4L2_CTRL_TYPE_AV1_TILE_GROUP_ENTRY = 0x281
+    V4L2_CTRL_TYPE_AV1_FRAME = 0x282
+    V4L2_CTRL_TYPE_AV1_FILM_GRAIN = 0x283
+
+V4L2_CTRL_TYPE_INTEGER = v4l2_ctrl_type.V4L2_CTRL_TYPE_INTEGER
+V4L2_CTRL_TYPE_BOOLEAN = v4l2_ctrl_type.V4L2_CTRL_TYPE_BOOLEAN
+V4L2_CTRL_TYPE_MENU = v4l2_ctrl_type.V4L2_CTRL_TYPE_MENU
+V4L2_CTRL_TYPE_BUTTON = v4l2_ctrl_type.V4L2_CTRL_TYPE_BUTTON
+V4L2_CTRL_TYPE_INTEGER64 = v4l2_ctrl_type.V4L2_CTRL_TYPE_INTEGER64
+V4L2_CTRL_TYPE_CTRL_CLASS = v4l2_ctrl_type.V4L2_CTRL_TYPE_CTRL_CLASS
+V4L2_CTRL_TYPE_STRING = v4l2_ctrl_type.V4L2_CTRL_TYPE_STRING
+V4L2_CTRL_TYPE_BITMASK = v4l2_ctrl_type.V4L2_CTRL_TYPE_BITMASK
+V4L2_CTRL_TYPE_INTEGER_MENU = v4l2_ctrl_type.V4L2_CTRL_TYPE_INTEGER_MENU
+V4L2_CTRL_COMPOUND_TYPES = v4l2_ctrl_type.V4L2_CTRL_COMPOUND_TYPES
+V4L2_CTRL_TYPE_U8 = v4l2_ctrl_type.V4L2_CTRL_TYPE_U8
+V4L2_CTRL_TYPE_U16 = v4l2_ctrl_type.V4L2_CTRL_TYPE_U16
+V4L2_CTRL_TYPE_U32 = v4l2_ctrl_type.V4L2_CTRL_TYPE_U32
+V4L2_CTRL_TYPE_AREA = v4l2_ctrl_type.V4L2_CTRL_TYPE_AREA
+V4L2_CTRL_TYPE_HDR10_CLL_INFO = v4l2_ctrl_type.V4L2_CTRL_TYPE_HDR10_CLL_INFO
+V4L2_CTRL_TYPE_HDR10_MASTERING_DISPLAY = v4l2_ctrl_type.V4L2_CTRL_TYPE_HDR10_MASTERING_DISPLAY
+V4L2_CTRL_TYPE_H264_SPS = v4l2_ctrl_type.V4L2_CTRL_TYPE_H264_SPS
+V4L2_CTRL_TYPE_H264_PPS = v4l2_ctrl_type.V4L2_CTRL_TYPE_H264_PPS
+V4L2_CTRL_TYPE_H264_SCALING_MATRIX = v4l2_ctrl_type.V4L2_CTRL_TYPE_H264_SCALING_MATRIX
+V4L2_CTRL_TYPE_H264_SLICE_PARAMS = v4l2_ctrl_type.V4L2_CTRL_TYPE_H264_SLICE_PARAMS
+V4L2_CTRL_TYPE_H264_DECODE_PARAMS = v4l2_ctrl_type.V4L2_CTRL_TYPE_H264_DECODE_PARAMS
+V4L2_CTRL_TYPE_H264_PRED_WEIGHTS = v4l2_ctrl_type.V4L2_CTRL_TYPE_H264_PRED_WEIGHTS
+V4L2_CTRL_TYPE_FWHT_PARAMS = v4l2_ctrl_type.V4L2_CTRL_TYPE_FWHT_PARAMS
+V4L2_CTRL_TYPE_VP8_FRAME = v4l2_ctrl_type.V4L2_CTRL_TYPE_VP8_FRAME
+V4L2_CTRL_TYPE_MPEG2_QUANTISATION = v4l2_ctrl_type.V4L2_CTRL_TYPE_MPEG2_QUANTISATION
+V4L2_CTRL_TYPE_MPEG2_SEQUENCE = v4l2_ctrl_type.V4L2_CTRL_TYPE_MPEG2_SEQUENCE
+V4L2_CTRL_TYPE_MPEG2_PICTURE = v4l2_ctrl_type.V4L2_CTRL_TYPE_MPEG2_PICTURE
+V4L2_CTRL_TYPE_VP9_COMPRESSED_HDR = v4l2_ctrl_type.V4L2_CTRL_TYPE_VP9_COMPRESSED_HDR
+V4L2_CTRL_TYPE_VP9_FRAME = v4l2_ctrl_type.V4L2_CTRL_TYPE_VP9_FRAME
+V4L2_CTRL_TYPE_HEVC_SPS = v4l2_ctrl_type.V4L2_CTRL_TYPE_HEVC_SPS
+V4L2_CTRL_TYPE_HEVC_PPS = v4l2_ctrl_type.V4L2_CTRL_TYPE_HEVC_PPS
+V4L2_CTRL_TYPE_HEVC_SLICE_PARAMS = v4l2_ctrl_type.V4L2_CTRL_TYPE_HEVC_SLICE_PARAMS
+V4L2_CTRL_TYPE_HEVC_SCALING_MATRIX = v4l2_ctrl_type.V4L2_CTRL_TYPE_HEVC_SCALING_MATRIX
+V4L2_CTRL_TYPE_HEVC_DECODE_PARAMS = v4l2_ctrl_type.V4L2_CTRL_TYPE_HEVC_DECODE_PARAMS
+V4L2_CTRL_TYPE_AV1_SEQUENCE = v4l2_ctrl_type.V4L2_CTRL_TYPE_AV1_SEQUENCE
+V4L2_CTRL_TYPE_AV1_TILE_GROUP_ENTRY = v4l2_ctrl_type.V4L2_CTRL_TYPE_AV1_TILE_GROUP_ENTRY
+V4L2_CTRL_TYPE_AV1_FRAME = v4l2_ctrl_type.V4L2_CTRL_TYPE_AV1_FRAME
+V4L2_CTRL_TYPE_AV1_FILM_GRAIN = v4l2_ctrl_type.V4L2_CTRL_TYPE_AV1_FILM_GRAIN
+
+# System structures
+class timeval(Structure):
+    _fields_ = [
+        ('tv_sec', c_long),    # time_t - seconds
+        ('tv_usec', c_long),   # suseconds_t - microseconds
+    ]
+
+class timespec(Structure):
+    _fields_ = [
+        ('tv_sec', c_long),    # time_t - seconds
+        ('tv_nsec', c_long),   # syscall_slong_t - nanoseconds
+    ]
+
+class v4l2_edid(Structure):
+    _fields_ = [
+        ('pad', c_uint32),
+        ('start_block', c_uint32),
+        ('blocks', c_uint32),
+        ('reserved', c_uint32 * 5),
+        ('edid', POINTER(c_uint8)),
+    ]
+
+class v4l2_ctrl_h264_sps(Structure):
+    _fields_ = [
+        ('profile_idc', c_uint8),
+        ('constraint_set_flags', c_uint8),
+        ('level_idc', c_uint8),
+        ('seq_parameter_set_id', c_uint8),
+        ('chroma_format_idc', c_uint8),
+        ('bit_depth_luma_minus8', c_uint8),
+        ('bit_depth_chroma_minus8', c_uint8),
+        ('log2_max_frame_num_minus4', c_uint8),
+        ('pic_order_cnt_type', c_uint8),
+        ('log2_max_pic_order_cnt_lsb_minus4', c_uint8),
+        ('max_num_ref_frames', c_uint8),
+        ('num_ref_frames_in_pic_order_cnt_cycle', c_uint8),
+        ('offset_for_ref_frame', c_int32 * 255),
+        ('offset_for_non_ref_pic', c_int32),
+        ('offset_for_top_to_bottom_field', c_int32),
+        ('pic_width_in_mbs_minus1', c_uint16),
+        ('pic_height_in_map_units_minus1', c_uint16),
+        ('flags', c_uint32),
+    ]
+
+class v4l2_ctrl_h264_pps(Structure):
+    _fields_ = [
+        ('pic_parameter_set_id', c_uint8),
+        ('seq_parameter_set_id', c_uint8),
+        ('num_slice_groups_minus1', c_uint8),
+        ('num_ref_idx_l0_default_active_minus1', c_uint8),
+        ('num_ref_idx_l1_default_active_minus1', c_uint8),
+        ('weighted_bipred_idc', c_uint8),
+        ('pic_init_qp_minus26', c_int8),
+        ('pic_init_qs_minus26', c_int8),
+        ('chroma_qp_index_offset', c_int8),
+        ('second_chroma_qp_index_offset', c_int8),
+        ('flags', c_uint16),
+    ]
+
+class v4l2_ctrl_h264_scaling_matrix(Structure):
+    _fields_ = [
+        ('scaling_list_4x4', c_uint8 * 6),
+        ('scaling_list_8x8', c_uint8 * 6),
+    ]
+
+class v4l2_h264_weight_factors(Structure):
+    _fields_ = [
+        ('luma_weight', c_int16 * 32),
+        ('luma_offset', c_int16 * 32),
+        ('chroma_weight', c_int16 * 32),
+        ('chroma_offset', c_int16 * 32),
+    ]
+
+class v4l2_ctrl_h264_pred_weights(Structure):
+    _fields_ = [
+        ('luma_log2_weight_denom', c_uint16),
+        ('chroma_log2_weight_denom', c_uint16),
+        ('weight_factors', v4l2_h264_weight_factors * 2),
+    ]
+
+class v4l2_h264_reference(Structure):
+    _fields_ = [
+        ('fields', c_uint8),
+        ('index', c_uint8),
+    ]
+
+class v4l2_ctrl_h264_slice_params(Structure):
+    _fields_ = [
+        ('header_bit_size', c_uint32),
+        ('first_mb_in_slice', c_uint32),
+        ('slice_type', c_uint8),
+        ('colour_plane_id', c_uint8),
+        ('redundant_pic_cnt', c_uint8),
+        ('cabac_init_idc', c_uint8),
+        ('slice_qp_delta', c_int8),
+        ('slice_qs_delta', c_int8),
+        ('disable_deblocking_filter_idc', c_uint8),
+        ('slice_alpha_c0_offset_div2', c_int8),
+        ('slice_beta_offset_div2', c_int8),
+        ('num_ref_idx_l0_active_minus1', c_uint8),
+        ('num_ref_idx_l1_active_minus1', c_uint8),
+        ('reserved', c_uint8),
+        ('ref_pic_list0', v4l2_h264_reference * 32),
+        ('ref_pic_list1', v4l2_h264_reference * 32),
+        ('flags', c_uint32),
+    ]
+
+class v4l2_h264_dpb_entry(Structure):
+    _fields_ = [
+        ('reference_ts', c_uint64),
+        ('pic_num', c_uint32),
+        ('frame_num', c_uint16),
+        ('fields', c_uint8),
+        ('reserved', c_uint8 * 5),
+        ('top_field_order_cnt', c_int32),
+        ('bottom_field_order_cnt', c_int32),
+        ('flags', c_uint32),
+    ]
+
+class v4l2_ctrl_h264_decode_params(Structure):
+    _fields_ = [
+        ('dpb', v4l2_h264_dpb_entry * 16),
+        ('nal_ref_idc', c_uint16),
+        ('frame_num', c_uint16),
+        ('top_field_order_cnt', c_int32),
+        ('bottom_field_order_cnt', c_int32),
+        ('idr_pic_id', c_uint16),
+        ('pic_order_cnt_lsb', c_uint16),
+        ('delta_pic_order_cnt_bottom', c_int32),
+        ('delta_pic_order_cnt0', c_int32),
+        ('delta_pic_order_cnt1', c_int32),
+        ('dec_ref_pic_marking_bit_size', c_uint32),
+        ('pic_order_cnt_bit_size', c_uint32),
+        ('slice_group_change_cycle', c_uint32),
+        ('reserved', c_uint32),
+        ('flags', c_uint32),
+    ]
+
+class v4l2_ctrl_fwht_params(Structure):
+    _fields_ = [
+        ('backward_ref_ts', c_uint64),
+        ('version', c_uint32),
+        ('width', c_uint32),
+        ('height', c_uint32),
+        ('flags', c_uint32),
+        ('colorspace', c_uint32),
+        ('xfer_func', c_uint32),
+        ('ycbcr_enc', c_uint32),
+        ('quantization', c_uint32),
+    ]
+
+class v4l2_vp8_segment(Structure):
+    _fields_ = [
+        ('quant_update', c_int8 * 4),
+        ('lf_update', c_int8 * 4),
+        ('segment_probs', c_uint8 * 3),
+        ('padding', c_uint8),
+        ('flags', c_uint32),
+    ]
+
+class v4l2_vp8_loop_filter(Structure):
+    _fields_ = [
+        ('ref_frm_delta', c_int8 * 4),
+        ('mb_mode_delta', c_int8 * 4),
+        ('sharpness_level', c_uint8),
+        ('level', c_uint8),
+        ('padding', c_uint16),
+        ('flags', c_uint32),
+    ]
+
+class v4l2_vp8_quantization(Structure):
+    _fields_ = [
+        ('y_ac_qi', c_uint8),
+        ('y_dc_delta', c_int8),
+        ('y2_dc_delta', c_int8),
+        ('y2_ac_delta', c_int8),
+        ('uv_dc_delta', c_int8),
+        ('uv_ac_delta', c_int8),
+        ('padding', c_uint16),
+    ]
+
+class v4l2_vp8_entropy(Structure):
+    _fields_ = [
+        ('coeff_probs', c_uint8 * 4),
+        ('y_mode_probs', c_uint8 * 4),
+        ('uv_mode_probs', c_uint8 * 3),
+        ('mv_probs', c_uint8 * 2),
+        ('padding', c_uint8 * 3),
+    ]
+
+class v4l2_vp8_entropy_coder_state(Structure):
+    _fields_ = [
+        ('range', c_uint8),
+        ('value', c_uint8),
+        ('bit_count', c_uint8),
+        ('padding', c_uint8),
+    ]
+
+class v4l2_ctrl_vp8_frame(Structure):
+    _fields_ = [
+        ('segment', v4l2_vp8_segment),
+        ('lf', v4l2_vp8_loop_filter),
+        ('quant', v4l2_vp8_quantization),
+        ('entropy', v4l2_vp8_entropy),
+        ('coder_state', v4l2_vp8_entropy_coder_state),
+        ('width', c_uint16),
+        ('height', c_uint16),
+        ('horizontal_scale', c_uint8),
+        ('vertical_scale', c_uint8),
+        ('version', c_uint8),
+        ('prob_skip_false', c_uint8),
+        ('prob_intra', c_uint8),
+        ('prob_last', c_uint8),
+        ('prob_gf', c_uint8),
+        ('num_dct_parts', c_uint8),
+        ('first_part_size', c_uint32),
+        ('first_part_header_bits', c_uint32),
+        ('dct_part_sizes', c_uint32 * 8),
+        ('last_frame_ts', c_uint64),
+        ('golden_frame_ts', c_uint64),
+        ('alt_frame_ts', c_uint64),
+        ('flags', c_uint64),
+    ]
+
+class v4l2_ctrl_mpeg2_sequence(Structure):
+    _fields_ = [
+        ('horizontal_size', c_uint16),
+        ('vertical_size', c_uint16),
+        ('vbv_buffer_size', c_uint32),
+        ('profile_and_level_indication', c_uint16),
+        ('chroma_format', c_uint8),
+        ('flags', c_uint8),
+    ]
+
+class v4l2_ctrl_mpeg2_picture(Structure):
+    _fields_ = [
+        ('backward_ref_ts', c_uint64),
+        ('forward_ref_ts', c_uint64),
+        ('flags', c_uint32),
+        ('f_code', c_uint8 * 2),
+        ('picture_coding_type', c_uint8),
+        ('picture_structure', c_uint8),
+        ('intra_dc_precision', c_uint8),
+        ('reserved', c_uint8 * 5),
+    ]
+
+class v4l2_ctrl_mpeg2_quantisation(Structure):
+    _fields_ = [
+        ('intra_quantiser_matrix', c_uint8 * 64),
+        ('non_intra_quantiser_matrix', c_uint8 * 64),
+        ('chroma_intra_quantiser_matrix', c_uint8 * 64),
+        ('chroma_non_intra_quantiser_matrix', c_uint8 * 64),
+    ]
+
+class v4l2_ctrl_hevc_sps(Structure):
+    _fields_ = [
+        ('video_parameter_set_id', c_uint8),
+        ('seq_parameter_set_id', c_uint8),
+        ('pic_width_in_luma_samples', c_uint16),
+        ('pic_height_in_luma_samples', c_uint16),
+        ('bit_depth_luma_minus8', c_uint8),
+        ('bit_depth_chroma_minus8', c_uint8),
+        ('log2_max_pic_order_cnt_lsb_minus4', c_uint8),
+        ('sps_max_dec_pic_buffering_minus1', c_uint8),
+        ('sps_max_num_reorder_pics', c_uint8),
+        ('sps_max_latency_increase_plus1', c_uint8),
+        ('log2_min_luma_coding_block_size_minus3', c_uint8),
+        ('log2_diff_max_min_luma_coding_block_size', c_uint8),
+        ('log2_min_luma_transform_block_size_minus2', c_uint8),
+        ('log2_diff_max_min_luma_transform_block_size', c_uint8),
+        ('max_transform_hierarchy_depth_inter', c_uint8),
+        ('max_transform_hierarchy_depth_intra', c_uint8),
+        ('pcm_sample_bit_depth_luma_minus1', c_uint8),
+        ('pcm_sample_bit_depth_chroma_minus1', c_uint8),
+        ('log2_min_pcm_luma_coding_block_size_minus3', c_uint8),
+        ('log2_diff_max_min_pcm_luma_coding_block_size', c_uint8),
+        ('num_short_term_ref_pic_sets', c_uint8),
+        ('num_long_term_ref_pics_sps', c_uint8),
+        ('chroma_format_idc', c_uint8),
+        ('sps_max_sub_layers_minus1', c_uint8),
+        ('reserved', c_uint8 * 6),
+        ('flags', c_uint64),
+    ]
+
+class v4l2_ctrl_hevc_pps(Structure):
+    _fields_ = [
+        ('pic_parameter_set_id', c_uint8),
+        ('num_extra_slice_header_bits', c_uint8),
+        ('num_ref_idx_l0_default_active_minus1', c_uint8),
+        ('num_ref_idx_l1_default_active_minus1', c_uint8),
+        ('init_qp_minus26', c_int8),
+        ('diff_cu_qp_delta_depth', c_uint8),
+        ('pps_cb_qp_offset', c_int8),
+        ('pps_cr_qp_offset', c_int8),
+        ('num_tile_columns_minus1', c_uint8),
+        ('num_tile_rows_minus1', c_uint8),
+        ('column_width_minus1', c_uint8 * 20),
+        ('row_height_minus1', c_uint8 * 22),
+        ('pps_beta_offset_div2', c_int8),
+        ('pps_tc_offset_div2', c_int8),
+        ('log2_parallel_merge_level_minus2', c_uint8),
+        ('reserved', c_uint8),
+        ('flags', c_uint64),
+    ]
+
+class v4l2_hevc_dpb_entry(Structure):
+    _fields_ = [
+        ('timestamp', c_uint64),
+        ('flags', c_uint8),
+        ('field_pic', c_uint8),
+        ('reserved', c_uint16),
+        ('pic_order_cnt_val', c_int32),
+    ]
+
+class v4l2_hevc_pred_weight_table(Structure):
+    _fields_ = [
+        ('delta_luma_weight_l0', c_int8 * 16),
+        ('luma_offset_l0', c_int8 * 16),
+        ('delta_chroma_weight_l0', c_int8 * 16),
+        ('chroma_offset_l0', c_int8 * 16),
+        ('delta_luma_weight_l1', c_int8 * 16),
+        ('luma_offset_l1', c_int8 * 16),
+        ('delta_chroma_weight_l1', c_int8 * 16),
+        ('chroma_offset_l1', c_int8 * 16),
+        ('luma_log2_weight_denom', c_uint8),
+        ('delta_chroma_log2_weight_denom', c_int8),
+    ]
+
+class v4l2_ctrl_hevc_slice_params(Structure):
+    _fields_ = [
+        ('bit_size', c_uint32),
+        ('data_byte_offset', c_uint32),
+        ('num_entry_point_offsets', c_uint32),
+        ('nal_unit_type', c_uint8),
+        ('nuh_temporal_id_plus1', c_uint8),
+        ('slice_type', c_uint8),
+        ('colour_plane_id', c_uint8),
+        ('slice_pic_order_cnt', c_int32),
+        ('num_ref_idx_l0_active_minus1', c_uint8),
+        ('num_ref_idx_l1_active_minus1', c_uint8),
+        ('collocated_ref_idx', c_uint8),
+        ('five_minus_max_num_merge_cand', c_uint8),
+        ('slice_qp_delta', c_int8),
+        ('slice_cb_qp_offset', c_int8),
+        ('slice_cr_qp_offset', c_int8),
+        ('slice_act_y_qp_offset', c_int8),
+        ('slice_act_cb_qp_offset', c_int8),
+        ('slice_act_cr_qp_offset', c_int8),
+        ('slice_beta_offset_div2', c_int8),
+        ('slice_tc_offset_div2', c_int8),
+        ('pic_struct', c_uint8),
+        ('reserved0', c_uint8 * 3),
+        ('slice_segment_addr', c_uint32),
+        ('ref_idx_l0', c_uint8 * 16),
+        ('ref_idx_l1', c_uint8 * 16),
+        ('short_term_ref_pic_set_size', c_uint16),
+        ('long_term_ref_pic_set_size', c_uint16),
+        ('pred_weight_table', v4l2_hevc_pred_weight_table),
+        ('reserved1', c_uint8 * 2),
+        ('flags', c_uint64),
+    ]
+
+class v4l2_ctrl_hevc_decode_params(Structure):
+    _fields_ = [
+        ('pic_order_cnt_val', c_int32),
+        ('short_term_ref_pic_set_size', c_uint16),
+        ('long_term_ref_pic_set_size', c_uint16),
+        ('num_active_dpb_entries', c_uint8),
+        ('num_poc_st_curr_before', c_uint8),
+        ('num_poc_st_curr_after', c_uint8),
+        ('num_poc_lt_curr', c_uint8),
+        ('poc_st_curr_before', c_uint8 * 16),
+        ('poc_st_curr_after', c_uint8 * 16),
+        ('poc_lt_curr', c_uint8 * 16),
+        ('num_delta_pocs_of_ref_rps_idx', c_uint8),
+        ('reserved', c_uint8 * 3),
+        ('dpb', v4l2_hevc_dpb_entry * 16),
+        ('flags', c_uint64),
+    ]
+
+class v4l2_ctrl_hevc_scaling_matrix(Structure):
+    _fields_ = [
+        ('scaling_list_4x4', c_uint8 * 6),
+        ('scaling_list_8x8', c_uint8 * 6),
+        ('scaling_list_16x16', c_uint8 * 6),
+        ('scaling_list_32x32', c_uint8 * 2),
+        ('scaling_list_dc_coef_16x16', c_uint8 * 6),
+        ('scaling_list_dc_coef_32x32', c_uint8 * 2),
+    ]
+
+class v4l2_ctrl_hdr10_cll_info(Structure):
+    _fields_ = [
+        ('max_content_light_level', c_uint16),
+        ('max_pic_average_light_level', c_uint16),
+    ]
+
+class v4l2_ctrl_hdr10_mastering_display(Structure):
+    _fields_ = [
+        ('display_primaries_x', c_uint16 * 3),
+        ('display_primaries_y', c_uint16 * 3),
+        ('white_point_x', c_uint16),
+        ('white_point_y', c_uint16),
+        ('max_display_mastering_luminance', c_uint32),
+        ('min_display_mastering_luminance', c_uint32),
+    ]
+
+class v4l2_vp9_loop_filter(Structure):
+    _fields_ = [
+        ('ref_deltas', c_int8 * 4),
+        ('mode_deltas', c_int8 * 2),
+        ('level', c_uint8),
+        ('sharpness', c_uint8),
+        ('flags', c_uint8),
+        ('reserved', c_uint8 * 7),
+    ]
+
+class v4l2_vp9_quantization(Structure):
+    _fields_ = [
+        ('base_q_idx', c_uint8),
+        ('delta_q_y_dc', c_int8),
+        ('delta_q_uv_dc', c_int8),
+        ('delta_q_uv_ac', c_int8),
+        ('reserved', c_uint8 * 4),
+    ]
+
+class v4l2_vp9_segmentation(Structure):
+    _fields_ = [
+        ('feature_data', c_int16 * 8),
+        ('feature_enabled', c_uint8 * 8),
+        ('tree_probs', c_uint8 * 7),
+        ('pred_probs', c_uint8 * 3),
+        ('flags', c_uint8),
+        ('reserved', c_uint8 * 5),
+    ]
+
+class v4l2_ctrl_vp9_frame(Structure):
+    _fields_ = [
+        ('lf', v4l2_vp9_loop_filter),
+        ('quant', v4l2_vp9_quantization),
+        ('seg', v4l2_vp9_segmentation),
+        ('flags', c_uint32),
+        ('compressed_header_size', c_uint16),
+        ('uncompressed_header_size', c_uint16),
+        ('frame_width_minus_1', c_uint16),
+        ('frame_height_minus_1', c_uint16),
+        ('render_width_minus_1', c_uint16),
+        ('render_height_minus_1', c_uint16),
+        ('last_frame_ts', c_uint64),
+        ('golden_frame_ts', c_uint64),
+        ('alt_frame_ts', c_uint64),
+        ('ref_frame_sign_bias', c_uint8),
+        ('reset_frame_context', c_uint8),
+        ('frame_context_idx', c_uint8),
+        ('profile', c_uint8),
+        ('bit_depth', c_uint8),
+        ('interpolation_filter', c_uint8),
+        ('tile_cols_log2', c_uint8),
+        ('tile_rows_log2', c_uint8),
+        ('reference_mode', c_uint8),
+        ('reserved', c_uint8 * 7),
+    ]
+
+class v4l2_vp9_mv_probs(Structure):
+    _fields_ = [
+        ('joint', c_uint8 * 3),
+        ('sign', c_uint8 * 2),
+        ('classes', c_uint8 * 2),
+        ('class0_bit', c_uint8 * 2),
+        ('bits', c_uint8 * 2),
+        ('class0_fr', c_uint8 * 2),
+        ('fr', c_uint8 * 2),
+        ('class0_hp', c_uint8 * 2),
+        ('hp', c_uint8 * 2),
+    ]
+
+class v4l2_ctrl_vp9_compressed_hdr(Structure):
+    _fields_ = [
+        ('tx_mode', c_uint8),
+        ('tx8', c_uint8 * 2),
+        ('tx16', c_uint8 * 2),
+        ('tx32', c_uint8 * 2),
+        ('coef', c_uint8 * 4),
+        ('skip', c_uint8 * 3),
+        ('inter_mode', c_uint8 * 7),
+        ('interp_filter', c_uint8 * 4),
+        ('is_inter', c_uint8 * 4),
+        ('comp_mode', c_uint8 * 5),
+        ('single_ref', c_uint8 * 5),
+        ('comp_ref', c_uint8 * 5),
+        ('y_mode', c_uint8 * 4),
+        ('uv_mode', c_uint8 * 10),
+        ('partition', c_uint8 * 16),
+        ('mv', v4l2_vp9_mv_probs),
+    ]
+
+class v4l2_ctrl_av1_sequence(Structure):
+    _fields_ = [
+        ('flags', c_uint32),
+        ('seq_profile', c_uint8),
+        ('order_hint_bits', c_uint8),
+        ('bit_depth', c_uint8),
+        ('reserved', c_uint8),
+        ('max_frame_width_minus_1', c_uint16),
+        ('max_frame_height_minus_1', c_uint16),
+    ]
+
+class v4l2_ctrl_av1_tile_group_entry(Structure):
+    _fields_ = [
+        ('tile_offset', c_uint32),
+        ('tile_size', c_uint32),
+        ('tile_row', c_uint32),
+        ('tile_col', c_uint32),
+    ]
+
+class v4l2_av1_global_motion(Structure):
+    _fields_ = [
+        ('flags', c_uint8 * 8),
+        ('type', c_uint32 * 8),
+        ('params', c_int32 * 8),
+        ('invalid', c_uint8),
+        ('reserved', c_uint8 * 3),
+    ]
+
+class v4l2_av1_loop_restoration(Structure):
+    _fields_ = [
+        ('flags', c_uint8),
+        ('lr_unit_shift', c_uint8),
+        ('lr_uv_shift', c_uint8),
+        ('reserved', c_uint8),
+        ('frame_restoration_type', c_uint32 * 3),
+        ('loop_restoration_size', c_uint32 * 3),
+    ]
+
+class v4l2_av1_cdef(Structure):
+    _fields_ = [
+        ('damping_minus_3', c_uint8),
+        ('bits', c_uint8),
+        ('y_pri_strength', c_uint8 * 8),
+        ('y_sec_strength', c_uint8 * 8),
+        ('uv_pri_strength', c_uint8 * 8),
+        ('uv_sec_strength', c_uint8 * 8),
+    ]
+
+class v4l2_av1_segmentation(Structure):
+    _fields_ = [
+        ('flags', c_uint8),
+        ('last_active_seg_id', c_uint8),
+        ('feature_enabled', c_uint8 * 8),
+        ('feature_data', c_int16 * 8),
+    ]
+
+class v4l2_av1_loop_filter(Structure):
+    _fields_ = [
+        ('flags', c_uint8),
+        ('level', c_uint8 * 4),
+        ('sharpness', c_uint8),
+        ('ref_deltas', c_int8 * 8),
+        ('mode_deltas', c_int8 * 2),
+        ('delta_lf_res', c_uint8),
+    ]
+
+class v4l2_av1_quantization(Structure):
+    _fields_ = [
+        ('flags', c_uint8),
+        ('base_q_idx', c_uint8),
+        ('delta_q_y_dc', c_int8),
+        ('delta_q_u_dc', c_int8),
+        ('delta_q_u_ac', c_int8),
+        ('delta_q_v_dc', c_int8),
+        ('delta_q_v_ac', c_int8),
+        ('qm_y', c_uint8),
+        ('qm_u', c_uint8),
+        ('qm_v', c_uint8),
+        ('delta_q_res', c_uint8),
+    ]
+
+class v4l2_av1_tile_info(Structure):
+    _fields_ = [
+        ('flags', c_uint8),
+        ('context_update_tile_id', c_uint8),
+        ('tile_cols', c_uint8),
+        ('tile_rows', c_uint8),
+        ('mi_col_starts', c_uint32 * 65),
+        ('mi_row_starts', c_uint32 * 65),
+        ('width_in_sbs_minus_1', c_uint32 * 64),
+        ('height_in_sbs_minus_1', c_uint32 * 64),
+        ('tile_size_bytes', c_uint8),
+        ('reserved', c_uint8 * 3),
+    ]
+
+class v4l2_ctrl_av1_frame(Structure):
+    _fields_ = [
+        ('tile_info', v4l2_av1_tile_info),
+        ('quantization', v4l2_av1_quantization),
+        ('superres_denom', c_uint8),
+        ('segmentation', v4l2_av1_segmentation),
+        ('loop_filter', v4l2_av1_loop_filter),
+        ('cdef', v4l2_av1_cdef),
+        ('skip_mode_frame', c_uint8 * 2),
+        ('primary_ref_frame', c_uint8),
+        ('loop_restoration', v4l2_av1_loop_restoration),
+        ('global_motion', v4l2_av1_global_motion),
+        ('flags', c_uint32),
+        ('v4l2_av1_frame_type', c_uint32),
+        ('order_hint', c_uint32),
+        ('upscaled_width', c_uint32),
+        ('v4l2_av1_interpolation_filter', c_uint32),
+        ('v4l2_av1_tx_mode', c_uint32),
+        ('frame_width_minus_1', c_uint32),
+        ('frame_height_minus_1', c_uint32),
+        ('render_width_minus_1', c_uint16),
+        ('render_height_minus_1', c_uint16),
+        ('current_frame_id', c_uint32),
+        ('buffer_removal_time', c_uint32 * (1 << 5)),
+        ('reserved', c_uint8 * 4),
+        ('order_hints', c_uint32 * 8),
+        ('reference_frame_ts', c_uint64 * 8),
+        ('ref_frame_idx', c_int8 * 7),
+        ('refresh_frame_flags', c_uint8),
+    ]
+
+class v4l2_ctrl_av1_film_grain(Structure):
+    _fields_ = [
+        ('flags', c_uint8),
+        ('cr_mult', c_uint8),
+        ('grain_seed', c_uint16),
+        ('film_grain_params_ref_idx', c_uint8),
+        ('num_y_points', c_uint8),
+        ('point_y_value', c_uint8 * (1 << 4)),
+        ('point_y_scaling', c_uint8 * (1 << 4)),
+        ('num_cb_points', c_uint8),
+        ('point_cb_value', c_uint8 * (1 << 4)),
+        ('point_cb_scaling', c_uint8 * (1 << 4)),
+        ('num_cr_points', c_uint8),
+        ('point_cr_value', c_uint8 * (1 << 4)),
+        ('point_cr_scaling', c_uint8 * (1 << 4)),
+        ('grain_scaling_minus_8', c_uint8),
+        ('ar_coeff_lag', c_uint8),
+        ('ar_coeffs_y_plus_128', c_uint8 * 25),
+        ('ar_coeffs_cb_plus_128', c_uint8 * 25),
+        ('ar_coeffs_cr_plus_128', c_uint8 * 25),
+        ('ar_coeff_shift_minus_6', c_uint8),
+        ('grain_scale_shift', c_uint8),
+        ('cb_mult', c_uint8),
+        ('cb_luma_mult', c_uint8),
+        ('cr_luma_mult', c_uint8),
+        ('cb_offset', c_uint16),
+        ('cr_offset', c_uint16),
+        ('reserved', c_uint8 * 4),
+    ]
+
+class v4l2_rect(Structure):
+    _fields_ = [
+        ('left', c_int32),
+        ('top', c_int32),
+        ('width', c_uint32),
+        ('height', c_uint32),
+    ]
+
+class v4l2_fract(Structure):
+    _fields_ = [
+        ('numerator', c_uint32),
+        ('denominator', c_uint32),
+    ]
+
+class v4l2_area(Structure):
+    _fields_ = [
+        ('width', c_uint32),
+        ('height', c_uint32),
+    ]
+
+class v4l2_capability(Structure):
+    _fields_ = [
+        ('driver', c_uint8 * 16),
+        ('card', c_uint8 * 32),
+        ('bus_info', c_uint8 * 32),
+        ('version', c_uint32),
+        ('capabilities', c_uint32),
+        ('device_caps', c_uint32),
+        ('reserved', c_uint32 * 3),
+    ]
+
+class v4l2_pix_format(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('ycbcr_enc', c_uint32),
+            ('hsv_enc', c_uint32),
+        ]
+
+    _fields_ = [
+        ('width', c_uint32),
+        ('height', c_uint32),
+        ('pixelformat', c_uint32),
+        ('field', c_uint32),
+        ('bytesperline', c_uint32),
+        ('sizeimage', c_uint32),
+        ('colorspace', c_uint32),
+        ('priv', c_uint32),
+        ('flags', c_uint32),
+        ('u', _u),
+        ('quantization', c_uint32),
+        ('xfer_func', c_uint32),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_fmtdesc(Structure):
+    _fields_ = [
+        ('index', c_uint32),
+        ('type', c_uint32),
+        ('flags', c_uint32),
+        ('description', c_uint8 * 32),
+        ('pixelformat', c_uint32),
+        ('mbus_code', c_uint32),
+        ('reserved', c_uint32 * 3),
+    ]
+
+class v4l2_frmsize_discrete(Structure):
+    _fields_ = [
+        ('width', c_uint32),
+        ('height', c_uint32),
+    ]
+
+class v4l2_frmsize_stepwise(Structure):
+    _fields_ = [
+        ('min_width', c_uint32),
+        ('max_width', c_uint32),
+        ('step_width', c_uint32),
+        ('min_height', c_uint32),
+        ('max_height', c_uint32),
+        ('step_height', c_uint32),
+    ]
+
+class v4l2_frmival_stepwise(Structure):
+    _fields_ = [
+        ('min', v4l2_fract),
+        ('max', v4l2_fract),
+        ('step', v4l2_fract),
+    ]
+
+class v4l2_timecode(Structure):
+    _fields_ = [
+        ('type', c_uint32),
+        ('flags', c_uint32),
+        ('frames', c_uint8),
+        ('seconds', c_uint8),
+        ('minutes', c_uint8),
+        ('hours', c_uint8),
+        ('userbits', c_uint8 * 4),
+    ]
+
+class v4l2_jpegcompression(Structure):
+    _fields_ = [
+        ('quality', c_int),
+        ('APPn', c_int),
+        ('APP_len', c_int),
+        ('APP_data', c_char * 60),
+        ('COM_len', c_int),
+        ('COM_data', c_char * 60),
+        ('jpeg_markers', c_uint32),
+    ]
+
+class v4l2_requestbuffers(Structure):
+    _fields_ = [
+        ('count', c_uint32),
+        ('type', c_uint32),
+        ('memory', c_uint32),
+        ('capabilities', c_uint32),
+        ('flags', c_uint8),
+        ('reserved', c_uint8 * 3),
+    ]
+
+class v4l2_plane(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('mem_offset', c_uint32),
+            ('long', c_uint),
+            ('fd', c_int32),
+        ]
+
+    _fields_ = [
+        ('bytesused', c_uint32),
+        ('length', c_uint32),
+        ('m', _u),
+        ('data_offset', c_uint32),
+        ('reserved', c_uint32 * 11),
+    ]
+
+class v4l2_buffer(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('offset', c_uint32),
+            ('long', c_uint),
+            ('planes', POINTER(v4l2_plane)),
+            ('fd', c_int32),
+        ]
+
+    class _u2(Union):
+        _fields_ = [
+            ('request_fd', c_int32),
+            ('reserved', c_uint32),
+        ]
+
+    _fields_ = [
+        ('index', c_uint32),
+        ('type', c_uint32),
+        ('bytesused', c_uint32),
+        ('flags', c_uint32),
+        ('field', c_uint32),
+        ('timestamp', timeval),
+        ('timecode', v4l2_timecode),
+        ('sequence', c_uint32),
+        ('memory', c_uint32),
+        ('m', _u),
+        ('length', c_uint32),
+        ('reserved2', c_uint32),
+        ('u', _u2),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_exportbuffer(Structure):
+    _fields_ = [
+        ('type', c_uint32),
+        ('index', c_uint32),
+        ('plane', c_uint32),
+        ('flags', c_uint32),
+        ('fd', c_int32),
+        ('reserved', c_uint32 * 11),
+    ]
+
+class v4l2_framebuffer(Structure):
+    class _s(Structure):
+        _fields_ = [
+            ('width', c_uint32),
+            ('height', c_uint32),
+            ('pixelformat', c_uint32),
+            ('field', c_uint32),
+            ('bytesperline', c_uint32),
+            ('sizeimage', c_uint32),
+            ('colorspace', c_uint32),
+            ('priv', c_uint32),
+        ]
+
+    _fields_ = [
+        ('capability', c_uint32),
+        ('flags', c_uint32),
+        ('base', c_void_p),
+        ('fmt', _s),
+    ]
+
+class v4l2_clip(Structure):
+    pass
+v4l2_clip._fields_ = [
+    ('c', v4l2_rect),
+    ('next', POINTER(v4l2_clip)),
+]
+
+class v4l2_window(Structure):
+    _fields_ = [
+        ('w', v4l2_rect),
+        ('field', c_uint32),
+        ('chromakey', c_uint32),
+        ('clips', POINTER(v4l2_clip)),
+        ('clipcount', c_uint32),
+        ('bitmap', c_void_p),
+        ('global_alpha', c_uint8),
+    ]
+
+class v4l2_captureparm(Structure):
+    _fields_ = [
+        ('capability', c_uint32),
+        ('capturemode', c_uint32),
+        ('timeperframe', v4l2_fract),
+        ('extendedmode', c_uint32),
+        ('readbuffers', c_uint32),
+        ('reserved', c_uint32 * 4),
+    ]
+
+class v4l2_outputparm(Structure):
+    _fields_ = [
+        ('capability', c_uint32),
+        ('outputmode', c_uint32),
+        ('timeperframe', v4l2_fract),
+        ('extendedmode', c_uint32),
+        ('writebuffers', c_uint32),
+        ('reserved', c_uint32 * 4),
+    ]
+
+class v4l2_cropcap(Structure):
+    _fields_ = [
+        ('type', c_uint32),
+        ('bounds', v4l2_rect),
+        ('defrect', v4l2_rect),
+        ('pixelaspect', v4l2_fract),
+    ]
+
+class v4l2_crop(Structure):
+    _fields_ = [
+        ('type', c_uint32),
+        ('c', v4l2_rect),
+    ]
+
+class v4l2_selection(Structure):
+    _fields_ = [
+        ('type', c_uint32),
+        ('target', c_uint32),
+        ('flags', c_uint32),
+        ('r', v4l2_rect),
+        ('reserved', c_uint32 * 9),
+    ]
+
+class v4l2_standard(Structure):
+    _fields_ = [
+        ('index', c_uint32),
+        ('id', c_uint64),
+        ('name', c_uint8 * 24),
+        ('frameperiod', v4l2_fract),
+        ('framelines', c_uint32),
+        ('reserved', c_uint32 * 4),
+    ]
+
+class v4l2_bt_timings(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('width', c_uint32),
+        ('height', c_uint32),
+        ('interlaced', c_uint32),
+        ('polarities', c_uint32),
+        ('pixelclock', c_uint64),
+        ('hfrontporch', c_uint32),
+        ('hsync', c_uint32),
+        ('hbackporch', c_uint32),
+        ('vfrontporch', c_uint32),
+        ('vsync', c_uint32),
+        ('vbackporch', c_uint32),
+        ('il_vfrontporch', c_uint32),
+        ('il_vsync', c_uint32),
+        ('il_vbackporch', c_uint32),
+        ('standards', c_uint32),
+        ('flags', c_uint32),
+        ('picture_aspect', v4l2_fract),
+        ('cea861_vic', c_uint8),
+        ('hdmi_vic', c_uint8),
+        ('reserved', c_uint8 * 46),
+    ]
+
+class v4l2_dv_timings(Structure):
+    _pack_ = 1
+    class _u(Union):
+        _fields_ = [
+            ('bt', v4l2_bt_timings),
+            ('reserved', c_uint32 * 32),
+        ]
+
+    _fields_ = [
+        ('type', c_uint32),
+        ('u', _u),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_bt_timings_cap(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('min_width', c_uint32),
+        ('max_width', c_uint32),
+        ('min_height', c_uint32),
+        ('max_height', c_uint32),
+        ('min_pixelclock', c_uint64),
+        ('max_pixelclock', c_uint64),
+        ('standards', c_uint32),
+        ('capabilities', c_uint32),
+        ('reserved', c_uint32 * 16),
+    ]
+
+class v4l2_dv_timings_cap(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('bt', v4l2_bt_timings_cap),
+            ('raw_data', c_uint32 * 32),
+        ]
+
+    _fields_ = [
+        ('type', c_uint32),
+        ('pad', c_uint32),
+        ('reserved', c_uint32 * 2),
+        ('u', _u),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_input(Structure):
+    _fields_ = [
+        ('index', c_uint32),
+        ('name', c_uint8 * 32),
+        ('type', c_uint32),
+        ('audioset', c_uint32),
+        ('tuner', c_uint32),
+        ('std', c_uint64),
+        ('status', c_uint32),
+        ('capabilities', c_uint32),
+        ('reserved', c_uint32 * 3),
+    ]
+
+class v4l2_output(Structure):
+    _fields_ = [
+        ('index', c_uint32),
+        ('name', c_uint8 * 32),
+        ('type', c_uint32),
+        ('audioset', c_uint32),
+        ('modulator', c_uint32),
+        ('std', c_uint64),
+        ('capabilities', c_uint32),
+        ('reserved', c_uint32 * 3),
+    ]
+
+class v4l2_control(Structure):
+    _fields_ = [
+        ('id', c_uint32),
+        ('value', c_int32),
+    ]
+
+class v4l2_ext_control(Structure):
+    _pack_ = 1
+    class _u(Union):
+        _fields_ = [
+            ('value', c_int32),
+            ('value64', c_int64),
+            ('string', c_char_p),
+            ('p_u8', POINTER(c_uint8)),
+            ('p_u16', POINTER(c_uint16)),
+            ('p_u32', POINTER(c_uint32)),
+            ('p_s32', POINTER(c_int32)),
+            ('p_s64', POINTER(c_int64)),
+            ('p_area', POINTER(v4l2_area)),
+            ('p_h264_sps', POINTER(v4l2_ctrl_h264_sps)),
+            ('p_h264_pps', POINTER(v4l2_ctrl_h264_pps)),
+            ('p_h264_scaling_matrix', POINTER(v4l2_ctrl_h264_scaling_matrix)),
+            ('p_h264_pred_weights', POINTER(v4l2_ctrl_h264_pred_weights)),
+            ('p_h264_slice_params', POINTER(v4l2_ctrl_h264_slice_params)),
+            ('p_h264_decode_params', POINTER(v4l2_ctrl_h264_decode_params)),
+            ('p_fwht_params', POINTER(v4l2_ctrl_fwht_params)),
+            ('p_vp8_frame', POINTER(v4l2_ctrl_vp8_frame)),
+            ('p_mpeg2_sequence', POINTER(v4l2_ctrl_mpeg2_sequence)),
+            ('p_mpeg2_picture', POINTER(v4l2_ctrl_mpeg2_picture)),
+            ('p_mpeg2_quantisation', POINTER(v4l2_ctrl_mpeg2_quantisation)),
+            ('p_vp9_compressed_hdr_probs', POINTER(v4l2_ctrl_vp9_compressed_hdr)),
+            ('p_vp9_frame', POINTER(v4l2_ctrl_vp9_frame)),
+            ('p_hevc_sps', POINTER(v4l2_ctrl_hevc_sps)),
+            ('p_hevc_pps', POINTER(v4l2_ctrl_hevc_pps)),
+            ('p_hevc_slice_params', POINTER(v4l2_ctrl_hevc_slice_params)),
+            ('p_hevc_scaling_matrix', POINTER(v4l2_ctrl_hevc_scaling_matrix)),
+            ('p_hevc_decode_params', POINTER(v4l2_ctrl_hevc_decode_params)),
+            ('p_av1_sequence', POINTER(v4l2_ctrl_av1_sequence)),
+            ('p_av1_tile_group_entry', POINTER(v4l2_ctrl_av1_tile_group_entry)),
+            ('p_av1_frame', POINTER(v4l2_ctrl_av1_frame)),
+            ('p_av1_film_grain', POINTER(v4l2_ctrl_av1_film_grain)),
+            ('p_hdr10_cll_info', POINTER(v4l2_ctrl_hdr10_cll_info)),
+            ('p_hdr10_mastering_display', POINTER(v4l2_ctrl_hdr10_mastering_display)),
+            ('ptr', c_void_p),
+        ]
+
+    _fields_ = [
+        ('id', c_uint32),
+        ('size', c_uint32),
+        ('reserved2', c_uint32 * 1),
+        ('u', _u),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_ext_controls(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('ctrl_class', c_uint32),
+            ('which', c_uint32),
+        ]
+
+    _fields_ = [
+        ('u', _u),
+        ('count', c_uint32),
+        ('error_idx', c_uint32),
+        ('request_fd', c_int32),
+        ('reserved', c_uint32 * 1),
+        ('controls', POINTER(v4l2_ext_control)),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_queryctrl(Structure):
+    _fields_ = [
+        ('id', c_uint32),
+        ('type', c_uint32),
+        ('name', c_uint8 * 32),
+        ('minimum', c_int32),
+        ('maximum', c_int32),
+        ('step', c_int32),
+        ('default_value', c_int32),
+        ('flags', c_uint32),
+        ('reserved', c_uint32 * 2),
+    ]
+
+class v4l2_query_ext_ctrl(Structure):
+    _fields_ = [
+        ('id', c_uint32),
+        ('type', c_uint32),
+        ('name', c_char * 32),
+        ('minimum', c_int64),
+        ('maximum', c_int64),
+        ('step', c_uint64),
+        ('default_value', c_int64),
+        ('flags', c_uint32),
+        ('elem_size', c_uint32),
+        ('elems', c_uint32),
+        ('nr_of_dims', c_uint32),
+        ('dims', c_uint32 * 4),
+        ('reserved', c_uint32 * 32),
+    ]
+
+class v4l2_querymenu(Structure):
+    _pack_ = 1
+    class _u(Union):
+        _fields_ = [
+            ('name', c_uint8 * 32),
+            ('value', c_int64),
+        ]
+
+    _fields_ = [
+        ('id', c_uint32),
+        ('index', c_uint32),
+        ('u', _u),
+        ('reserved', c_uint32),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_tuner(Structure):
+    _fields_ = [
+        ('index', c_uint32),
+        ('name', c_uint8 * 32),
+        ('type', c_uint32),
+        ('capability', c_uint32),
+        ('rangelow', c_uint32),
+        ('rangehigh', c_uint32),
+        ('rxsubchans', c_uint32),
+        ('audmode', c_uint32),
+        ('signal', c_int32),
+        ('afc', c_int32),
+        ('reserved', c_uint32 * 4),
+    ]
+
+class v4l2_modulator(Structure):
+    _fields_ = [
+        ('index', c_uint32),
+        ('name', c_uint8 * 32),
+        ('capability', c_uint32),
+        ('rangelow', c_uint32),
+        ('rangehigh', c_uint32),
+        ('txsubchans', c_uint32),
+        ('type', c_uint32),
+        ('reserved', c_uint32 * 3),
+    ]
+
+class v4l2_frequency(Structure):
+    _fields_ = [
+        ('tuner', c_uint32),
+        ('type', c_uint32),
+        ('frequency', c_uint32),
+        ('reserved', c_uint32 * 8),
+    ]
+
+class v4l2_frequency_band(Structure):
+    _fields_ = [
+        ('tuner', c_uint32),
+        ('type', c_uint32),
+        ('index', c_uint32),
+        ('capability', c_uint32),
+        ('rangelow', c_uint32),
+        ('rangehigh', c_uint32),
+        ('modulation', c_uint32),
+        ('reserved', c_uint32 * 9),
+    ]
+
+class v4l2_hw_freq_seek(Structure):
+    _fields_ = [
+        ('tuner', c_uint32),
+        ('type', c_uint32),
+        ('seek_upward', c_uint32),
+        ('wrap_around', c_uint32),
+        ('spacing', c_uint32),
+        ('rangelow', c_uint32),
+        ('rangehigh', c_uint32),
+        ('reserved', c_uint32 * 5),
+    ]
+
+class v4l2_rds_data(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('lsb', c_uint8),
+        ('msb', c_uint8),
+        ('block', c_uint8),
+    ]
+
+class v4l2_audio(Structure):
+    _fields_ = [
+        ('index', c_uint32),
+        ('name', c_uint8 * 32),
+        ('capability', c_uint32),
+        ('mode', c_uint32),
+        ('reserved', c_uint32 * 2),
+    ]
+
+class v4l2_audioout(Structure):
+    _fields_ = [
+        ('index', c_uint32),
+        ('name', c_uint8 * 32),
+        ('capability', c_uint32),
+        ('mode', c_uint32),
+        ('reserved', c_uint32 * 2),
+    ]
+
+class v4l2_enc_idx_entry(Structure):
+    _fields_ = [
+        ('offset', c_uint64),
+        ('pts', c_uint64),
+        ('length', c_uint32),
+        ('flags', c_uint32),
+        ('reserved', c_uint32 * 2),
+    ]
+
+class v4l2_enc_idx(Structure):
+    _fields_ = [
+        ('entries', c_uint32),
+        ('entries_cap', c_uint32),
+        ('reserved', c_uint32 * 4),
+        ('entry', v4l2_enc_idx_entry * 64),
+    ]
+
+class v4l2_encoder_cmd(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('raw', c_void_p),
+        ]
+
+    _fields_ = [
+        ('cmd', c_uint32),
+        ('flags', c_uint32),
+        ('u', _u),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_decoder_cmd(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('stop', c_void_p),
+            ('start', c_void_p),
+            ('raw', c_void_p),
+        ]
+
+    _fields_ = [
+        ('cmd', c_uint32),
+        ('flags', c_uint32),
+        ('u', _u),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_vbi_format(Structure):
+    _fields_ = [
+        ('sampling_rate', c_uint32),
+        ('offset', c_uint32),
+        ('samples_per_line', c_uint32),
+        ('sample_format', c_uint32),
+        ('start', c_int32 * 2),
+        ('count', c_uint32 * 2),
+        ('flags', c_uint32),
+        ('reserved', c_uint32 * 2),
+    ]
+
+class v4l2_sliced_vbi_format(Structure):
+    _fields_ = [
+        ('service_set', c_uint16),
+        ('service_lines', c_uint16 * 2),
+        ('io_size', c_uint32),
+        ('reserved', c_uint32 * 2),
+    ]
+
+class v4l2_sliced_vbi_cap(Structure):
+    _fields_ = [
+        ('service_set', c_uint16),
+        ('service_lines', c_uint16 * 2),
+        ('type', c_uint32),
+        ('reserved', c_uint32 * 3),
+    ]
+
+class v4l2_sliced_vbi_data(Structure):
+    _fields_ = [
+        ('id', c_uint32),
+        ('field', c_uint32),
+        ('line', c_uint32),
+        ('reserved', c_uint32),
+        ('data', c_uint8 * 48),
+    ]
+
+class v4l2_mpeg_vbi_itv0_line(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('id', c_uint8),
+        ('data', c_uint8 * 42),
+    ]
+
+class v4l2_mpeg_vbi_itv0(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('linemask', c_uint32 * 2),
+        ('line', v4l2_mpeg_vbi_itv0_line * 35),
+    ]
+
+class v4l2_mpeg_vbi_ITV0(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('line', v4l2_mpeg_vbi_itv0_line * 36),
+    ]
+
+class v4l2_mpeg_vbi_fmt_ivtv(Structure):
+    _pack_ = 1
+    class _u(Union):
+        _fields_ = [
+            ('itv0', v4l2_mpeg_vbi_itv0),
+            ('ITV0', v4l2_mpeg_vbi_ITV0),
+        ]
+
+    _fields_ = [
+        ('magic', c_uint8 * 4),
+        ('u', _u),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_plane_pix_format(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('sizeimage', c_uint32),
+        ('bytesperline', c_uint32),
+        ('reserved', c_uint16 * 6),
+    ]
+
+class v4l2_pix_format_mplane(Structure):
+    _pack_ = 1
+    class _u(Union):
+        _fields_ = [
+            ('ycbcr_enc', c_uint8),
+            ('hsv_enc', c_uint8),
+        ]
+
+    _fields_ = [
+        ('width', c_uint32),
+        ('height', c_uint32),
+        ('pixelformat', c_uint32),
+        ('field', c_uint32),
+        ('colorspace', c_uint32),
+        ('plane_fmt', v4l2_plane_pix_format * 8),
+        ('num_planes', c_uint8),
+        ('flags', c_uint8),
+        ('u', _u),
+        ('quantization', c_uint8),
+        ('xfer_func', c_uint8),
+        ('reserved', c_uint8 * 7),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_sdr_format(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('pixelformat', c_uint32),
+        ('buffersize', c_uint32),
+        ('reserved', c_uint8 * 24),
+    ]
+
+class v4l2_meta_format(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('dataformat', c_uint32),
+        ('buffersize', c_uint32),
+        ('width', c_uint32),
+        ('height', c_uint32),
+        ('bytesperline', c_uint32),
+    ]
+
+class v4l2_format(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('pix', v4l2_pix_format),
+            ('pix_mp', v4l2_pix_format_mplane),
+            ('win', v4l2_window),
+            ('vbi', v4l2_vbi_format),
+            ('sliced', v4l2_sliced_vbi_format),
+            ('sdr', v4l2_sdr_format),
+            ('meta', v4l2_meta_format),
+            ('raw_data', c_uint8 * 200),
+        ]
+
+    _fields_ = [
+        ('type', c_uint32),
+        ('fmt', _u),
+    ]
+
+class v4l2_streamparm(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('capture', v4l2_captureparm),
+            ('output', v4l2_outputparm),
+            ('raw_data', c_uint8 * 200),
+        ]
+
+    _fields_ = [
+        ('type', c_uint32),
+        ('parm', _u),
+    ]
+
+class v4l2_event_vsync(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('field', c_uint8),
+    ]
+
+class v4l2_event_ctrl(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('value', c_int32),
+            ('value64', c_int64),
+        ]
+
+    _fields_ = [
+        ('changes', c_uint32),
+        ('type', c_uint32),
+        ('u', _u),
+        ('flags', c_uint32),
+        ('minimum', c_int32),
+        ('maximum', c_int32),
+        ('step', c_int32),
+        ('default_value', c_int32),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_event_frame_sync(Structure):
+    _fields_ = [
+        ('frame_sequence', c_uint32),
+    ]
+
+class v4l2_event_src_change(Structure):
+    _fields_ = [
+        ('changes', c_uint32),
+    ]
+
+class v4l2_event_motion_det(Structure):
+    _fields_ = [
+        ('flags', c_uint32),
+        ('frame_sequence', c_uint32),
+        ('region_mask', c_uint32),
+    ]
+
+class v4l2_event(Structure):
+    class _u(Union):
+        _fields_ = [
+            ('vsync', v4l2_event_vsync),
+            ('ctrl', v4l2_event_ctrl),
+            ('frame_sync', v4l2_event_frame_sync),
+            ('src_change', v4l2_event_src_change),
+            ('motion_det', v4l2_event_motion_det),
+            ('data', c_uint8 * 64),
+        ]
+
+    _fields_ = [
+        ('type', c_uint32),
+        ('u', _u),
+        ('pending', c_uint32),
+        ('sequence', c_uint32),
+        ('timestamp', timespec),
+        ('id', c_uint32),
+        ('reserved', c_uint32 * 8),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_event_subscription(Structure):
+    _fields_ = [
+        ('type', c_uint32),
+        ('id', c_uint32),
+        ('flags', c_uint32),
+        ('reserved', c_uint32 * 5),
+    ]
+
+class v4l2_dbg_match(Structure):
+    _pack_ = 1
+    class _u(Union):
+        _fields_ = [
+            ('addr', c_uint32),
+            ('name', c_char * 32),
+        ]
+
+    _fields_ = [
+        ('type', c_uint32),
+        ('u', _u),
+    ]
+    _anonymous_ = ('u',)
+
+class v4l2_dbg_register(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('match', v4l2_dbg_match),
+        ('size', c_uint32),
+        ('reg', c_uint64),
+        ('val', c_uint64),
+    ]
+
+class v4l2_dbg_chip_info(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('match', v4l2_dbg_match),
+        ('name', c_char * 32),
+        ('flags', c_uint32),
+        ('reserved', c_uint32 * 32),
+    ]
+
+class v4l2_create_buffers(Structure):
+    _fields_ = [
+        ('index', c_uint32),
+        ('count', c_uint32),
+        ('memory', c_uint32),
+        ('format', v4l2_format),
+        ('capabilities', c_uint32),
+        ('flags', c_uint32),
+        ('max_num_buffers', c_uint32),
+        ('reserved', c_uint32 * 5),
+    ]
+
+class v4l2_remove_buffers(Structure):
+    _fields_ = [
+        ('index', c_uint32),
+        ('count', c_uint32),
+        ('type', c_uint32),
+        ('reserved', c_uint32 * 13),
+    ]
+
+import fcntl
+
+# Basic constants
+_IOC_NRBITS = 8
+_IOC_TYPEBITS = 8
+_IOC_SIZEBITS = 14
+_IOC_DIRBITS = 2
+_IOC_NRSHIFT = 0
+_IOC_NONE = 0
+_IOC_WRITE = 1
+_IOC_READ = 2
+V4L2_SEL_TGT_CROP = 0x0000
+V4L2_SEL_TGT_CROP_DEFAULT = 0x0001
+V4L2_SEL_TGT_CROP_BOUNDS = 0x0002
+V4L2_SEL_TGT_NATIVE_SIZE = 0x0003
+V4L2_SEL_TGT_COMPOSE = 0x0100
+V4L2_SEL_TGT_COMPOSE_DEFAULT = 0x0101
+V4L2_SEL_TGT_COMPOSE_BOUNDS = 0x0102
+V4L2_SEL_TGT_COMPOSE_PADDED = 0x0103
+V4L2_SEL_FLAG_GE = (1 << 0)
+V4L2_SEL_FLAG_LE = (1 << 1)
+V4L2_SEL_FLAG_KEEP_CONFIG = (1 << 2)
+V4L2_SEL_TGT_CROP_ACTIVE = V4L2_SEL_TGT_CROP
+V4L2_SEL_TGT_COMPOSE_ACTIVE = V4L2_SEL_TGT_COMPOSE
+V4L2_SUBDEV_SEL_TGT_CROP_ACTUAL = V4L2_SEL_TGT_CROP
+V4L2_SUBDEV_SEL_TGT_COMPOSE_ACTUAL = V4L2_SEL_TGT_COMPOSE
+V4L2_SUBDEV_SEL_TGT_CROP_BOUNDS = V4L2_SEL_TGT_CROP_BOUNDS
+V4L2_SUBDEV_SEL_TGT_COMPOSE_BOUNDS = V4L2_SEL_TGT_COMPOSE_BOUNDS
+V4L2_SUBDEV_SEL_FLAG_SIZE_GE = V4L2_SEL_FLAG_GE
+V4L2_SUBDEV_SEL_FLAG_SIZE_LE = V4L2_SEL_FLAG_LE
+V4L2_SUBDEV_SEL_FLAG_KEEP_CONFIG = V4L2_SEL_FLAG_KEEP_CONFIG
+V4L2_CTRL_CLASS_USER = 0x00980000
+V4L2_CTRL_CLASS_CODEC = 0x00990000
+V4L2_CTRL_CLASS_CAMERA = 0x009a0000
+V4L2_CTRL_CLASS_FM_TX = 0x009b0000
+V4L2_CTRL_CLASS_FLASH = 0x009c0000
+V4L2_CTRL_CLASS_JPEG = 0x009d0000
+V4L2_CTRL_CLASS_IMAGE_SOURCE = 0x009e0000
+V4L2_CTRL_CLASS_IMAGE_PROC = 0x009f0000
+V4L2_CTRL_CLASS_DV = 0x00a00000
+V4L2_CTRL_CLASS_FM_RX = 0x00a10000
+V4L2_CTRL_CLASS_RF_TUNER = 0x00a20000
+V4L2_CTRL_CLASS_DETECT = 0x00a30000
+V4L2_CTRL_CLASS_CODEC_STATELESS = 0x00a40000
+V4L2_CTRL_CLASS_COLORIMETRY = 0x00a50000
+V4L2_CID_BASE = (V4L2_CTRL_CLASS_USER | 0x900)
+V4L2_CID_USER_BASE = V4L2_CID_BASE
+V4L2_CID_USER_CLASS = (V4L2_CTRL_CLASS_USER | 1)
+V4L2_CID_BRIGHTNESS = (V4L2_CID_BASE+0)
+V4L2_CID_CONTRAST = (V4L2_CID_BASE+1)
+V4L2_CID_SATURATION = (V4L2_CID_BASE+2)
+V4L2_CID_HUE = (V4L2_CID_BASE+3)
+V4L2_CID_AUDIO_VOLUME = (V4L2_CID_BASE+5)
+V4L2_CID_AUDIO_BALANCE = (V4L2_CID_BASE+6)
+V4L2_CID_AUDIO_BASS = (V4L2_CID_BASE+7)
+V4L2_CID_AUDIO_TREBLE = (V4L2_CID_BASE+8)
+V4L2_CID_AUDIO_MUTE = (V4L2_CID_BASE+9)
+V4L2_CID_AUDIO_LOUDNESS = (V4L2_CID_BASE+10)
+V4L2_CID_BLACK_LEVEL = (V4L2_CID_BASE+11)
+V4L2_CID_AUTO_WHITE_BALANCE = (V4L2_CID_BASE+12)
+V4L2_CID_DO_WHITE_BALANCE = (V4L2_CID_BASE+13)
+V4L2_CID_RED_BALANCE = (V4L2_CID_BASE+14)
+V4L2_CID_BLUE_BALANCE = (V4L2_CID_BASE+15)
+V4L2_CID_GAMMA = (V4L2_CID_BASE+16)
+V4L2_CID_WHITENESS = (V4L2_CID_GAMMA)
+V4L2_CID_EXPOSURE = (V4L2_CID_BASE+17)
+V4L2_CID_AUTOGAIN = (V4L2_CID_BASE+18)
+V4L2_CID_GAIN = (V4L2_CID_BASE+19)
+V4L2_CID_HFLIP = (V4L2_CID_BASE+20)
+V4L2_CID_VFLIP = (V4L2_CID_BASE+21)
+V4L2_CID_POWER_LINE_FREQUENCY = (V4L2_CID_BASE+24)
+V4L2_CID_HUE_AUTO = (V4L2_CID_BASE+25)
+V4L2_CID_WHITE_BALANCE_TEMPERATURE = (V4L2_CID_BASE+26)
+V4L2_CID_SHARPNESS = (V4L2_CID_BASE+27)
+V4L2_CID_BACKLIGHT_COMPENSATION = (V4L2_CID_BASE+28)
+V4L2_CID_CHROMA_AGC = (V4L2_CID_BASE+29)
+V4L2_CID_COLOR_KILLER = (V4L2_CID_BASE+30)
+V4L2_CID_COLORFX = (V4L2_CID_BASE+31)
+V4L2_CID_AUTOBRIGHTNESS = (V4L2_CID_BASE+32)
+V4L2_CID_BAND_STOP_FILTER = (V4L2_CID_BASE+33)
+V4L2_CID_ROTATE = (V4L2_CID_BASE+34)
+V4L2_CID_BG_COLOR = (V4L2_CID_BASE+35)
+V4L2_CID_CHROMA_GAIN = (V4L2_CID_BASE+36)
+V4L2_CID_ILLUMINATORS_1 = (V4L2_CID_BASE+37)
+V4L2_CID_ILLUMINATORS_2 = (V4L2_CID_BASE+38)
+V4L2_CID_MIN_BUFFERS_FOR_CAPTURE = (V4L2_CID_BASE+39)
+V4L2_CID_MIN_BUFFERS_FOR_OUTPUT = (V4L2_CID_BASE+40)
+V4L2_CID_ALPHA_COMPONENT = (V4L2_CID_BASE+41)
+V4L2_CID_COLORFX_CBCR = (V4L2_CID_BASE+42)
+V4L2_CID_COLORFX_RGB = (V4L2_CID_BASE+43)
+V4L2_CID_LASTP1 = (V4L2_CID_BASE+44)
+V4L2_CID_USER_MEYE_BASE = (V4L2_CID_USER_BASE + 0x1000)
+V4L2_CID_USER_BTTV_BASE = (V4L2_CID_USER_BASE + 0x1010)
+V4L2_CID_USER_S2255_BASE = (V4L2_CID_USER_BASE + 0x1030)
+V4L2_CID_USER_SI476X_BASE = (V4L2_CID_USER_BASE + 0x1040)
+V4L2_CID_USER_TI_VPE_BASE = (V4L2_CID_USER_BASE + 0x1050)
+V4L2_CID_USER_SAA7134_BASE = (V4L2_CID_USER_BASE + 0x1060)
+V4L2_CID_USER_ADV7180_BASE = (V4L2_CID_USER_BASE + 0x1070)
+V4L2_CID_USER_TC358743_BASE = (V4L2_CID_USER_BASE + 0x1080)
+V4L2_CID_USER_MAX217X_BASE = (V4L2_CID_USER_BASE + 0x1090)
+V4L2_CID_USER_IMX_BASE = (V4L2_CID_USER_BASE + 0x10b0)
+V4L2_CID_USER_ATMEL_ISC_BASE = (V4L2_CID_USER_BASE + 0x10c0)
+V4L2_CID_USER_CODA_BASE = (V4L2_CID_USER_BASE + 0x10e0)
+V4L2_CID_USER_CCS_BASE = (V4L2_CID_USER_BASE + 0x10f0)
+V4L2_CID_USER_ALLEGRO_BASE = (V4L2_CID_USER_BASE + 0x1170)
+V4L2_CID_USER_ISL7998X_BASE = (V4L2_CID_USER_BASE + 0x1180)
+V4L2_CID_USER_DW100_BASE = (V4L2_CID_USER_BASE + 0x1190)
+V4L2_CID_USER_ASPEED_BASE = (V4L2_CID_USER_BASE + 0x11a0)
+V4L2_CID_USER_NPCM_BASE = (V4L2_CID_USER_BASE + 0x11b0)
+V4L2_CID_USER_THP7312_BASE = (V4L2_CID_USER_BASE + 0x11c0)
+V4L2_CID_CODEC_BASE = (V4L2_CTRL_CLASS_CODEC | 0x900)
+V4L2_CID_CODEC_CLASS = (V4L2_CTRL_CLASS_CODEC | 1)
+V4L2_CID_MPEG_STREAM_TYPE = (V4L2_CID_CODEC_BASE+0)
+V4L2_CID_MPEG_STREAM_PID_PMT = (V4L2_CID_CODEC_BASE+1)
+V4L2_CID_MPEG_STREAM_PID_AUDIO = (V4L2_CID_CODEC_BASE+2)
+V4L2_CID_MPEG_STREAM_PID_VIDEO = (V4L2_CID_CODEC_BASE+3)
+V4L2_CID_MPEG_STREAM_PID_PCR = (V4L2_CID_CODEC_BASE+4)
+V4L2_CID_MPEG_STREAM_PES_ID_AUDIO = (V4L2_CID_CODEC_BASE+5)
+V4L2_CID_MPEG_STREAM_PES_ID_VIDEO = (V4L2_CID_CODEC_BASE+6)
+V4L2_CID_MPEG_STREAM_VBI_FMT = (V4L2_CID_CODEC_BASE+7)
+V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ = (V4L2_CID_CODEC_BASE+100)
+V4L2_CID_MPEG_AUDIO_ENCODING = (V4L2_CID_CODEC_BASE+101)
+V4L2_CID_MPEG_AUDIO_L1_BITRATE = (V4L2_CID_CODEC_BASE+102)
+V4L2_CID_MPEG_AUDIO_L2_BITRATE = (V4L2_CID_CODEC_BASE+103)
+V4L2_CID_MPEG_AUDIO_L3_BITRATE = (V4L2_CID_CODEC_BASE+104)
+V4L2_CID_MPEG_AUDIO_MODE = (V4L2_CID_CODEC_BASE+105)
+V4L2_CID_MPEG_AUDIO_MODE_EXTENSION = (V4L2_CID_CODEC_BASE+106)
+V4L2_CID_MPEG_AUDIO_EMPHASIS = (V4L2_CID_CODEC_BASE+107)
+V4L2_CID_MPEG_AUDIO_CRC = (V4L2_CID_CODEC_BASE+108)
+V4L2_CID_MPEG_AUDIO_MUTE = (V4L2_CID_CODEC_BASE+109)
+V4L2_CID_MPEG_AUDIO_AAC_BITRATE = (V4L2_CID_CODEC_BASE+110)
+V4L2_CID_MPEG_AUDIO_AC3_BITRATE = (V4L2_CID_CODEC_BASE+111)
+V4L2_CID_MPEG_AUDIO_DEC_PLAYBACK = (V4L2_CID_CODEC_BASE+112)
+V4L2_CID_MPEG_AUDIO_DEC_MULTILINGUAL_PLAYBACK = (V4L2_CID_CODEC_BASE+113)
+V4L2_CID_MPEG_VIDEO_ENCODING = (V4L2_CID_CODEC_BASE+200)
+V4L2_CID_MPEG_VIDEO_ASPECT = (V4L2_CID_CODEC_BASE+201)
+V4L2_CID_MPEG_VIDEO_B_FRAMES = (V4L2_CID_CODEC_BASE+202)
+V4L2_CID_MPEG_VIDEO_GOP_SIZE = (V4L2_CID_CODEC_BASE+203)
+V4L2_CID_MPEG_VIDEO_GOP_CLOSURE = (V4L2_CID_CODEC_BASE+204)
+V4L2_CID_MPEG_VIDEO_PULLDOWN = (V4L2_CID_CODEC_BASE+205)
+V4L2_CID_MPEG_VIDEO_BITRATE_MODE = (V4L2_CID_CODEC_BASE+206)
+V4L2_CID_MPEG_VIDEO_BITRATE = (V4L2_CID_CODEC_BASE+207)
+V4L2_CID_MPEG_VIDEO_BITRATE_PEAK = (V4L2_CID_CODEC_BASE+208)
+V4L2_CID_MPEG_VIDEO_TEMPORAL_DECIMATION = (V4L2_CID_CODEC_BASE+209)
+V4L2_CID_MPEG_VIDEO_MUTE = (V4L2_CID_CODEC_BASE+210)
+V4L2_CID_MPEG_VIDEO_MUTE_YUV = (V4L2_CID_CODEC_BASE+211)
+V4L2_CID_MPEG_VIDEO_DECODER_SLICE_INTERFACE = (V4L2_CID_CODEC_BASE+212)
+V4L2_CID_MPEG_VIDEO_DECODER_MPEG4_DEBLOCK_FILTER = (V4L2_CID_CODEC_BASE+213)
+V4L2_CID_MPEG_VIDEO_CYCLIC_INTRA_REFRESH_MB = (V4L2_CID_CODEC_BASE+214)
+V4L2_CID_MPEG_VIDEO_FRAME_RC_ENABLE = (V4L2_CID_CODEC_BASE+215)
+V4L2_CID_MPEG_VIDEO_HEADER_MODE = (V4L2_CID_CODEC_BASE+216)
+V4L2_CID_MPEG_VIDEO_MAX_REF_PIC = (V4L2_CID_CODEC_BASE+217)
+V4L2_CID_MPEG_VIDEO_MB_RC_ENABLE = (V4L2_CID_CODEC_BASE+218)
+V4L2_CID_MPEG_VIDEO_MULTI_SLICE_MAX_BYTES = (V4L2_CID_CODEC_BASE+219)
+V4L2_CID_MPEG_VIDEO_MULTI_SLICE_MAX_MB = (V4L2_CID_CODEC_BASE+220)
+V4L2_CID_MPEG_VIDEO_MULTI_SLICE_MODE = (V4L2_CID_CODEC_BASE+221)
+V4L2_CID_MPEG_VIDEO_VBV_SIZE = (V4L2_CID_CODEC_BASE+222)
+V4L2_CID_MPEG_VIDEO_DEC_PTS = (V4L2_CID_CODEC_BASE+223)
+V4L2_CID_MPEG_VIDEO_DEC_FRAME = (V4L2_CID_CODEC_BASE+224)
+V4L2_CID_MPEG_VIDEO_VBV_DELAY = (V4L2_CID_CODEC_BASE+225)
+V4L2_CID_MPEG_VIDEO_REPEAT_SEQ_HEADER = (V4L2_CID_CODEC_BASE+226)
+V4L2_CID_MPEG_VIDEO_MV_H_SEARCH_RANGE = (V4L2_CID_CODEC_BASE+227)
+V4L2_CID_MPEG_VIDEO_MV_V_SEARCH_RANGE = (V4L2_CID_CODEC_BASE+228)
+V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME = (V4L2_CID_CODEC_BASE+229)
+V4L2_CID_MPEG_VIDEO_BASELAYER_PRIORITY_ID = (V4L2_CID_CODEC_BASE+230)
+V4L2_CID_MPEG_VIDEO_AU_DELIMITER = (V4L2_CID_CODEC_BASE+231)
+V4L2_CID_MPEG_VIDEO_LTR_COUNT = (V4L2_CID_CODEC_BASE+232)
+V4L2_CID_MPEG_VIDEO_FRAME_LTR_INDEX = (V4L2_CID_CODEC_BASE+233)
+V4L2_CID_MPEG_VIDEO_USE_LTR_FRAMES = (V4L2_CID_CODEC_BASE+234)
+V4L2_CID_MPEG_VIDEO_DEC_CONCEAL_COLOR = (V4L2_CID_CODEC_BASE+235)
+V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD = (V4L2_CID_CODEC_BASE+236)
+V4L2_CID_MPEG_VIDEO_INTRA_REFRESH_PERIOD_TYPE = (V4L2_CID_CODEC_BASE+237)
+V4L2_CID_MPEG_VIDEO_MPEG2_LEVEL = (V4L2_CID_CODEC_BASE+270)
+V4L2_CID_MPEG_VIDEO_MPEG2_PROFILE = (V4L2_CID_CODEC_BASE+271)
+V4L2_CID_FWHT_I_FRAME_QP = (V4L2_CID_CODEC_BASE + 290)
+V4L2_CID_FWHT_P_FRAME_QP = (V4L2_CID_CODEC_BASE + 291)
+V4L2_CID_MPEG_VIDEO_H263_I_FRAME_QP = (V4L2_CID_CODEC_BASE+300)
+V4L2_CID_MPEG_VIDEO_H263_P_FRAME_QP = (V4L2_CID_CODEC_BASE+301)
+V4L2_CID_MPEG_VIDEO_H263_B_FRAME_QP = (V4L2_CID_CODEC_BASE+302)
+V4L2_CID_MPEG_VIDEO_H263_MIN_QP = (V4L2_CID_CODEC_BASE+303)
+V4L2_CID_MPEG_VIDEO_H263_MAX_QP = (V4L2_CID_CODEC_BASE+304)
+V4L2_CID_MPEG_VIDEO_H264_I_FRAME_QP = (V4L2_CID_CODEC_BASE+350)
+V4L2_CID_MPEG_VIDEO_H264_P_FRAME_QP = (V4L2_CID_CODEC_BASE+351)
+V4L2_CID_MPEG_VIDEO_H264_B_FRAME_QP = (V4L2_CID_CODEC_BASE+352)
+V4L2_CID_MPEG_VIDEO_H264_MIN_QP = (V4L2_CID_CODEC_BASE+353)
+V4L2_CID_MPEG_VIDEO_H264_MAX_QP = (V4L2_CID_CODEC_BASE+354)
+V4L2_CID_MPEG_VIDEO_H264_8X8_TRANSFORM = (V4L2_CID_CODEC_BASE+355)
+V4L2_CID_MPEG_VIDEO_H264_CPB_SIZE = (V4L2_CID_CODEC_BASE+356)
+V4L2_CID_MPEG_VIDEO_H264_ENTROPY_MODE = (V4L2_CID_CODEC_BASE+357)
+V4L2_CID_MPEG_VIDEO_H264_I_PERIOD = (V4L2_CID_CODEC_BASE+358)
+V4L2_CID_MPEG_VIDEO_H264_LEVEL = (V4L2_CID_CODEC_BASE+359)
+V4L2_CID_MPEG_VIDEO_H264_LOOP_FILTER_ALPHA = (V4L2_CID_CODEC_BASE+360)
+V4L2_CID_MPEG_VIDEO_H264_LOOP_FILTER_BETA = (V4L2_CID_CODEC_BASE+361)
+V4L2_CID_MPEG_VIDEO_H264_LOOP_FILTER_MODE = (V4L2_CID_CODEC_BASE+362)
+V4L2_CID_MPEG_VIDEO_H264_PROFILE = (V4L2_CID_CODEC_BASE+363)
+V4L2_CID_MPEG_VIDEO_H264_VUI_EXT_SAR_HEIGHT = (V4L2_CID_CODEC_BASE+364)
+V4L2_CID_MPEG_VIDEO_H264_VUI_EXT_SAR_WIDTH = (V4L2_CID_CODEC_BASE+365)
+V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_ENABLE = (V4L2_CID_CODEC_BASE+366)
+V4L2_CID_MPEG_VIDEO_H264_VUI_SAR_IDC = (V4L2_CID_CODEC_BASE+367)
+V4L2_CID_MPEG_VIDEO_H264_SEI_FRAME_PACKING = (V4L2_CID_CODEC_BASE+368)
+V4L2_CID_MPEG_VIDEO_H264_SEI_FP_CURRENT_FRAME_0 = (V4L2_CID_CODEC_BASE+369)
+V4L2_CID_MPEG_VIDEO_H264_SEI_FP_ARRANGEMENT_TYPE = (V4L2_CID_CODEC_BASE+370)
+V4L2_CID_MPEG_VIDEO_H264_FMO = (V4L2_CID_CODEC_BASE+371)
+V4L2_CID_MPEG_VIDEO_H264_FMO_MAP_TYPE = (V4L2_CID_CODEC_BASE+372)
+V4L2_CID_MPEG_VIDEO_H264_FMO_SLICE_GROUP = (V4L2_CID_CODEC_BASE+373)
+V4L2_CID_MPEG_VIDEO_H264_FMO_CHANGE_DIRECTION = (V4L2_CID_CODEC_BASE+374)
+V4L2_CID_MPEG_VIDEO_H264_FMO_CHANGE_RATE = (V4L2_CID_CODEC_BASE+375)
+V4L2_CID_MPEG_VIDEO_H264_FMO_RUN_LENGTH = (V4L2_CID_CODEC_BASE+376)
+V4L2_CID_MPEG_VIDEO_H264_ASO = (V4L2_CID_CODEC_BASE+377)
+V4L2_CID_MPEG_VIDEO_H264_ASO_SLICE_ORDER = (V4L2_CID_CODEC_BASE+378)
+V4L2_CID_MPEG_VIDEO_H264_HIERARCHICAL_CODING = (V4L2_CID_CODEC_BASE+379)
+V4L2_CID_MPEG_VIDEO_H264_HIERARCHICAL_CODING_TYPE = (V4L2_CID_CODEC_BASE+380)
+V4L2_CID_MPEG_VIDEO_H264_HIERARCHICAL_CODING_LAYER = (V4L2_CID_CODEC_BASE+381)
+V4L2_CID_MPEG_VIDEO_H264_HIERARCHICAL_CODING_LAYER_QP = (V4L2_CID_CODEC_BASE+382)
+V4L2_CID_MPEG_VIDEO_H264_CONSTRAINED_INTRA_PREDICTION = (V4L2_CID_CODEC_BASE+383)
+V4L2_CID_MPEG_VIDEO_H264_CHROMA_QP_INDEX_OFFSET = (V4L2_CID_CODEC_BASE+384)
+V4L2_CID_MPEG_VIDEO_H264_I_FRAME_MIN_QP = (V4L2_CID_CODEC_BASE+385)
+V4L2_CID_MPEG_VIDEO_H264_I_FRAME_MAX_QP = (V4L2_CID_CODEC_BASE+386)
+V4L2_CID_MPEG_VIDEO_H264_P_FRAME_MIN_QP = (V4L2_CID_CODEC_BASE+387)
+V4L2_CID_MPEG_VIDEO_H264_P_FRAME_MAX_QP = (V4L2_CID_CODEC_BASE+388)
+V4L2_CID_MPEG_VIDEO_H264_B_FRAME_MIN_QP = (V4L2_CID_CODEC_BASE+389)
+V4L2_CID_MPEG_VIDEO_H264_B_FRAME_MAX_QP = (V4L2_CID_CODEC_BASE+390)
+V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L0_BR = (V4L2_CID_CODEC_BASE+391)
+V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L1_BR = (V4L2_CID_CODEC_BASE+392)
+V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L2_BR = (V4L2_CID_CODEC_BASE+393)
+V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L3_BR = (V4L2_CID_CODEC_BASE+394)
+V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L4_BR = (V4L2_CID_CODEC_BASE+395)
+V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L5_BR = (V4L2_CID_CODEC_BASE+396)
+V4L2_CID_MPEG_VIDEO_H264_HIER_CODING_L6_BR = (V4L2_CID_CODEC_BASE+397)
+V4L2_CID_MPEG_VIDEO_MPEG4_I_FRAME_QP = (V4L2_CID_CODEC_BASE+400)
+V4L2_CID_MPEG_VIDEO_MPEG4_P_FRAME_QP = (V4L2_CID_CODEC_BASE+401)
+V4L2_CID_MPEG_VIDEO_MPEG4_B_FRAME_QP = (V4L2_CID_CODEC_BASE+402)
+V4L2_CID_MPEG_VIDEO_MPEG4_MIN_QP = (V4L2_CID_CODEC_BASE+403)
+V4L2_CID_MPEG_VIDEO_MPEG4_MAX_QP = (V4L2_CID_CODEC_BASE+404)
+V4L2_CID_MPEG_VIDEO_MPEG4_LEVEL = (V4L2_CID_CODEC_BASE+405)
+V4L2_CID_MPEG_VIDEO_MPEG4_PROFILE = (V4L2_CID_CODEC_BASE+406)
+V4L2_CID_MPEG_VIDEO_MPEG4_QPEL = (V4L2_CID_CODEC_BASE+407)
+V4L2_CID_MPEG_VIDEO_VPX_NUM_PARTITIONS = (V4L2_CID_CODEC_BASE+500)
+V4L2_CID_MPEG_VIDEO_VPX_IMD_DISABLE_4X4 = (V4L2_CID_CODEC_BASE+501)
+V4L2_CID_MPEG_VIDEO_VPX_NUM_REF_FRAMES = (V4L2_CID_CODEC_BASE+502)
+V4L2_CID_MPEG_VIDEO_VPX_FILTER_LEVEL = (V4L2_CID_CODEC_BASE+503)
+V4L2_CID_MPEG_VIDEO_VPX_FILTER_SHARPNESS = (V4L2_CID_CODEC_BASE+504)
+V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_REF_PERIOD = (V4L2_CID_CODEC_BASE+505)
+V4L2_CID_MPEG_VIDEO_VPX_GOLDEN_FRAME_SEL = (V4L2_CID_CODEC_BASE+506)
+V4L2_CID_MPEG_VIDEO_VPX_MIN_QP = (V4L2_CID_CODEC_BASE+507)
+V4L2_CID_MPEG_VIDEO_VPX_MAX_QP = (V4L2_CID_CODEC_BASE+508)
+V4L2_CID_MPEG_VIDEO_VPX_I_FRAME_QP = (V4L2_CID_CODEC_BASE+509)
+V4L2_CID_MPEG_VIDEO_VPX_P_FRAME_QP = (V4L2_CID_CODEC_BASE+510)
+V4L2_CID_MPEG_VIDEO_VP8_PROFILE = (V4L2_CID_CODEC_BASE+511)
+V4L2_CID_MPEG_VIDEO_VPX_PROFILE = V4L2_CID_MPEG_VIDEO_VP8_PROFILE
+V4L2_CID_MPEG_VIDEO_VP9_PROFILE = (V4L2_CID_CODEC_BASE+512)
+V4L2_CID_MPEG_VIDEO_VP9_LEVEL = (V4L2_CID_CODEC_BASE+513)
+V4L2_CID_MPEG_VIDEO_HEVC_MIN_QP = (V4L2_CID_CODEC_BASE + 600)
+V4L2_CID_MPEG_VIDEO_HEVC_MAX_QP = (V4L2_CID_CODEC_BASE + 601)
+V4L2_CID_MPEG_VIDEO_HEVC_I_FRAME_QP = (V4L2_CID_CODEC_BASE + 602)
+V4L2_CID_MPEG_VIDEO_HEVC_P_FRAME_QP = (V4L2_CID_CODEC_BASE + 603)
+V4L2_CID_MPEG_VIDEO_HEVC_B_FRAME_QP = (V4L2_CID_CODEC_BASE + 604)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_QP = (V4L2_CID_CODEC_BASE + 605)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_TYPE = (V4L2_CID_CODEC_BASE + 606)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_LAYER = (V4L2_CID_CODEC_BASE + 607)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L0_QP = (V4L2_CID_CODEC_BASE + 608)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L1_QP = (V4L2_CID_CODEC_BASE + 609)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L2_QP = (V4L2_CID_CODEC_BASE + 610)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L3_QP = (V4L2_CID_CODEC_BASE + 611)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L4_QP = (V4L2_CID_CODEC_BASE + 612)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L5_QP = (V4L2_CID_CODEC_BASE + 613)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L6_QP = (V4L2_CID_CODEC_BASE + 614)
+V4L2_CID_MPEG_VIDEO_HEVC_PROFILE = (V4L2_CID_CODEC_BASE + 615)
+V4L2_CID_MPEG_VIDEO_HEVC_LEVEL = (V4L2_CID_CODEC_BASE + 616)
+V4L2_CID_MPEG_VIDEO_HEVC_FRAME_RATE_RESOLUTION = (V4L2_CID_CODEC_BASE + 617)
+V4L2_CID_MPEG_VIDEO_HEVC_TIER = (V4L2_CID_CODEC_BASE + 618)
+V4L2_CID_MPEG_VIDEO_HEVC_MAX_PARTITION_DEPTH = (V4L2_CID_CODEC_BASE + 619)
+V4L2_CID_MPEG_VIDEO_HEVC_LOOP_FILTER_MODE = (V4L2_CID_CODEC_BASE + 620)
+V4L2_CID_MPEG_VIDEO_HEVC_LF_BETA_OFFSET_DIV2 = (V4L2_CID_CODEC_BASE + 621)
+V4L2_CID_MPEG_VIDEO_HEVC_LF_TC_OFFSET_DIV2 = (V4L2_CID_CODEC_BASE + 622)
+V4L2_CID_MPEG_VIDEO_HEVC_REFRESH_TYPE = (V4L2_CID_CODEC_BASE + 623)
+V4L2_CID_MPEG_VIDEO_HEVC_REFRESH_PERIOD = (V4L2_CID_CODEC_BASE + 624)
+V4L2_CID_MPEG_VIDEO_HEVC_LOSSLESS_CU = (V4L2_CID_CODEC_BASE + 625)
+V4L2_CID_MPEG_VIDEO_HEVC_CONST_INTRA_PRED = (V4L2_CID_CODEC_BASE + 626)
+V4L2_CID_MPEG_VIDEO_HEVC_WAVEFRONT = (V4L2_CID_CODEC_BASE + 627)
+V4L2_CID_MPEG_VIDEO_HEVC_GENERAL_PB = (V4L2_CID_CODEC_BASE + 628)
+V4L2_CID_MPEG_VIDEO_HEVC_TEMPORAL_ID = (V4L2_CID_CODEC_BASE + 629)
+V4L2_CID_MPEG_VIDEO_HEVC_STRONG_SMOOTHING = (V4L2_CID_CODEC_BASE + 630)
+V4L2_CID_MPEG_VIDEO_HEVC_MAX_NUM_MERGE_MV_MINUS1 = (V4L2_CID_CODEC_BASE + 631)
+V4L2_CID_MPEG_VIDEO_HEVC_INTRA_PU_SPLIT = (V4L2_CID_CODEC_BASE + 632)
+V4L2_CID_MPEG_VIDEO_HEVC_TMV_PREDICTION = (V4L2_CID_CODEC_BASE + 633)
+V4L2_CID_MPEG_VIDEO_HEVC_WITHOUT_STARTCODE = (V4L2_CID_CODEC_BASE + 634)
+V4L2_CID_MPEG_VIDEO_HEVC_SIZE_OF_LENGTH_FIELD = (V4L2_CID_CODEC_BASE + 635)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L0_BR = (V4L2_CID_CODEC_BASE + 636)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L1_BR = (V4L2_CID_CODEC_BASE + 637)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L2_BR = (V4L2_CID_CODEC_BASE + 638)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L3_BR = (V4L2_CID_CODEC_BASE + 639)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L4_BR = (V4L2_CID_CODEC_BASE + 640)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L5_BR = (V4L2_CID_CODEC_BASE + 641)
+V4L2_CID_MPEG_VIDEO_HEVC_HIER_CODING_L6_BR = (V4L2_CID_CODEC_BASE + 642)
+V4L2_CID_MPEG_VIDEO_REF_NUMBER_FOR_PFRAMES = (V4L2_CID_CODEC_BASE + 643)
+V4L2_CID_MPEG_VIDEO_PREPEND_SPSPPS_TO_IDR = (V4L2_CID_CODEC_BASE + 644)
+V4L2_CID_MPEG_VIDEO_CONSTANT_QUALITY = (V4L2_CID_CODEC_BASE + 645)
+V4L2_CID_MPEG_VIDEO_FRAME_SKIP_MODE = (V4L2_CID_CODEC_BASE + 646)
+V4L2_CID_MPEG_VIDEO_HEVC_I_FRAME_MIN_QP = (V4L2_CID_CODEC_BASE + 647)
+V4L2_CID_MPEG_VIDEO_HEVC_I_FRAME_MAX_QP = (V4L2_CID_CODEC_BASE + 648)
+V4L2_CID_MPEG_VIDEO_HEVC_P_FRAME_MIN_QP = (V4L2_CID_CODEC_BASE + 649)
+V4L2_CID_MPEG_VIDEO_HEVC_P_FRAME_MAX_QP = (V4L2_CID_CODEC_BASE + 650)
+V4L2_CID_MPEG_VIDEO_HEVC_B_FRAME_MIN_QP = (V4L2_CID_CODEC_BASE + 651)
+V4L2_CID_MPEG_VIDEO_HEVC_B_FRAME_MAX_QP = (V4L2_CID_CODEC_BASE + 652)
+V4L2_CID_MPEG_VIDEO_DEC_DISPLAY_DELAY = (V4L2_CID_CODEC_BASE + 653)
+V4L2_CID_MPEG_VIDEO_DEC_DISPLAY_DELAY_ENABLE = (V4L2_CID_CODEC_BASE + 654)
+V4L2_CID_MPEG_VIDEO_AV1_PROFILE = (V4L2_CID_CODEC_BASE + 655)
+V4L2_CID_MPEG_VIDEO_AV1_LEVEL = (V4L2_CID_CODEC_BASE + 656)
+V4L2_CID_CODEC_CX2341X_BASE = (V4L2_CTRL_CLASS_CODEC | 0x1000)
+V4L2_CID_MPEG_CX2341X_VIDEO_SPATIAL_FILTER_MODE = (V4L2_CID_CODEC_CX2341X_BASE+0)
+V4L2_CID_MPEG_CX2341X_VIDEO_SPATIAL_FILTER = (V4L2_CID_CODEC_CX2341X_BASE+1)
+V4L2_CID_MPEG_CX2341X_VIDEO_LUMA_SPATIAL_FILTER_TYPE = (V4L2_CID_CODEC_CX2341X_BASE+2)
+V4L2_CID_MPEG_CX2341X_VIDEO_CHROMA_SPATIAL_FILTER_TYPE = (V4L2_CID_CODEC_CX2341X_BASE+3)
+V4L2_CID_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER_MODE = (V4L2_CID_CODEC_CX2341X_BASE+4)
+V4L2_CID_MPEG_CX2341X_VIDEO_TEMPORAL_FILTER = (V4L2_CID_CODEC_CX2341X_BASE+5)
+V4L2_CID_MPEG_CX2341X_VIDEO_MEDIAN_FILTER_TYPE = (V4L2_CID_CODEC_CX2341X_BASE+6)
+V4L2_CID_MPEG_CX2341X_VIDEO_LUMA_MEDIAN_FILTER_BOTTOM = (V4L2_CID_CODEC_CX2341X_BASE+7)
+V4L2_CID_MPEG_CX2341X_VIDEO_LUMA_MEDIAN_FILTER_TOP = (V4L2_CID_CODEC_CX2341X_BASE+8)
+V4L2_CID_MPEG_CX2341X_VIDEO_CHROMA_MEDIAN_FILTER_BOTTOM = (V4L2_CID_CODEC_CX2341X_BASE+9)
+V4L2_CID_MPEG_CX2341X_VIDEO_CHROMA_MEDIAN_FILTER_TOP = (V4L2_CID_CODEC_CX2341X_BASE+10)
+V4L2_CID_MPEG_CX2341X_STREAM_INSERT_NAV_PACKETS = (V4L2_CID_CODEC_CX2341X_BASE+11)
+V4L2_CID_CODEC_MFC51_BASE = (V4L2_CTRL_CLASS_CODEC | 0x1100)
+V4L2_CID_MPEG_MFC51_VIDEO_DECODER_H264_DISPLAY_DELAY = (V4L2_CID_CODEC_MFC51_BASE+0)
+V4L2_CID_MPEG_MFC51_VIDEO_DECODER_H264_DISPLAY_DELAY_ENABLE = (V4L2_CID_CODEC_MFC51_BASE+1)
+V4L2_CID_MPEG_MFC51_VIDEO_FRAME_SKIP_MODE = (V4L2_CID_CODEC_MFC51_BASE+2)
+V4L2_CID_MPEG_MFC51_VIDEO_FORCE_FRAME_TYPE = (V4L2_CID_CODEC_MFC51_BASE+3)
+V4L2_CID_MPEG_MFC51_VIDEO_PADDING = (V4L2_CID_CODEC_MFC51_BASE+4)
+V4L2_CID_MPEG_MFC51_VIDEO_PADDING_YUV = (V4L2_CID_CODEC_MFC51_BASE+5)
+V4L2_CID_MPEG_MFC51_VIDEO_RC_FIXED_TARGET_BIT = (V4L2_CID_CODEC_MFC51_BASE+6)
+V4L2_CID_MPEG_MFC51_VIDEO_RC_REACTION_COEFF = (V4L2_CID_CODEC_MFC51_BASE+7)
+V4L2_CID_MPEG_MFC51_VIDEO_H264_ADAPTIVE_RC_ACTIVITY = (V4L2_CID_CODEC_MFC51_BASE+50)
+V4L2_CID_MPEG_MFC51_VIDEO_H264_ADAPTIVE_RC_DARK = (V4L2_CID_CODEC_MFC51_BASE+51)
+V4L2_CID_MPEG_MFC51_VIDEO_H264_ADAPTIVE_RC_SMOOTH = (V4L2_CID_CODEC_MFC51_BASE+52)
+V4L2_CID_MPEG_MFC51_VIDEO_H264_ADAPTIVE_RC_STATIC = (V4L2_CID_CODEC_MFC51_BASE+53)
+V4L2_CID_MPEG_MFC51_VIDEO_H264_NUM_REF_PIC_FOR_P = (V4L2_CID_CODEC_MFC51_BASE+54)
+V4L2_CID_CAMERA_CLASS_BASE = (V4L2_CTRL_CLASS_CAMERA | 0x900)
+V4L2_CID_CAMERA_CLASS = (V4L2_CTRL_CLASS_CAMERA | 1)
+V4L2_CID_EXPOSURE_AUTO = (V4L2_CID_CAMERA_CLASS_BASE+1)
+V4L2_CID_EXPOSURE_ABSOLUTE = (V4L2_CID_CAMERA_CLASS_BASE+2)
+V4L2_CID_EXPOSURE_AUTO_PRIORITY = (V4L2_CID_CAMERA_CLASS_BASE+3)
+V4L2_CID_PAN_RELATIVE = (V4L2_CID_CAMERA_CLASS_BASE+4)
+V4L2_CID_TILT_RELATIVE = (V4L2_CID_CAMERA_CLASS_BASE+5)
+V4L2_CID_PAN_RESET = (V4L2_CID_CAMERA_CLASS_BASE+6)
+V4L2_CID_TILT_RESET = (V4L2_CID_CAMERA_CLASS_BASE+7)
+V4L2_CID_PAN_ABSOLUTE = (V4L2_CID_CAMERA_CLASS_BASE+8)
+V4L2_CID_TILT_ABSOLUTE = (V4L2_CID_CAMERA_CLASS_BASE+9)
+V4L2_CID_FOCUS_ABSOLUTE = (V4L2_CID_CAMERA_CLASS_BASE+10)
+V4L2_CID_FOCUS_RELATIVE = (V4L2_CID_CAMERA_CLASS_BASE+11)
+V4L2_CID_FOCUS_AUTO = (V4L2_CID_CAMERA_CLASS_BASE+12)
+V4L2_CID_ZOOM_ABSOLUTE = (V4L2_CID_CAMERA_CLASS_BASE+13)
+V4L2_CID_ZOOM_RELATIVE = (V4L2_CID_CAMERA_CLASS_BASE+14)
+V4L2_CID_ZOOM_CONTINUOUS = (V4L2_CID_CAMERA_CLASS_BASE+15)
+V4L2_CID_PRIVACY = (V4L2_CID_CAMERA_CLASS_BASE+16)
+V4L2_CID_IRIS_ABSOLUTE = (V4L2_CID_CAMERA_CLASS_BASE+17)
+V4L2_CID_IRIS_RELATIVE = (V4L2_CID_CAMERA_CLASS_BASE+18)
+V4L2_CID_AUTO_EXPOSURE_BIAS = (V4L2_CID_CAMERA_CLASS_BASE+19)
+V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE = (V4L2_CID_CAMERA_CLASS_BASE+20)
+V4L2_CID_WIDE_DYNAMIC_RANGE = (V4L2_CID_CAMERA_CLASS_BASE+21)
+V4L2_CID_IMAGE_STABILIZATION = (V4L2_CID_CAMERA_CLASS_BASE+22)
+V4L2_CID_ISO_SENSITIVITY = (V4L2_CID_CAMERA_CLASS_BASE+23)
+V4L2_CID_ISO_SENSITIVITY_AUTO = (V4L2_CID_CAMERA_CLASS_BASE+24)
+V4L2_CID_EXPOSURE_METERING = (V4L2_CID_CAMERA_CLASS_BASE+25)
+V4L2_CID_SCENE_MODE = (V4L2_CID_CAMERA_CLASS_BASE+26)
+V4L2_CID_3A_LOCK = (V4L2_CID_CAMERA_CLASS_BASE+27)
+V4L2_LOCK_EXPOSURE = (1 << 0)
+V4L2_LOCK_WHITE_BALANCE = (1 << 1)
+V4L2_LOCK_FOCUS = (1 << 2)
+V4L2_CID_AUTO_FOCUS_START = (V4L2_CID_CAMERA_CLASS_BASE+28)
+V4L2_CID_AUTO_FOCUS_STOP = (V4L2_CID_CAMERA_CLASS_BASE+29)
+V4L2_CID_AUTO_FOCUS_STATUS = (V4L2_CID_CAMERA_CLASS_BASE+30)
+V4L2_AUTO_FOCUS_STATUS_IDLE = (0 << 0)
+V4L2_AUTO_FOCUS_STATUS_BUSY = (1 << 0)
+V4L2_AUTO_FOCUS_STATUS_REACHED = (1 << 1)
+V4L2_AUTO_FOCUS_STATUS_FAILED = (1 << 2)
+V4L2_CID_AUTO_FOCUS_RANGE = (V4L2_CID_CAMERA_CLASS_BASE+31)
+V4L2_CID_PAN_SPEED = (V4L2_CID_CAMERA_CLASS_BASE+32)
+V4L2_CID_TILT_SPEED = (V4L2_CID_CAMERA_CLASS_BASE+33)
+V4L2_CID_CAMERA_ORIENTATION = (V4L2_CID_CAMERA_CLASS_BASE+34)
+V4L2_CAMERA_ORIENTATION_FRONT = 0
+V4L2_CAMERA_ORIENTATION_BACK = 1
+V4L2_CAMERA_ORIENTATION_EXTERNAL = 2
+V4L2_CID_CAMERA_SENSOR_ROTATION = (V4L2_CID_CAMERA_CLASS_BASE+35)
+V4L2_CID_HDR_SENSOR_MODE = (V4L2_CID_CAMERA_CLASS_BASE+36)
+V4L2_CID_FM_TX_CLASS_BASE = (V4L2_CTRL_CLASS_FM_TX | 0x900)
+V4L2_CID_FM_TX_CLASS = (V4L2_CTRL_CLASS_FM_TX | 1)
+V4L2_CID_RDS_TX_DEVIATION = (V4L2_CID_FM_TX_CLASS_BASE + 1)
+V4L2_CID_RDS_TX_PI = (V4L2_CID_FM_TX_CLASS_BASE + 2)
+V4L2_CID_RDS_TX_PTY = (V4L2_CID_FM_TX_CLASS_BASE + 3)
+V4L2_CID_RDS_TX_PS_NAME = (V4L2_CID_FM_TX_CLASS_BASE + 5)
+V4L2_CID_RDS_TX_RADIO_TEXT = (V4L2_CID_FM_TX_CLASS_BASE + 6)
+V4L2_CID_RDS_TX_MONO_STEREO = (V4L2_CID_FM_TX_CLASS_BASE + 7)
+V4L2_CID_RDS_TX_ARTIFICIAL_HEAD = (V4L2_CID_FM_TX_CLASS_BASE + 8)
+V4L2_CID_RDS_TX_COMPRESSED = (V4L2_CID_FM_TX_CLASS_BASE + 9)
+V4L2_CID_RDS_TX_DYNAMIC_PTY = (V4L2_CID_FM_TX_CLASS_BASE + 10)
+V4L2_CID_RDS_TX_TRAFFIC_ANNOUNCEMENT = (V4L2_CID_FM_TX_CLASS_BASE + 11)
+V4L2_CID_RDS_TX_TRAFFIC_PROGRAM = (V4L2_CID_FM_TX_CLASS_BASE + 12)
+V4L2_CID_RDS_TX_MUSIC_SPEECH = (V4L2_CID_FM_TX_CLASS_BASE + 13)
+V4L2_CID_RDS_TX_ALT_FREQS_ENABLE = (V4L2_CID_FM_TX_CLASS_BASE + 14)
+V4L2_CID_RDS_TX_ALT_FREQS = (V4L2_CID_FM_TX_CLASS_BASE + 15)
+V4L2_CID_AUDIO_LIMITER_ENABLED = (V4L2_CID_FM_TX_CLASS_BASE + 64)
+V4L2_CID_AUDIO_LIMITER_RELEASE_TIME = (V4L2_CID_FM_TX_CLASS_BASE + 65)
+V4L2_CID_AUDIO_LIMITER_DEVIATION = (V4L2_CID_FM_TX_CLASS_BASE + 66)
+V4L2_CID_AUDIO_COMPRESSION_ENABLED = (V4L2_CID_FM_TX_CLASS_BASE + 80)
+V4L2_CID_AUDIO_COMPRESSION_GAIN = (V4L2_CID_FM_TX_CLASS_BASE + 81)
+V4L2_CID_AUDIO_COMPRESSION_THRESHOLD = (V4L2_CID_FM_TX_CLASS_BASE + 82)
+V4L2_CID_AUDIO_COMPRESSION_ATTACK_TIME = (V4L2_CID_FM_TX_CLASS_BASE + 83)
+V4L2_CID_AUDIO_COMPRESSION_RELEASE_TIME = (V4L2_CID_FM_TX_CLASS_BASE + 84)
+V4L2_CID_PILOT_TONE_ENABLED = (V4L2_CID_FM_TX_CLASS_BASE + 96)
+V4L2_CID_PILOT_TONE_DEVIATION = (V4L2_CID_FM_TX_CLASS_BASE + 97)
+V4L2_CID_PILOT_TONE_FREQUENCY = (V4L2_CID_FM_TX_CLASS_BASE + 98)
+V4L2_CID_TUNE_PREEMPHASIS = (V4L2_CID_FM_TX_CLASS_BASE + 112)
+V4L2_CID_TUNE_POWER_LEVEL = (V4L2_CID_FM_TX_CLASS_BASE + 113)
+V4L2_CID_TUNE_ANTENNA_CAPACITOR = (V4L2_CID_FM_TX_CLASS_BASE + 114)
+V4L2_CID_FLASH_CLASS_BASE = (V4L2_CTRL_CLASS_FLASH | 0x900)
+V4L2_CID_FLASH_CLASS = (V4L2_CTRL_CLASS_FLASH | 1)
+V4L2_CID_FLASH_LED_MODE = (V4L2_CID_FLASH_CLASS_BASE + 1)
+V4L2_CID_FLASH_STROBE_SOURCE = (V4L2_CID_FLASH_CLASS_BASE + 2)
+V4L2_CID_FLASH_STROBE = (V4L2_CID_FLASH_CLASS_BASE + 3)
+V4L2_CID_FLASH_STROBE_STOP = (V4L2_CID_FLASH_CLASS_BASE + 4)
+V4L2_CID_FLASH_STROBE_STATUS = (V4L2_CID_FLASH_CLASS_BASE + 5)
+V4L2_CID_FLASH_TIMEOUT = (V4L2_CID_FLASH_CLASS_BASE + 6)
+V4L2_CID_FLASH_INTENSITY = (V4L2_CID_FLASH_CLASS_BASE + 7)
+V4L2_CID_FLASH_TORCH_INTENSITY = (V4L2_CID_FLASH_CLASS_BASE + 8)
+V4L2_CID_FLASH_INDICATOR_INTENSITY = (V4L2_CID_FLASH_CLASS_BASE + 9)
+V4L2_CID_FLASH_FAULT = (V4L2_CID_FLASH_CLASS_BASE + 10)
+V4L2_FLASH_FAULT_OVER_VOLTAGE = (1 << 0)
+V4L2_FLASH_FAULT_TIMEOUT = (1 << 1)
+V4L2_FLASH_FAULT_OVER_TEMPERATURE = (1 << 2)
+V4L2_FLASH_FAULT_SHORT_CIRCUIT = (1 << 3)
+V4L2_FLASH_FAULT_OVER_CURRENT = (1 << 4)
+V4L2_FLASH_FAULT_INDICATOR = (1 << 5)
+V4L2_FLASH_FAULT_UNDER_VOLTAGE = (1 << 6)
+V4L2_FLASH_FAULT_INPUT_VOLTAGE = (1 << 7)
+V4L2_FLASH_FAULT_LED_OVER_TEMPERATURE = (1 << 8)
+V4L2_CID_FLASH_CHARGE = (V4L2_CID_FLASH_CLASS_BASE + 11)
+V4L2_CID_FLASH_READY = (V4L2_CID_FLASH_CLASS_BASE + 12)
+V4L2_CID_JPEG_CLASS_BASE = (V4L2_CTRL_CLASS_JPEG | 0x900)
+V4L2_CID_JPEG_CLASS = (V4L2_CTRL_CLASS_JPEG | 1)
+V4L2_CID_JPEG_CHROMA_SUBSAMPLING = (V4L2_CID_JPEG_CLASS_BASE + 1)
+V4L2_CID_JPEG_RESTART_INTERVAL = (V4L2_CID_JPEG_CLASS_BASE + 2)
+V4L2_CID_JPEG_COMPRESSION_QUALITY = (V4L2_CID_JPEG_CLASS_BASE + 3)
+V4L2_CID_JPEG_ACTIVE_MARKER = (V4L2_CID_JPEG_CLASS_BASE + 4)
+V4L2_JPEG_ACTIVE_MARKER_APP0 = (1 << 0)
+V4L2_JPEG_ACTIVE_MARKER_APP1 = (1 << 1)
+V4L2_JPEG_ACTIVE_MARKER_COM = (1 << 16)
+V4L2_JPEG_ACTIVE_MARKER_DQT = (1 << 17)
+V4L2_JPEG_ACTIVE_MARKER_DHT = (1 << 18)
+V4L2_CID_IMAGE_SOURCE_CLASS_BASE = (V4L2_CTRL_CLASS_IMAGE_SOURCE | 0x900)
+V4L2_CID_IMAGE_SOURCE_CLASS = (V4L2_CTRL_CLASS_IMAGE_SOURCE | 1)
+V4L2_CID_VBLANK = (V4L2_CID_IMAGE_SOURCE_CLASS_BASE + 1)
+V4L2_CID_HBLANK = (V4L2_CID_IMAGE_SOURCE_CLASS_BASE + 2)
+V4L2_CID_ANALOGUE_GAIN = (V4L2_CID_IMAGE_SOURCE_CLASS_BASE + 3)
+V4L2_CID_TEST_PATTERN_RED = (V4L2_CID_IMAGE_SOURCE_CLASS_BASE + 4)
+V4L2_CID_TEST_PATTERN_GREENR = (V4L2_CID_IMAGE_SOURCE_CLASS_BASE + 5)
+V4L2_CID_TEST_PATTERN_BLUE = (V4L2_CID_IMAGE_SOURCE_CLASS_BASE + 6)
+V4L2_CID_TEST_PATTERN_GREENB = (V4L2_CID_IMAGE_SOURCE_CLASS_BASE + 7)
+V4L2_CID_UNIT_CELL_SIZE = (V4L2_CID_IMAGE_SOURCE_CLASS_BASE + 8)
+V4L2_CID_NOTIFY_GAINS = (V4L2_CID_IMAGE_SOURCE_CLASS_BASE + 9)
+V4L2_CID_IMAGE_PROC_CLASS_BASE = (V4L2_CTRL_CLASS_IMAGE_PROC | 0x900)
+V4L2_CID_IMAGE_PROC_CLASS = (V4L2_CTRL_CLASS_IMAGE_PROC | 1)
+V4L2_CID_LINK_FREQ = (V4L2_CID_IMAGE_PROC_CLASS_BASE + 1)
+V4L2_CID_PIXEL_RATE = (V4L2_CID_IMAGE_PROC_CLASS_BASE + 2)
+V4L2_CID_TEST_PATTERN = (V4L2_CID_IMAGE_PROC_CLASS_BASE + 3)
+V4L2_CID_DEINTERLACING_MODE = (V4L2_CID_IMAGE_PROC_CLASS_BASE + 4)
+V4L2_CID_DIGITAL_GAIN = (V4L2_CID_IMAGE_PROC_CLASS_BASE + 5)
+V4L2_CID_DV_CLASS_BASE = (V4L2_CTRL_CLASS_DV | 0x900)
+V4L2_CID_DV_CLASS = (V4L2_CTRL_CLASS_DV | 1)
+V4L2_CID_DV_TX_HOTPLUG = (V4L2_CID_DV_CLASS_BASE + 1)
+V4L2_CID_DV_TX_RXSENSE = (V4L2_CID_DV_CLASS_BASE + 2)
+V4L2_CID_DV_TX_EDID_PRESENT = (V4L2_CID_DV_CLASS_BASE + 3)
+V4L2_CID_DV_TX_MODE = (V4L2_CID_DV_CLASS_BASE + 4)
+V4L2_CID_DV_TX_RGB_RANGE = (V4L2_CID_DV_CLASS_BASE + 5)
+V4L2_CID_DV_TX_IT_CONTENT_TYPE = (V4L2_CID_DV_CLASS_BASE + 6)
+V4L2_CID_DV_RX_POWER_PRESENT = (V4L2_CID_DV_CLASS_BASE + 100)
+V4L2_CID_DV_RX_RGB_RANGE = (V4L2_CID_DV_CLASS_BASE + 101)
+V4L2_CID_DV_RX_IT_CONTENT_TYPE = (V4L2_CID_DV_CLASS_BASE + 102)
+V4L2_CID_FM_RX_CLASS_BASE = (V4L2_CTRL_CLASS_FM_RX | 0x900)
+V4L2_CID_FM_RX_CLASS = (V4L2_CTRL_CLASS_FM_RX | 1)
+V4L2_CID_TUNE_DEEMPHASIS = (V4L2_CID_FM_RX_CLASS_BASE + 1)
+V4L2_CID_RDS_RECEPTION = (V4L2_CID_FM_RX_CLASS_BASE + 2)
+V4L2_CID_RDS_RX_PTY = (V4L2_CID_FM_RX_CLASS_BASE + 3)
+V4L2_CID_RDS_RX_PS_NAME = (V4L2_CID_FM_RX_CLASS_BASE + 4)
+V4L2_CID_RDS_RX_RADIO_TEXT = (V4L2_CID_FM_RX_CLASS_BASE + 5)
+V4L2_CID_RDS_RX_TRAFFIC_ANNOUNCEMENT = (V4L2_CID_FM_RX_CLASS_BASE + 6)
+V4L2_CID_RDS_RX_TRAFFIC_PROGRAM = (V4L2_CID_FM_RX_CLASS_BASE + 7)
+V4L2_CID_RDS_RX_MUSIC_SPEECH = (V4L2_CID_FM_RX_CLASS_BASE + 8)
+V4L2_CID_RF_TUNER_CLASS_BASE = (V4L2_CTRL_CLASS_RF_TUNER | 0x900)
+V4L2_CID_RF_TUNER_CLASS = (V4L2_CTRL_CLASS_RF_TUNER | 1)
+V4L2_CID_RF_TUNER_BANDWIDTH_AUTO = (V4L2_CID_RF_TUNER_CLASS_BASE + 11)
+V4L2_CID_RF_TUNER_BANDWIDTH = (V4L2_CID_RF_TUNER_CLASS_BASE + 12)
+V4L2_CID_RF_TUNER_RF_GAIN = (V4L2_CID_RF_TUNER_CLASS_BASE + 32)
+V4L2_CID_RF_TUNER_LNA_GAIN_AUTO = (V4L2_CID_RF_TUNER_CLASS_BASE + 41)
+V4L2_CID_RF_TUNER_LNA_GAIN = (V4L2_CID_RF_TUNER_CLASS_BASE + 42)
+V4L2_CID_RF_TUNER_MIXER_GAIN_AUTO = (V4L2_CID_RF_TUNER_CLASS_BASE + 51)
+V4L2_CID_RF_TUNER_MIXER_GAIN = (V4L2_CID_RF_TUNER_CLASS_BASE + 52)
+V4L2_CID_RF_TUNER_IF_GAIN_AUTO = (V4L2_CID_RF_TUNER_CLASS_BASE + 61)
+V4L2_CID_RF_TUNER_IF_GAIN = (V4L2_CID_RF_TUNER_CLASS_BASE + 62)
+V4L2_CID_RF_TUNER_PLL_LOCK = (V4L2_CID_RF_TUNER_CLASS_BASE + 91)
+V4L2_CID_DETECT_CLASS_BASE = (V4L2_CTRL_CLASS_DETECT | 0x900)
+V4L2_CID_DETECT_CLASS = (V4L2_CTRL_CLASS_DETECT | 1)
+V4L2_CID_DETECT_MD_MODE = (V4L2_CID_DETECT_CLASS_BASE + 1)
+V4L2_CID_DETECT_MD_GLOBAL_THRESHOLD = (V4L2_CID_DETECT_CLASS_BASE + 2)
+V4L2_CID_DETECT_MD_THRESHOLD_GRID = (V4L2_CID_DETECT_CLASS_BASE + 3)
+V4L2_CID_DETECT_MD_REGION_GRID = (V4L2_CID_DETECT_CLASS_BASE + 4)
+V4L2_CID_CODEC_STATELESS_BASE = (V4L2_CTRL_CLASS_CODEC_STATELESS | 0x900)
+V4L2_CID_CODEC_STATELESS_CLASS = (V4L2_CTRL_CLASS_CODEC_STATELESS | 1)
+V4L2_CID_STATELESS_H264_DECODE_MODE = (V4L2_CID_CODEC_STATELESS_BASE + 0)
+V4L2_CID_STATELESS_H264_START_CODE = (V4L2_CID_CODEC_STATELESS_BASE + 1)
+V4L2_H264_SPS_CONSTRAINT_SET0_FLAG = 0x01
+V4L2_H264_SPS_CONSTRAINT_SET1_FLAG = 0x02
+V4L2_H264_SPS_CONSTRAINT_SET2_FLAG = 0x04
+V4L2_H264_SPS_CONSTRAINT_SET3_FLAG = 0x08
+V4L2_H264_SPS_CONSTRAINT_SET4_FLAG = 0x10
+V4L2_H264_SPS_CONSTRAINT_SET5_FLAG = 0x20
+V4L2_H264_SPS_FLAG_SEPARATE_COLOUR_PLANE = 0x01
+V4L2_H264_SPS_FLAG_QPPRIME_Y_ZERO_TRANSFORM_BYPASS = 0x02
+V4L2_H264_SPS_FLAG_DELTA_PIC_ORDER_ALWAYS_ZERO = 0x04
+V4L2_H264_SPS_FLAG_GAPS_IN_FRAME_NUM_VALUE_ALLOWED = 0x08
+V4L2_H264_SPS_FLAG_FRAME_MBS_ONLY = 0x10
+V4L2_H264_SPS_FLAG_MB_ADAPTIVE_FRAME_FIELD = 0x20
+V4L2_H264_SPS_FLAG_DIRECT_8X8_INFERENCE = 0x40
+V4L2_CID_STATELESS_H264_SPS = (V4L2_CID_CODEC_STATELESS_BASE + 2)
+V4L2_H264_PPS_FLAG_ENTROPY_CODING_MODE = 0x0001
+V4L2_H264_PPS_FLAG_BOTTOM_FIELD_PIC_ORDER_IN_FRAME_PRESENT = 0x0002
+V4L2_H264_PPS_FLAG_WEIGHTED_PRED = 0x0004
+V4L2_H264_PPS_FLAG_DEBLOCKING_FILTER_CONTROL_PRESENT = 0x0008
+V4L2_H264_PPS_FLAG_CONSTRAINED_INTRA_PRED = 0x0010
+V4L2_H264_PPS_FLAG_REDUNDANT_PIC_CNT_PRESENT = 0x0020
+V4L2_H264_PPS_FLAG_TRANSFORM_8X8_MODE = 0x0040
+V4L2_H264_PPS_FLAG_SCALING_MATRIX_PRESENT = 0x0080
+V4L2_CID_STATELESS_H264_PPS = (V4L2_CID_CODEC_STATELESS_BASE + 3)
+V4L2_CID_STATELESS_H264_SCALING_MATRIX = (V4L2_CID_CODEC_STATELESS_BASE + 4)
+V4L2_CID_STATELESS_H264_PRED_WEIGHTS = (V4L2_CID_CODEC_STATELESS_BASE + 5)
+V4L2_H264_SLICE_TYPE_P = 0
+V4L2_H264_SLICE_TYPE_B = 1
+V4L2_H264_SLICE_TYPE_I = 2
+V4L2_H264_SLICE_TYPE_SP = 3
+V4L2_H264_SLICE_TYPE_SI = 4
+V4L2_H264_SLICE_FLAG_DIRECT_SPATIAL_MV_PRED = 0x01
+V4L2_H264_SLICE_FLAG_SP_FOR_SWITCH = 0x02
+V4L2_H264_TOP_FIELD_REF = 0x1
+V4L2_H264_BOTTOM_FIELD_REF = 0x2
+V4L2_H264_FRAME_REF = 0x3
+V4L2_H264_NUM_DPB_ENTRIES = 16
+V4L2_H264_REF_LIST_LEN = (2 * V4L2_H264_NUM_DPB_ENTRIES)
+V4L2_CID_STATELESS_H264_SLICE_PARAMS = (V4L2_CID_CODEC_STATELESS_BASE + 6)
+V4L2_H264_DPB_ENTRY_FLAG_VALID = 0x01
+V4L2_H264_DPB_ENTRY_FLAG_ACTIVE = 0x02
+V4L2_H264_DPB_ENTRY_FLAG_LONG_TERM = 0x04
+V4L2_H264_DPB_ENTRY_FLAG_FIELD = 0x08
+V4L2_H264_DECODE_PARAM_FLAG_IDR_PIC = 0x01
+V4L2_H264_DECODE_PARAM_FLAG_FIELD_PIC = 0x02
+V4L2_H264_DECODE_PARAM_FLAG_BOTTOM_FIELD = 0x04
+V4L2_H264_DECODE_PARAM_FLAG_PFRAME = 0x08
+V4L2_H264_DECODE_PARAM_FLAG_BFRAME = 0x10
+V4L2_CID_STATELESS_H264_DECODE_PARAMS = (V4L2_CID_CODEC_STATELESS_BASE + 7)
+V4L2_FWHT_VERSION = 3
+V4L2_FWHT_FL_COMPONENTS_NUM_OFFSET = 16
+V4L2_FWHT_FL_PIXENC_OFFSET = 19
+V4L2_FWHT_FL_PIXENC_YUV = (1 << V4L2_FWHT_FL_PIXENC_OFFSET)
+V4L2_FWHT_FL_PIXENC_RGB = (2 << V4L2_FWHT_FL_PIXENC_OFFSET)
+V4L2_FWHT_FL_PIXENC_HSV = (3 << V4L2_FWHT_FL_PIXENC_OFFSET)
+V4L2_CID_STATELESS_FWHT_PARAMS = (V4L2_CID_CODEC_STATELESS_BASE + 100)
+V4L2_VP8_SEGMENT_FLAG_ENABLED = 0x01
+V4L2_VP8_SEGMENT_FLAG_UPDATE_MAP = 0x02
+V4L2_VP8_SEGMENT_FLAG_UPDATE_FEATURE_DATA = 0x04
+V4L2_VP8_SEGMENT_FLAG_DELTA_VALUE_MODE = 0x08
+V4L2_VP8_LF_ADJ_ENABLE = 0x01
+V4L2_VP8_LF_DELTA_UPDATE = 0x02
+V4L2_VP8_LF_FILTER_TYPE_SIMPLE = 0x04
+V4L2_VP8_COEFF_PROB_CNT = 11
+V4L2_VP8_MV_PROB_CNT = 19
+V4L2_VP8_FRAME_FLAG_KEY_FRAME = 0x01
+V4L2_VP8_FRAME_FLAG_EXPERIMENTAL = 0x02
+V4L2_VP8_FRAME_FLAG_SHOW_FRAME = 0x04
+V4L2_VP8_FRAME_FLAG_MB_NO_SKIP_COEFF = 0x08
+V4L2_VP8_FRAME_FLAG_SIGN_BIAS_GOLDEN = 0x10
+V4L2_VP8_FRAME_FLAG_SIGN_BIAS_ALT = 0x20
+V4L2_CID_STATELESS_VP8_FRAME = (V4L2_CID_CODEC_STATELESS_BASE + 200)
+V4L2_MPEG2_SEQ_FLAG_PROGRESSIVE = 0x01
+V4L2_CID_STATELESS_MPEG2_SEQUENCE = (V4L2_CID_CODEC_STATELESS_BASE+220)
+V4L2_MPEG2_PIC_CODING_TYPE_I = 1
+V4L2_MPEG2_PIC_CODING_TYPE_P = 2
+V4L2_MPEG2_PIC_CODING_TYPE_B = 3
+V4L2_MPEG2_PIC_CODING_TYPE_D = 4
+V4L2_MPEG2_PIC_TOP_FIELD = 0x1
+V4L2_MPEG2_PIC_BOTTOM_FIELD = 0x2
+V4L2_MPEG2_PIC_FRAME = 0x3
+V4L2_MPEG2_PIC_FLAG_TOP_FIELD_FIRST = 0x0001
+V4L2_MPEG2_PIC_FLAG_FRAME_PRED_DCT = 0x0002
+V4L2_MPEG2_PIC_FLAG_CONCEALMENT_MV = 0x0004
+V4L2_MPEG2_PIC_FLAG_Q_SCALE_TYPE = 0x0008
+V4L2_MPEG2_PIC_FLAG_INTRA_VLC = 0x0010
+V4L2_MPEG2_PIC_FLAG_ALT_SCAN = 0x0020
+V4L2_MPEG2_PIC_FLAG_REPEAT_FIRST = 0x0040
+V4L2_MPEG2_PIC_FLAG_PROGRESSIVE = 0x0080
+V4L2_CID_STATELESS_MPEG2_PICTURE = (V4L2_CID_CODEC_STATELESS_BASE+221)
+V4L2_CID_STATELESS_MPEG2_QUANTISATION = (V4L2_CID_CODEC_STATELESS_BASE+222)
+V4L2_CID_STATELESS_HEVC_SPS = (V4L2_CID_CODEC_STATELESS_BASE + 400)
+V4L2_CID_STATELESS_HEVC_PPS = (V4L2_CID_CODEC_STATELESS_BASE + 401)
+V4L2_CID_STATELESS_HEVC_SLICE_PARAMS = (V4L2_CID_CODEC_STATELESS_BASE + 402)
+V4L2_CID_STATELESS_HEVC_SCALING_MATRIX = (V4L2_CID_CODEC_STATELESS_BASE + 403)
+V4L2_CID_STATELESS_HEVC_DECODE_PARAMS = (V4L2_CID_CODEC_STATELESS_BASE + 404)
+V4L2_CID_STATELESS_HEVC_DECODE_MODE = (V4L2_CID_CODEC_STATELESS_BASE + 405)
+V4L2_CID_STATELESS_HEVC_START_CODE = (V4L2_CID_CODEC_STATELESS_BASE + 406)
+V4L2_CID_STATELESS_HEVC_ENTRY_POINT_OFFSETS = (V4L2_CID_CODEC_STATELESS_BASE + 407)
+V4L2_HEVC_SLICE_TYPE_B = 0
+V4L2_HEVC_SLICE_TYPE_P = 1
+V4L2_HEVC_SLICE_TYPE_I = 2
+V4L2_HEVC_DPB_ENTRY_LONG_TERM_REFERENCE = 0x01
+V4L2_HEVC_SEI_PIC_STRUCT_FRAME = 0
+V4L2_HEVC_SEI_PIC_STRUCT_TOP_FIELD = 1
+V4L2_HEVC_SEI_PIC_STRUCT_BOTTOM_FIELD = 2
+V4L2_HEVC_SEI_PIC_STRUCT_TOP_BOTTOM = 3
+V4L2_HEVC_SEI_PIC_STRUCT_BOTTOM_TOP = 4
+V4L2_HEVC_SEI_PIC_STRUCT_TOP_BOTTOM_TOP = 5
+V4L2_HEVC_SEI_PIC_STRUCT_BOTTOM_TOP_BOTTOM = 6
+V4L2_HEVC_SEI_PIC_STRUCT_FRAME_DOUBLING = 7
+V4L2_HEVC_SEI_PIC_STRUCT_FRAME_TRIPLING = 8
+V4L2_HEVC_SEI_PIC_STRUCT_TOP_PAIRED_PREVIOUS_BOTTOM = 9
+V4L2_HEVC_SEI_PIC_STRUCT_BOTTOM_PAIRED_PREVIOUS_TOP = 10
+V4L2_HEVC_SEI_PIC_STRUCT_TOP_PAIRED_NEXT_BOTTOM = 11
+V4L2_HEVC_SEI_PIC_STRUCT_BOTTOM_PAIRED_NEXT_TOP = 12
+V4L2_HEVC_DPB_ENTRIES_NUM_MAX = 16
+V4L2_HEVC_DECODE_PARAM_FLAG_IRAP_PIC = 0x1
+V4L2_HEVC_DECODE_PARAM_FLAG_IDR_PIC = 0x2
+V4L2_HEVC_DECODE_PARAM_FLAG_NO_OUTPUT_OF_PRIOR = 0x4
+V4L2_CID_COLORIMETRY_CLASS_BASE = (V4L2_CTRL_CLASS_COLORIMETRY | 0x900)
+V4L2_CID_COLORIMETRY_CLASS = (V4L2_CTRL_CLASS_COLORIMETRY | 1)
+V4L2_CID_COLORIMETRY_HDR10_CLL_INFO = (V4L2_CID_COLORIMETRY_CLASS_BASE + 0)
+V4L2_CID_COLORIMETRY_HDR10_MASTERING_DISPLAY = (V4L2_CID_COLORIMETRY_CLASS_BASE + 1)
+V4L2_HDR10_MASTERING_PRIMARIES_X_LOW = 5
+V4L2_HDR10_MASTERING_PRIMARIES_X_HIGH = 37000
+V4L2_HDR10_MASTERING_PRIMARIES_Y_LOW = 5
+V4L2_HDR10_MASTERING_PRIMARIES_Y_HIGH = 42000
+V4L2_HDR10_MASTERING_WHITE_POINT_X_LOW = 5
+V4L2_HDR10_MASTERING_WHITE_POINT_X_HIGH = 37000
+V4L2_HDR10_MASTERING_WHITE_POINT_Y_LOW = 5
+V4L2_HDR10_MASTERING_WHITE_POINT_Y_HIGH = 42000
+V4L2_HDR10_MASTERING_MAX_LUMA_LOW = 50000
+V4L2_HDR10_MASTERING_MAX_LUMA_HIGH = 100000000
+V4L2_HDR10_MASTERING_MIN_LUMA_LOW = 1
+V4L2_HDR10_MASTERING_MIN_LUMA_HIGH = 50000
+V4L2_VP9_LOOP_FILTER_FLAG_DELTA_ENABLED = 0x1
+V4L2_VP9_LOOP_FILTER_FLAG_DELTA_UPDATE = 0x2
+V4L2_VP9_SEGMENTATION_FLAG_ENABLED = 0x01
+V4L2_VP9_SEGMENTATION_FLAG_UPDATE_MAP = 0x02
+V4L2_VP9_SEGMENTATION_FLAG_TEMPORAL_UPDATE = 0x04
+V4L2_VP9_SEGMENTATION_FLAG_UPDATE_DATA = 0x08
+V4L2_VP9_SEGMENTATION_FLAG_ABS_OR_DELTA_UPDATE = 0x10
+V4L2_VP9_SEG_LVL_ALT_Q = 0
+V4L2_VP9_SEG_LVL_ALT_L = 1
+V4L2_VP9_SEG_LVL_REF_FRAME = 2
+V4L2_VP9_SEG_LVL_SKIP = 3
+V4L2_VP9_SEG_LVL_MAX = 4
+V4L2_VP9_SEGMENT_FEATURE_ENABLED_MASK = 0xf
+V4L2_VP9_FRAME_FLAG_KEY_FRAME = 0x001
+V4L2_VP9_FRAME_FLAG_SHOW_FRAME = 0x002
+V4L2_VP9_FRAME_FLAG_ERROR_RESILIENT = 0x004
+V4L2_VP9_FRAME_FLAG_INTRA_ONLY = 0x008
+V4L2_VP9_FRAME_FLAG_ALLOW_HIGH_PREC_MV = 0x010
+V4L2_VP9_FRAME_FLAG_REFRESH_FRAME_CTX = 0x020
+V4L2_VP9_FRAME_FLAG_PARALLEL_DEC_MODE = 0x040
+V4L2_VP9_FRAME_FLAG_X_SUBSAMPLING = 0x080
+V4L2_VP9_FRAME_FLAG_Y_SUBSAMPLING = 0x100
+V4L2_VP9_FRAME_FLAG_COLOR_RANGE_FULL_SWING = 0x200
+V4L2_VP9_SIGN_BIAS_LAST = 0x1
+V4L2_VP9_SIGN_BIAS_GOLDEN = 0x2
+V4L2_VP9_SIGN_BIAS_ALT = 0x4
+V4L2_VP9_RESET_FRAME_CTX_NONE = 0
+V4L2_VP9_RESET_FRAME_CTX_SPEC = 1
+V4L2_VP9_RESET_FRAME_CTX_ALL = 2
+V4L2_VP9_INTERP_FILTER_EIGHTTAP = 0
+V4L2_VP9_INTERP_FILTER_EIGHTTAP_SMOOTH = 1
+V4L2_VP9_INTERP_FILTER_EIGHTTAP_SHARP = 2
+V4L2_VP9_INTERP_FILTER_BILINEAR = 3
+V4L2_VP9_INTERP_FILTER_SWITCHABLE = 4
+V4L2_VP9_REFERENCE_MODE_SINGLE_REFERENCE = 0
+V4L2_VP9_REFERENCE_MODE_COMPOUND_REFERENCE = 1
+V4L2_VP9_REFERENCE_MODE_SELECT = 2
+V4L2_VP9_PROFILE_MAX = 3
+V4L2_CID_STATELESS_VP9_FRAME = (V4L2_CID_CODEC_STATELESS_BASE + 300)
+V4L2_VP9_NUM_FRAME_CTX = 4
+V4L2_CID_STATELESS_VP9_COMPRESSED_HDR = (V4L2_CID_CODEC_STATELESS_BASE + 301)
+V4L2_VP9_TX_MODE_ONLY_4X4 = 0
+V4L2_VP9_TX_MODE_ALLOW_8X8 = 1
+V4L2_VP9_TX_MODE_ALLOW_16X16 = 2
+V4L2_VP9_TX_MODE_ALLOW_32X32 = 3
+V4L2_VP9_TX_MODE_SELECT = 4
+V4L2_AV1_TOTAL_REFS_PER_FRAME = 8
+V4L2_AV1_CDEF_MAX = 8
+V4L2_AV1_NUM_PLANES_MAX = 3
+V4L2_AV1_MAX_SEGMENTS = 8
+V4L2_AV1_MAX_OPERATING_POINTS = (1 << 5)
+V4L2_AV1_REFS_PER_FRAME = 7
+V4L2_AV1_MAX_NUM_Y_POINTS = (1 << 4)
+V4L2_AV1_MAX_NUM_CB_POINTS = (1 << 4)
+V4L2_AV1_MAX_NUM_CR_POINTS = (1 << 4)
+V4L2_AV1_AR_COEFFS_SIZE = 25
+V4L2_AV1_MAX_NUM_PLANES = 3
+V4L2_AV1_MAX_TILE_COLS = 64
+V4L2_AV1_MAX_TILE_ROWS = 64
+V4L2_AV1_MAX_TILE_COUNT = 512
+V4L2_AV1_SEQUENCE_FLAG_STILL_PICTURE = 0x00000001
+V4L2_AV1_SEQUENCE_FLAG_USE_128X128_SUPERBLOCK = 0x00000002
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_FILTER_INTRA = 0x00000004
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_INTRA_EDGE_FILTER = 0x00000008
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_INTERINTRA_COMPOUND = 0x00000010
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_MASKED_COMPOUND = 0x00000020
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_WARPED_MOTION = 0x00000040
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_DUAL_FILTER = 0x00000080
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_ORDER_HINT = 0x00000100
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_JNT_COMP = 0x00000200
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_REF_FRAME_MVS = 0x00000400
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_SUPERRES = 0x00000800
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_CDEF = 0x00001000
+V4L2_AV1_SEQUENCE_FLAG_ENABLE_RESTORATION = 0x00002000
+V4L2_AV1_SEQUENCE_FLAG_MONO_CHROME = 0x00004000
+V4L2_AV1_SEQUENCE_FLAG_COLOR_RANGE = 0x00008000
+V4L2_AV1_SEQUENCE_FLAG_SUBSAMPLING_X = 0x00010000
+V4L2_AV1_SEQUENCE_FLAG_SUBSAMPLING_Y = 0x00020000
+V4L2_AV1_SEQUENCE_FLAG_FILM_GRAIN_PARAMS_PRESENT = 0x00040000
+V4L2_AV1_SEQUENCE_FLAG_SEPARATE_UV_DELTA_Q = 0x00080000
+V4L2_CID_STATELESS_AV1_SEQUENCE = (V4L2_CID_CODEC_STATELESS_BASE + 500)
+V4L2_CID_STATELESS_AV1_TILE_GROUP_ENTRY = (V4L2_CID_CODEC_STATELESS_BASE + 501)
+V4L2_AV1_GLOBAL_MOTION_FLAG_IS_GLOBAL = 0x1
+V4L2_AV1_GLOBAL_MOTION_FLAG_IS_ROT_ZOOM = 0x2
+V4L2_AV1_GLOBAL_MOTION_FLAG_IS_TRANSLATION = 0x4
+V4L2_AV1_LOOP_RESTORATION_FLAG_USES_LR = 0x1
+V4L2_AV1_LOOP_RESTORATION_FLAG_USES_CHROMA_LR = 0x2
+V4L2_AV1_SEGMENTATION_FLAG_ENABLED = 0x1
+V4L2_AV1_SEGMENTATION_FLAG_UPDATE_MAP = 0x2
+V4L2_AV1_SEGMENTATION_FLAG_TEMPORAL_UPDATE = 0x4
+V4L2_AV1_SEGMENTATION_FLAG_UPDATE_DATA = 0x8
+V4L2_AV1_SEGMENTATION_FLAG_SEG_ID_PRE_SKIP = 0x10
+V4L2_AV1_LOOP_FILTER_FLAG_DELTA_ENABLED = 0x1
+V4L2_AV1_LOOP_FILTER_FLAG_DELTA_UPDATE = 0x2
+V4L2_AV1_LOOP_FILTER_FLAG_DELTA_LF_PRESENT = 0x4
+V4L2_AV1_LOOP_FILTER_FLAG_DELTA_LF_MULTI = 0x8
+V4L2_AV1_QUANTIZATION_FLAG_DIFF_UV_DELTA = 0x1
+V4L2_AV1_QUANTIZATION_FLAG_USING_QMATRIX = 0x2
+V4L2_AV1_QUANTIZATION_FLAG_DELTA_Q_PRESENT = 0x4
+V4L2_AV1_TILE_INFO_FLAG_UNIFORM_TILE_SPACING = 0x1
+V4L2_AV1_FRAME_FLAG_SHOW_FRAME = 0x00000001
+V4L2_AV1_FRAME_FLAG_SHOWABLE_FRAME = 0x00000002
+V4L2_AV1_FRAME_FLAG_ERROR_RESILIENT_MODE = 0x00000004
+V4L2_AV1_FRAME_FLAG_DISABLE_CDF_UPDATE = 0x00000008
+V4L2_AV1_FRAME_FLAG_ALLOW_SCREEN_CONTENT_TOOLS = 0x00000010
+V4L2_AV1_FRAME_FLAG_FORCE_INTEGER_MV = 0x00000020
+V4L2_AV1_FRAME_FLAG_ALLOW_INTRABC = 0x00000040
+V4L2_AV1_FRAME_FLAG_USE_SUPERRES = 0x00000080
+V4L2_AV1_FRAME_FLAG_ALLOW_HIGH_PRECISION_MV = 0x00000100
+V4L2_AV1_FRAME_FLAG_IS_MOTION_MODE_SWITCHABLE = 0x00000200
+V4L2_AV1_FRAME_FLAG_USE_REF_FRAME_MVS = 0x00000400
+V4L2_AV1_FRAME_FLAG_DISABLE_FRAME_END_UPDATE_CDF = 0x00000800
+V4L2_AV1_FRAME_FLAG_ALLOW_WARPED_MOTION = 0x00001000
+V4L2_AV1_FRAME_FLAG_REFERENCE_SELECT = 0x00002000
+V4L2_AV1_FRAME_FLAG_REDUCED_TX_SET = 0x00004000
+V4L2_AV1_FRAME_FLAG_SKIP_MODE_ALLOWED = 0x00008000
+V4L2_AV1_FRAME_FLAG_SKIP_MODE_PRESENT = 0x00010000
+V4L2_AV1_FRAME_FLAG_FRAME_SIZE_OVERRIDE = 0x00020000
+V4L2_AV1_FRAME_FLAG_BUFFER_REMOVAL_TIME_PRESENT = 0x00040000
+V4L2_AV1_FRAME_FLAG_FRAME_REFS_SHORT_SIGNALING = 0x00080000
+V4L2_CID_STATELESS_AV1_FRAME = (V4L2_CID_CODEC_STATELESS_BASE + 502)
+V4L2_AV1_FILM_GRAIN_FLAG_APPLY_GRAIN = 0x1
+V4L2_AV1_FILM_GRAIN_FLAG_UPDATE_GRAIN = 0x2
+V4L2_AV1_FILM_GRAIN_FLAG_CHROMA_SCALING_FROM_LUMA = 0x4
+V4L2_AV1_FILM_GRAIN_FLAG_OVERLAP = 0x8
+V4L2_AV1_FILM_GRAIN_FLAG_CLIP_TO_RESTRICTED_RANGE = 0x10
+V4L2_CID_STATELESS_AV1_FILM_GRAIN = (V4L2_CID_CODEC_STATELESS_BASE + 505)
+V4L2_CTRL_CLASS_MPEG = V4L2_CTRL_CLASS_CODEC
+V4L2_CID_MPEG_CLASS = V4L2_CID_CODEC_CLASS
+V4L2_CID_MPEG_BASE = V4L2_CID_CODEC_BASE
+V4L2_CID_MPEG_CX2341X_BASE = V4L2_CID_CODEC_CX2341X_BASE
+V4L2_CID_MPEG_MFC51_BASE = V4L2_CID_CODEC_MFC51_BASE
+V4L2_FOURCC_CONV = "%c%c%c%c%s"
+V4L2_TUNER_ADC = V4L2_TUNER_SDR
+V4L2_COLORSPACE_ADOBERGB = V4L2_COLORSPACE_OPRGB
+V4L2_XFER_FUNC_ADOBERGB = V4L2_XFER_FUNC_OPRGB
+V4L2_CAP_VIDEO_CAPTURE = 0x00000001
+V4L2_CAP_VIDEO_OUTPUT = 0x00000002
+V4L2_CAP_VIDEO_OVERLAY = 0x00000004
+V4L2_CAP_VBI_CAPTURE = 0x00000010
+V4L2_CAP_VBI_OUTPUT = 0x00000020
+V4L2_CAP_SLICED_VBI_CAPTURE = 0x00000040
+V4L2_CAP_SLICED_VBI_OUTPUT = 0x00000080
+V4L2_CAP_RDS_CAPTURE = 0x00000100
+V4L2_CAP_VIDEO_OUTPUT_OVERLAY = 0x00000200
+V4L2_CAP_HW_FREQ_SEEK = 0x00000400
+V4L2_CAP_RDS_OUTPUT = 0x00000800
+V4L2_CAP_VIDEO_CAPTURE_MPLANE = 0x00001000
+V4L2_CAP_VIDEO_OUTPUT_MPLANE = 0x00002000
+V4L2_CAP_VIDEO_M2M_MPLANE = 0x00004000
+V4L2_CAP_VIDEO_M2M = 0x00008000
+V4L2_CAP_TUNER = 0x00010000
+V4L2_CAP_AUDIO = 0x00020000
+V4L2_CAP_RADIO = 0x00040000
+V4L2_CAP_MODULATOR = 0x00080000
+V4L2_CAP_SDR_CAPTURE = 0x00100000
+V4L2_CAP_EXT_PIX_FORMAT = 0x00200000
+V4L2_CAP_SDR_OUTPUT = 0x00400000
+V4L2_CAP_META_CAPTURE = 0x00800000
+V4L2_CAP_READWRITE = 0x01000000
+V4L2_CAP_EDID = 0x02000000
+V4L2_CAP_STREAMING = 0x04000000
+V4L2_CAP_META_OUTPUT = 0x08000000
+V4L2_CAP_TOUCH = 0x10000000
+V4L2_CAP_IO_MC = 0x20000000
+V4L2_CAP_DEVICE_CAPS = 0x80000000
+V4L2_PIX_FMT_PRIV_MAGIC = 0xfeedcafe
+V4L2_PIX_FMT_FLAG_PREMUL_ALPHA = 0x00000001
+V4L2_PIX_FMT_FLAG_SET_CSC = 0x00000002
+V4L2_FMT_FLAG_COMPRESSED = 0x0001
+V4L2_FMT_FLAG_EMULATED = 0x0002
+V4L2_FMT_FLAG_CONTINUOUS_BYTESTREAM = 0x0004
+V4L2_FMT_FLAG_DYN_RESOLUTION = 0x0008
+V4L2_FMT_FLAG_ENC_CAP_FRAME_INTERVAL = 0x0010
+V4L2_FMT_FLAG_CSC_COLORSPACE = 0x0020
+V4L2_FMT_FLAG_CSC_XFER_FUNC = 0x0040
+V4L2_FMT_FLAG_CSC_YCBCR_ENC = 0x0080
+V4L2_FMT_FLAG_CSC_HSV_ENC = V4L2_FMT_FLAG_CSC_YCBCR_ENC
+V4L2_FMT_FLAG_CSC_QUANTIZATION = 0x0100
+V4L2_FMT_FLAG_META_LINE_BASED = 0x0200
+V4L2_TC_TYPE_24FPS = 1
+V4L2_TC_TYPE_25FPS = 2
+V4L2_TC_TYPE_30FPS = 3
+V4L2_TC_TYPE_50FPS = 4
+V4L2_TC_TYPE_60FPS = 5
+V4L2_TC_FLAG_DROPFRAME = 0x0001
+V4L2_TC_FLAG_COLORFRAME = 0x0002
+V4L2_TC_USERBITS_field = 0x000C
+V4L2_TC_USERBITS_USERDEFINED = 0x0000
+V4L2_TC_USERBITS_8BITCHARS = 0x0008
+V4L2_MEMORY_FLAG_NON_COHERENT = (1 << 0)
+V4L2_BUF_CAP_SUPPORTS_MMAP = (1 << 0)
+V4L2_BUF_CAP_SUPPORTS_USERPTR = (1 << 1)
+V4L2_BUF_CAP_SUPPORTS_DMABUF = (1 << 2)
+V4L2_BUF_CAP_SUPPORTS_REQUESTS = (1 << 3)
+V4L2_BUF_CAP_SUPPORTS_ORPHANED_BUFS = (1 << 4)
+V4L2_BUF_CAP_SUPPORTS_M2M_HOLD_CAPTURE_BUF = (1 << 5)
+V4L2_BUF_CAP_SUPPORTS_MMAP_CACHE_HINTS = (1 << 6)
+V4L2_BUF_CAP_SUPPORTS_MAX_NUM_BUFFERS = (1 << 7)
+V4L2_BUF_CAP_SUPPORTS_REMOVE_BUFS = (1 << 8)
+V4L2_BUF_FLAG_MAPPED = 0x00000001
+V4L2_BUF_FLAG_QUEUED = 0x00000002
+V4L2_BUF_FLAG_DONE = 0x00000004
+V4L2_BUF_FLAG_KEYFRAME = 0x00000008
+V4L2_BUF_FLAG_PFRAME = 0x00000010
+V4L2_BUF_FLAG_BFRAME = 0x00000020
+V4L2_BUF_FLAG_ERROR = 0x00000040
+V4L2_BUF_FLAG_IN_REQUEST = 0x00000080
+V4L2_BUF_FLAG_TIMECODE = 0x00000100
+V4L2_BUF_FLAG_M2M_HOLD_CAPTURE_BUF = 0x00000200
+V4L2_BUF_FLAG_PREPARED = 0x00000400
+V4L2_BUF_FLAG_NO_CACHE_INVALIDATE = 0x00000800
+V4L2_BUF_FLAG_NO_CACHE_CLEAN = 0x00001000
+V4L2_BUF_FLAG_TIMESTAMP_MASK = 0x0000e000
+V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN = 0x00000000
+V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC = 0x00002000
+V4L2_BUF_FLAG_TIMESTAMP_COPY = 0x00004000
+V4L2_BUF_FLAG_TSTAMP_SRC_MASK = 0x00070000
+V4L2_BUF_FLAG_TSTAMP_SRC_EOF = 0x00000000
+V4L2_BUF_FLAG_TSTAMP_SRC_SOE = 0x00010000
+V4L2_BUF_FLAG_LAST = 0x00100000
+V4L2_BUF_FLAG_REQUEST_FD = 0x00800000
+V4L2_FBUF_CAP_EXTERNOVERLAY = 0x0001
+V4L2_FBUF_CAP_CHROMAKEY = 0x0002
+V4L2_FBUF_CAP_LIST_CLIPPING = 0x0004
+V4L2_FBUF_CAP_BITMAP_CLIPPING = 0x0008
+V4L2_FBUF_CAP_LOCAL_ALPHA = 0x0010
+V4L2_FBUF_CAP_GLOBAL_ALPHA = 0x0020
+V4L2_FBUF_CAP_LOCAL_INV_ALPHA = 0x0040
+V4L2_FBUF_CAP_SRC_CHROMAKEY = 0x0080
+V4L2_FBUF_FLAG_PRIMARY = 0x0001
+V4L2_FBUF_FLAG_OVERLAY = 0x0002
+V4L2_FBUF_FLAG_CHROMAKEY = 0x0004
+V4L2_FBUF_FLAG_LOCAL_ALPHA = 0x0008
+V4L2_FBUF_FLAG_GLOBAL_ALPHA = 0x0010
+V4L2_FBUF_FLAG_LOCAL_INV_ALPHA = 0x0020
+V4L2_FBUF_FLAG_SRC_CHROMAKEY = 0x0040
+V4L2_MODE_HIGHQUALITY = 0x0001
+V4L2_CAP_TIMEPERFRAME = 0x1000
+V4L2_STD_PAL_B = 0x00000001
+V4L2_STD_PAL_B1 = 0x00000002
+V4L2_STD_PAL_G = 0x00000004
+V4L2_STD_PAL_H = 0x00000008
+V4L2_STD_PAL_I = 0x00000010
+V4L2_STD_PAL_D = 0x00000020
+V4L2_STD_PAL_D1 = 0x00000040
+V4L2_STD_PAL_K = 0x00000080
+V4L2_STD_PAL_M = 0x00000100
+V4L2_STD_PAL_N = 0x00000200
+V4L2_STD_PAL_Nc = 0x00000400
+V4L2_STD_PAL_60 = 0x00000800
+V4L2_STD_NTSC_M = 0x00001000
+V4L2_STD_NTSC_M_JP = 0x00002000
+V4L2_STD_NTSC_443 = 0x00004000
+V4L2_STD_NTSC_M_KR = 0x00008000
+V4L2_STD_SECAM_B = 0x00010000
+V4L2_STD_SECAM_D = 0x00020000
+V4L2_STD_SECAM_G = 0x00040000
+V4L2_STD_SECAM_H = 0x00080000
+V4L2_STD_SECAM_K = 0x00100000
+V4L2_STD_SECAM_K1 = 0x00200000
+V4L2_STD_SECAM_L = 0x00400000
+V4L2_STD_SECAM_LC = 0x00800000
+V4L2_STD_ATSC_8_VSB = 0x01000000
+V4L2_STD_ATSC_16_VSB = 0x02000000
+V4L2_STD_NTSC = (V4L2_STD_NTSC_M | V4L2_STD_NTSC_M_JP | V4L2_STD_NTSC_M_KR)
+V4L2_STD_SECAM_DK = (V4L2_STD_SECAM_D | V4L2_STD_SECAM_K | V4L2_STD_SECAM_K1)
+V4L2_STD_SECAM = (V4L2_STD_SECAM_B | V4L2_STD_SECAM_G | V4L2_STD_SECAM_H | V4L2_STD_SECAM_DK | V4L2_STD_SECAM_L | V4L2_STD_SECAM_LC)
+V4L2_STD_PAL_BG = (V4L2_STD_PAL_B | V4L2_STD_PAL_B1 | V4L2_STD_PAL_G)
+V4L2_STD_PAL_DK = (V4L2_STD_PAL_D | V4L2_STD_PAL_D1 | V4L2_STD_PAL_K)
+V4L2_STD_PAL = (V4L2_STD_PAL_BG | V4L2_STD_PAL_DK | V4L2_STD_PAL_H | V4L2_STD_PAL_I)
+V4L2_STD_B = (V4L2_STD_PAL_B | V4L2_STD_PAL_B1 | V4L2_STD_SECAM_B)
+V4L2_STD_G = (V4L2_STD_PAL_G | V4L2_STD_SECAM_G)
+V4L2_STD_H = (V4L2_STD_PAL_H | V4L2_STD_SECAM_H)
+V4L2_STD_L = (V4L2_STD_SECAM_L | V4L2_STD_SECAM_LC)
+V4L2_STD_GH = (V4L2_STD_G | V4L2_STD_H)
+V4L2_STD_DK = (V4L2_STD_PAL_DK | V4L2_STD_SECAM_DK)
+V4L2_STD_BG = (V4L2_STD_B | V4L2_STD_G)
+V4L2_STD_MN = (V4L2_STD_PAL_M | V4L2_STD_PAL_N | V4L2_STD_PAL_Nc | V4L2_STD_NTSC)
+V4L2_STD_MTS = (V4L2_STD_NTSC_M | V4L2_STD_PAL_M | V4L2_STD_PAL_N | V4L2_STD_PAL_Nc)
+V4L2_STD_525_60 = (V4L2_STD_PAL_M | V4L2_STD_PAL_60 | V4L2_STD_NTSC | V4L2_STD_NTSC_443)
+V4L2_STD_625_50 = (V4L2_STD_PAL | V4L2_STD_PAL_N | V4L2_STD_PAL_Nc | V4L2_STD_SECAM)
+V4L2_STD_ATSC = (V4L2_STD_ATSC_8_VSB | V4L2_STD_ATSC_16_VSB)
+V4L2_STD_UNKNOWN = 0
+V4L2_STD_ALL = (V4L2_STD_525_60 | V4L2_STD_625_50)
+V4L2_DV_PROGRESSIVE = 0
+V4L2_DV_INTERLACED = 1
+V4L2_DV_VSYNC_POS_POL = 0x00000001
+V4L2_DV_HSYNC_POS_POL = 0x00000002
+V4L2_DV_BT_STD_CEA861 = (1 << 0)
+V4L2_DV_BT_STD_DMT = (1 << 1)
+V4L2_DV_BT_STD_CVT = (1 << 2)
+V4L2_DV_BT_STD_GTF = (1 << 3)
+V4L2_DV_BT_STD_SDI = (1 << 4)
+V4L2_DV_FL_REDUCED_BLANKING = (1 << 0)
+V4L2_DV_FL_CAN_REDUCE_FPS = (1 << 1)
+V4L2_DV_FL_REDUCED_FPS = (1 << 2)
+V4L2_DV_FL_HALF_LINE = (1 << 3)
+V4L2_DV_FL_IS_CE_VIDEO = (1 << 4)
+V4L2_DV_FL_FIRST_FIELD_EXTRA_LINE = (1 << 5)
+V4L2_DV_FL_HAS_PICTURE_ASPECT = (1 << 6)
+V4L2_DV_FL_HAS_CEA861_VIC = (1 << 7)
+V4L2_DV_FL_HAS_HDMI_VIC = (1 << 8)
+V4L2_DV_FL_CAN_DETECT_REDUCED_FPS = (1 << 9)
+V4L2_DV_BT_656_1120 = 0
+V4L2_DV_BT_CAP_INTERLACED = (1 << 0)
+V4L2_DV_BT_CAP_PROGRESSIVE = (1 << 1)
+V4L2_DV_BT_CAP_REDUCED_BLANKING = (1 << 2)
+V4L2_DV_BT_CAP_CUSTOM = (1 << 3)
+V4L2_INPUT_TYPE_TUNER = 1
+V4L2_INPUT_TYPE_CAMERA = 2
+V4L2_INPUT_TYPE_TOUCH = 3
+V4L2_IN_ST_NO_POWER = 0x00000001
+V4L2_IN_ST_NO_SIGNAL = 0x00000002
+V4L2_IN_ST_NO_COLOR = 0x00000004
+V4L2_IN_ST_HFLIP = 0x00000010
+V4L2_IN_ST_VFLIP = 0x00000020
+V4L2_IN_ST_NO_H_LOCK = 0x00000100
+V4L2_IN_ST_COLOR_KILL = 0x00000200
+V4L2_IN_ST_NO_V_LOCK = 0x00000400
+V4L2_IN_ST_NO_STD_LOCK = 0x00000800
+V4L2_IN_ST_NO_SYNC = 0x00010000
+V4L2_IN_ST_NO_EQU = 0x00020000
+V4L2_IN_ST_NO_CARRIER = 0x00040000
+V4L2_IN_ST_MACROVISION = 0x01000000
+V4L2_IN_ST_NO_ACCESS = 0x02000000
+V4L2_IN_ST_VTR = 0x04000000
+V4L2_IN_CAP_DV_TIMINGS = 0x00000002
+V4L2_IN_CAP_CUSTOM_TIMINGS = V4L2_IN_CAP_DV_TIMINGS
+V4L2_IN_CAP_STD = 0x00000004
+V4L2_IN_CAP_NATIVE_SIZE = 0x00000008
+V4L2_OUTPUT_TYPE_MODULATOR = 1
+V4L2_OUTPUT_TYPE_ANALOG = 2
+V4L2_OUTPUT_TYPE_ANALOGVGAOVERLAY = 3
+V4L2_OUT_CAP_DV_TIMINGS = 0x00000002
+V4L2_OUT_CAP_CUSTOM_TIMINGS = V4L2_OUT_CAP_DV_TIMINGS
+V4L2_OUT_CAP_STD = 0x00000004
+V4L2_OUT_CAP_NATIVE_SIZE = 0x00000008
+V4L2_CTRL_ID_MASK = (0x0fffffff)
+V4L2_CTRL_MAX_DIMS = (4)
+V4L2_CTRL_WHICH_CUR_VAL = 0
+V4L2_CTRL_WHICH_DEF_VAL = 0x0f000000
+V4L2_CTRL_WHICH_REQUEST_VAL = 0x0f010000
+V4L2_CTRL_FLAG_DISABLED = 0x0001
+V4L2_CTRL_FLAG_GRABBED = 0x0002
+V4L2_CTRL_FLAG_READ_ONLY = 0x0004
+V4L2_CTRL_FLAG_UPDATE = 0x0008
+V4L2_CTRL_FLAG_INACTIVE = 0x0010
+V4L2_CTRL_FLAG_SLIDER = 0x0020
+V4L2_CTRL_FLAG_WRITE_ONLY = 0x0040
+V4L2_CTRL_FLAG_VOLATILE = 0x0080
+V4L2_CTRL_FLAG_HAS_PAYLOAD = 0x0100
+V4L2_CTRL_FLAG_EXECUTE_ON_WRITE = 0x0200
+V4L2_CTRL_FLAG_MODIFY_LAYOUT = 0x0400
+V4L2_CTRL_FLAG_DYNAMIC_ARRAY = 0x0800
+V4L2_CTRL_FLAG_NEXT_CTRL = 0x80000000
+V4L2_CTRL_FLAG_NEXT_COMPOUND = 0x40000000
+V4L2_CID_MAX_CTRLS = 1024
+V4L2_CID_PRIVATE_BASE = 0x08000000
+V4L2_TUNER_CAP_LOW = 0x0001
+V4L2_TUNER_CAP_NORM = 0x0002
+V4L2_TUNER_CAP_HWSEEK_BOUNDED = 0x0004
+V4L2_TUNER_CAP_HWSEEK_WRAP = 0x0008
+V4L2_TUNER_CAP_STEREO = 0x0010
+V4L2_TUNER_CAP_LANG2 = 0x0020
+V4L2_TUNER_CAP_SAP = 0x0020
+V4L2_TUNER_CAP_LANG1 = 0x0040
+V4L2_TUNER_CAP_RDS = 0x0080
+V4L2_TUNER_CAP_RDS_BLOCK_IO = 0x0100
+V4L2_TUNER_CAP_RDS_CONTROLS = 0x0200
+V4L2_TUNER_CAP_FREQ_BANDS = 0x0400
+V4L2_TUNER_CAP_HWSEEK_PROG_LIM = 0x0800
+V4L2_TUNER_CAP_1HZ = 0x1000
+V4L2_TUNER_SUB_MONO = 0x0001
+V4L2_TUNER_SUB_STEREO = 0x0002
+V4L2_TUNER_SUB_LANG2 = 0x0004
+V4L2_TUNER_SUB_SAP = 0x0004
+V4L2_TUNER_SUB_LANG1 = 0x0008
+V4L2_TUNER_SUB_RDS = 0x0010
+V4L2_TUNER_MODE_MONO = 0x0000
+V4L2_TUNER_MODE_STEREO = 0x0001
+V4L2_TUNER_MODE_LANG2 = 0x0002
+V4L2_TUNER_MODE_SAP = 0x0002
+V4L2_TUNER_MODE_LANG1 = 0x0003
+V4L2_TUNER_MODE_LANG1_LANG2 = 0x0004
+V4L2_BAND_MODULATION_VSB = (1 << 1)
+V4L2_BAND_MODULATION_FM = (1 << 2)
+V4L2_BAND_MODULATION_AM = (1 << 3)
+V4L2_RDS_BLOCK_MSK = 0x7
+V4L2_RDS_BLOCK_A = 0
+V4L2_RDS_BLOCK_B = 1
+V4L2_RDS_BLOCK_C = 2
+V4L2_RDS_BLOCK_D = 3
+V4L2_RDS_BLOCK_C_ALT = 4
+V4L2_RDS_BLOCK_INVALID = 7
+V4L2_RDS_BLOCK_CORRECTED = 0x40
+V4L2_RDS_BLOCK_ERROR = 0x80
+V4L2_AUDCAP_STEREO = 0x00001
+V4L2_AUDCAP_AVL = 0x00002
+V4L2_AUDMODE_AVL = 0x00001
+V4L2_ENC_IDX_FRAME_I = (0)
+V4L2_ENC_IDX_FRAME_P = (1)
+V4L2_ENC_IDX_FRAME_B = (2)
+V4L2_ENC_IDX_FRAME_MASK = (0xf)
+V4L2_ENC_IDX_ENTRIES = (64)
+V4L2_ENC_CMD_START = (0)
+V4L2_ENC_CMD_STOP = (1)
+V4L2_ENC_CMD_PAUSE = (2)
+V4L2_ENC_CMD_RESUME = (3)
+V4L2_ENC_CMD_STOP_AT_GOP_END = (1 << 0)
+V4L2_DEC_CMD_START = (0)
+V4L2_DEC_CMD_STOP = (1)
+V4L2_DEC_CMD_PAUSE = (2)
+V4L2_DEC_CMD_RESUME = (3)
+V4L2_DEC_CMD_FLUSH = (4)
+V4L2_DEC_CMD_START_MUTE_AUDIO = (1 << 0)
+V4L2_DEC_CMD_PAUSE_TO_BLACK = (1 << 0)
+V4L2_DEC_CMD_STOP_TO_BLACK = (1 << 0)
+V4L2_DEC_CMD_STOP_IMMEDIATELY = (1 << 1)
+V4L2_DEC_START_FMT_NONE = (0)
+V4L2_DEC_START_FMT_GOP = (1)
+V4L2_VBI_UNSYNC = (1 << 0)
+V4L2_VBI_INTERLACED = (1 << 1)
+V4L2_VBI_ITU_525_F1_START = (1)
+V4L2_VBI_ITU_525_F2_START = (264)
+V4L2_VBI_ITU_625_F1_START = (1)
+V4L2_VBI_ITU_625_F2_START = (314)
+V4L2_SLICED_TELETEXT_B = (0x0001)
+V4L2_SLICED_VPS = (0x0400)
+V4L2_SLICED_CAPTION_525 = (0x1000)
+V4L2_SLICED_WSS_625 = (0x4000)
+V4L2_SLICED_VBI_525 = (V4L2_SLICED_CAPTION_525)
+V4L2_SLICED_VBI_625 = (V4L2_SLICED_TELETEXT_B | V4L2_SLICED_VPS | V4L2_SLICED_WSS_625)
+V4L2_MPEG_VBI_IVTV_TELETEXT_B = (1)
+V4L2_MPEG_VBI_IVTV_CAPTION_525 = (4)
+V4L2_MPEG_VBI_IVTV_WSS_625 = (5)
+V4L2_MPEG_VBI_IVTV_VPS = (7)
+V4L2_MPEG_VBI_IVTV_MAGIC0 = "itv0"
+V4L2_MPEG_VBI_IVTV_MAGIC1 = "ITV0"
+V4L2_EVENT_ALL = 0
+V4L2_EVENT_VSYNC = 1
+V4L2_EVENT_EOS = 2
+V4L2_EVENT_CTRL = 3
+V4L2_EVENT_FRAME_SYNC = 4
+V4L2_EVENT_SOURCE_CHANGE = 5
+V4L2_EVENT_MOTION_DET = 6
+V4L2_EVENT_PRIVATE_START = 0x08000000
+V4L2_EVENT_CTRL_CH_VALUE = (1 << 0)
+V4L2_EVENT_CTRL_CH_FLAGS = (1 << 1)
+V4L2_EVENT_CTRL_CH_RANGE = (1 << 2)
+V4L2_EVENT_CTRL_CH_DIMENSIONS = (1 << 3)
+V4L2_EVENT_SRC_CH_RESOLUTION = (1 << 0)
+V4L2_EVENT_MD_FL_HAVE_FRAME_SEQ = (1 << 0)
+V4L2_EVENT_SUB_FL_SEND_INITIAL = (1 << 0)
+V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK = (1 << 1)
+V4L2_CHIP_MATCH_BRIDGE = 0
+V4L2_CHIP_MATCH_SUBDEV = 4
+V4L2_CHIP_MATCH_HOST = V4L2_CHIP_MATCH_BRIDGE
+V4L2_CHIP_MATCH_I2C_DRIVER = 1
+V4L2_CHIP_MATCH_I2C_ADDR = 2
+V4L2_CHIP_MATCH_AC97 = 3
+V4L2_CHIP_FL_READABLE = (1 << 0)
+V4L2_CHIP_FL_WRITABLE = (1 << 1)
+BASE_VIDIOC_PRIVATE = 192
+# V4L2_PIX_FMT_HM12 = V4L2_PIX_FMT_NV12_16L16  # Commented out due to dependency issues
+# V4L2_PIX_FMT_SUNXI_TILED_NV12 = V4L2_PIX_FMT_NV12_32L32  # Commented out due to dependency issues
+V4L2_CAP_ASYNCIO = 0x02000000
+# Computed IOCTL constants
+_IOC_TYPESHIFT = 8
+_IOC_SIZESHIFT = 16
+_IOC_DIRSHIFT = 30
+
+# V4L2 Array Size Constants
+VIDEO_MAX_PLANES = 8
+V4L2_MAX_PLANES = 8
+VIDIOC_MAX_PLANES = 8
+
+# Helper functions from macros
+def _IOC(dir,ioc_type,nr,size):
+    return ctypes.c_int32((((dir) << _IOC_DIRSHIFT) | ((ioc_type) << _IOC_TYPESHIFT) | ((nr) << _IOC_NRSHIFT) | ((size) << _IOC_SIZESHIFT))).value
+
+def _IOC_TYPECHECK(t):
+    return (ctypes.sizeof(t))
+
+def _IO(ioc_type,nr):
+    return _IOC(_IOC_NONE,ord(ioc_type),(nr),0)
+
+def _IOR(ioc_type,nr,size):
+    return _IOC(_IOC_READ,ord(ioc_type),(nr),(_IOC_TYPECHECK(size)))
+
+def _IOW(ioc_type,nr,size):
+    return _IOC(_IOC_WRITE,ord(ioc_type),(nr),(_IOC_TYPECHECK(size)))
+
+def _IOWR(ioc_type,nr,size):
+    return _IOC(_IOC_READ|_IOC_WRITE,ord(ioc_type),(nr),(_IOC_TYPECHECK(size)))
+
+def _IOR_BAD(ioc_type,nr,size):
+    return _IOC(_IOC_READ,(ioc_type),(nr),cioc_types.sizeof(size))
+
+def _IOW_BAD(ioc_type,nr,size):
+    return _IOC(_IOC_WRITE,(ioc_type),(nr),cioc_types.sizeof(size))
+
+def _IOWR_BAD(ioc_type,nr,size):
+    return _IOC(_IOC_READ|_IOC_WRITE,(ioc_type),(nr),cioc_types.sizeof(size))
+
+def _IOC_DIR(nr):
+    return (((nr) >> _IOC_DIRSHIFT) & _IOC_DIRMASK)
+
+def _IOC_TYPE(nr):
+    return (((nr) >> _IOC_TYPESHIFT) & _IOC_TYPEMASK)
+
+def _IOC_NR(nr):
+    return (((nr) >> _IOC_NRSHIFT) & _IOC_NRMASK)
+
+def _IOC_SIZE(nr):
+    return (((nr) >> _IOC_SIZESHIFT) & _IOC_SIZEMASK)
+
+def v4l2_fourcc(a,b,c,d):
+    return (ord(a) | (ord(b) << 8) | (ord(c) << 16) | (ord(d) << 24))
+
+def v4l2_fourcc_be(a,b,c,d):
+    return (v4l2_fourcc(a, b, c, d) | (1 << 31))
+
+# Constants that use helper functions
+V4L2_PIX_FMT_RGB332 = v4l2_fourcc('R', 'G', 'B', '1')
+V4L2_PIX_FMT_RGB444 = v4l2_fourcc('R', '4', '4', '4')
+V4L2_PIX_FMT_ARGB444 = v4l2_fourcc('A', 'R', '1', '2')
+V4L2_PIX_FMT_XRGB444 = v4l2_fourcc('X', 'R', '1', '2')
+V4L2_PIX_FMT_RGBA444 = v4l2_fourcc('R', 'A', '1', '2')
+V4L2_PIX_FMT_RGBX444 = v4l2_fourcc('R', 'X', '1', '2')
+V4L2_PIX_FMT_ABGR444 = v4l2_fourcc('A', 'B', '1', '2')
+V4L2_PIX_FMT_XBGR444 = v4l2_fourcc('X', 'B', '1', '2')
+V4L2_PIX_FMT_BGRA444 = v4l2_fourcc('G', 'A', '1', '2')
+V4L2_PIX_FMT_BGRX444 = v4l2_fourcc('B', 'X', '1', '2')
+V4L2_PIX_FMT_RGB555 = v4l2_fourcc('R', 'G', 'B', 'O')
+V4L2_PIX_FMT_ARGB555 = v4l2_fourcc('A', 'R', '1', '5')
+V4L2_PIX_FMT_XRGB555 = v4l2_fourcc('X', 'R', '1', '5')
+V4L2_PIX_FMT_RGBA555 = v4l2_fourcc('R', 'A', '1', '5')
+V4L2_PIX_FMT_RGBX555 = v4l2_fourcc('R', 'X', '1', '5')
+V4L2_PIX_FMT_ABGR555 = v4l2_fourcc('A', 'B', '1', '5')
+V4L2_PIX_FMT_XBGR555 = v4l2_fourcc('X', 'B', '1', '5')
+V4L2_PIX_FMT_BGRA555 = v4l2_fourcc('B', 'A', '1', '5')
+V4L2_PIX_FMT_BGRX555 = v4l2_fourcc('B', 'X', '1', '5')
+V4L2_PIX_FMT_RGB565 = v4l2_fourcc('R', 'G', 'B', 'P')
+V4L2_PIX_FMT_RGB555X = v4l2_fourcc('R', 'G', 'B', 'Q')
+V4L2_PIX_FMT_ARGB555X = v4l2_fourcc_be('A', 'R', '1', '5')
+V4L2_PIX_FMT_XRGB555X = v4l2_fourcc_be('X', 'R', '1', '5')
+V4L2_PIX_FMT_RGB565X = v4l2_fourcc('R', 'G', 'B', 'R')
+V4L2_PIX_FMT_BGR666 = v4l2_fourcc('B', 'G', 'R', 'H')
+V4L2_PIX_FMT_BGR24 = v4l2_fourcc('B', 'G', 'R', '3')
+V4L2_PIX_FMT_RGB24 = v4l2_fourcc('R', 'G', 'B', '3')
+V4L2_PIX_FMT_BGR32 = v4l2_fourcc('B', 'G', 'R', '4')
+V4L2_PIX_FMT_ABGR32 = v4l2_fourcc('A', 'R', '2', '4')
+V4L2_PIX_FMT_XBGR32 = v4l2_fourcc('X', 'R', '2', '4')
+V4L2_PIX_FMT_BGRA32 = v4l2_fourcc('R', 'A', '2', '4')
+V4L2_PIX_FMT_BGRX32 = v4l2_fourcc('R', 'X', '2', '4')
+V4L2_PIX_FMT_RGB32 = v4l2_fourcc('R', 'G', 'B', '4')
+V4L2_PIX_FMT_RGBA32 = v4l2_fourcc('A', 'B', '2', '4')
+V4L2_PIX_FMT_RGBX32 = v4l2_fourcc('X', 'B', '2', '4')
+V4L2_PIX_FMT_ARGB32 = v4l2_fourcc('B', 'A', '2', '4')
+V4L2_PIX_FMT_XRGB32 = v4l2_fourcc('B', 'X', '2', '4')
+V4L2_PIX_FMT_RGBX1010102 = v4l2_fourcc('R', 'X', '3', '0')
+V4L2_PIX_FMT_RGBA1010102 = v4l2_fourcc('R', 'A', '3', '0')
+V4L2_PIX_FMT_ARGB2101010 = v4l2_fourcc('A', 'R', '3', '0')
+V4L2_PIX_FMT_BGR48_12 = v4l2_fourcc('B', '3', '1', '2')
+V4L2_PIX_FMT_BGR48 = v4l2_fourcc('B', 'G', 'R', '6')
+V4L2_PIX_FMT_RGB48 = v4l2_fourcc('R', 'G', 'B', '6')
+V4L2_PIX_FMT_ABGR64_12 = v4l2_fourcc('B', '4', '1', '2')
+V4L2_PIX_FMT_GREY = v4l2_fourcc('G', 'R', 'E', 'Y')
+V4L2_PIX_FMT_Y4 = v4l2_fourcc('Y', '0', '4', ' ')
+V4L2_PIX_FMT_Y6 = v4l2_fourcc('Y', '0', '6', ' ')
+V4L2_PIX_FMT_Y10 = v4l2_fourcc('Y', '1', '0', ' ')
+V4L2_PIX_FMT_Y12 = v4l2_fourcc('Y', '1', '2', ' ')
+V4L2_PIX_FMT_Y012 = v4l2_fourcc('Y', '0', '1', '2')
+V4L2_PIX_FMT_Y14 = v4l2_fourcc('Y', '1', '4', ' ')
+V4L2_PIX_FMT_Y16 = v4l2_fourcc('Y', '1', '6', ' ')
+V4L2_PIX_FMT_Y16_BE = v4l2_fourcc_be('Y', '1', '6', ' ')
+V4L2_PIX_FMT_Y10BPACK = v4l2_fourcc('Y', '1', '0', 'B')
+V4L2_PIX_FMT_Y10P = v4l2_fourcc('Y', '1', '0', 'P')
+V4L2_PIX_FMT_IPU3_Y10 = v4l2_fourcc('i', 'p', '3', 'y')
+V4L2_PIX_FMT_Y12P = v4l2_fourcc('Y', '1', '2', 'P')
+V4L2_PIX_FMT_Y14P = v4l2_fourcc('Y', '1', '4', 'P')
+V4L2_PIX_FMT_PAL8 = v4l2_fourcc('P', 'A', 'L', '8')
+V4L2_PIX_FMT_UV8 = v4l2_fourcc('U', 'V', '8', ' ')
+V4L2_PIX_FMT_YUYV = v4l2_fourcc('Y', 'U', 'Y', 'V')
+V4L2_PIX_FMT_YYUV = v4l2_fourcc('Y', 'Y', 'U', 'V')
+V4L2_PIX_FMT_YVYU = v4l2_fourcc('Y', 'V', 'Y', 'U')
+V4L2_PIX_FMT_UYVY = v4l2_fourcc('U', 'Y', 'V', 'Y')
+V4L2_PIX_FMT_VYUY = v4l2_fourcc('V', 'Y', 'U', 'Y')
+V4L2_PIX_FMT_Y41P = v4l2_fourcc('Y', '4', '1', 'P')
+V4L2_PIX_FMT_YUV444 = v4l2_fourcc('Y', '4', '4', '4')
+V4L2_PIX_FMT_YUV555 = v4l2_fourcc('Y', 'U', 'V', 'O')
+V4L2_PIX_FMT_YUV565 = v4l2_fourcc('Y', 'U', 'V', 'P')
+V4L2_PIX_FMT_YUV24 = v4l2_fourcc('Y', 'U', 'V', '3')
+V4L2_PIX_FMT_YUV32 = v4l2_fourcc('Y', 'U', 'V', '4')
+V4L2_PIX_FMT_AYUV32 = v4l2_fourcc('A', 'Y', 'U', 'V')
+V4L2_PIX_FMT_XYUV32 = v4l2_fourcc('X', 'Y', 'U', 'V')
+V4L2_PIX_FMT_VUYA32 = v4l2_fourcc('V', 'U', 'Y', 'A')
+V4L2_PIX_FMT_VUYX32 = v4l2_fourcc('V', 'U', 'Y', 'X')
+V4L2_PIX_FMT_YUVA32 = v4l2_fourcc('Y', 'U', 'V', 'A')
+V4L2_PIX_FMT_YUVX32 = v4l2_fourcc('Y', 'U', 'V', 'X')
+V4L2_PIX_FMT_M420 = v4l2_fourcc('M', '4', '2', '0')
+V4L2_PIX_FMT_YUV48_12 = v4l2_fourcc('Y', '3', '1', '2')
+V4L2_PIX_FMT_Y210 = v4l2_fourcc('Y', '2', '1', '0')
+V4L2_PIX_FMT_Y212 = v4l2_fourcc('Y', '2', '1', '2')
+V4L2_PIX_FMT_Y216 = v4l2_fourcc('Y', '2', '1', '6')
+V4L2_PIX_FMT_NV12 = v4l2_fourcc('N', 'V', '1', '2')
+V4L2_PIX_FMT_NV21 = v4l2_fourcc('N', 'V', '2', '1')
+V4L2_PIX_FMT_NV16 = v4l2_fourcc('N', 'V', '1', '6')
+V4L2_PIX_FMT_NV61 = v4l2_fourcc('N', 'V', '6', '1')
+V4L2_PIX_FMT_NV24 = v4l2_fourcc('N', 'V', '2', '4')
+V4L2_PIX_FMT_NV42 = v4l2_fourcc('N', 'V', '4', '2')
+V4L2_PIX_FMT_P010 = v4l2_fourcc('P', '0', '1', '0')
+V4L2_PIX_FMT_P012 = v4l2_fourcc('P', '0', '1', '2')
+V4L2_PIX_FMT_NV12M = v4l2_fourcc('N', 'M', '1', '2')
+V4L2_PIX_FMT_NV21M = v4l2_fourcc('N', 'M', '2', '1')
+V4L2_PIX_FMT_NV16M = v4l2_fourcc('N', 'M', '1', '6')
+V4L2_PIX_FMT_NV61M = v4l2_fourcc('N', 'M', '6', '1')
+V4L2_PIX_FMT_P012M = v4l2_fourcc('P', 'M', '1', '2')
+V4L2_PIX_FMT_YUV410 = v4l2_fourcc('Y', 'U', 'V', '9')
+V4L2_PIX_FMT_YVU410 = v4l2_fourcc('Y', 'V', 'U', '9')
+V4L2_PIX_FMT_YUV411P = v4l2_fourcc('4', '1', '1', 'P')
+V4L2_PIX_FMT_YUV420 = v4l2_fourcc('Y', 'U', '1', '2')
+V4L2_PIX_FMT_YVU420 = v4l2_fourcc('Y', 'V', '1', '2')
+V4L2_PIX_FMT_YUV422P = v4l2_fourcc('4', '2', '2', 'P')
+V4L2_PIX_FMT_YUV420M = v4l2_fourcc('Y', 'M', '1', '2')
+V4L2_PIX_FMT_YVU420M = v4l2_fourcc('Y', 'M', '2', '1')
+V4L2_PIX_FMT_YUV422M = v4l2_fourcc('Y', 'M', '1', '6')
+V4L2_PIX_FMT_YVU422M = v4l2_fourcc('Y', 'M', '6', '1')
+V4L2_PIX_FMT_YUV444M = v4l2_fourcc('Y', 'M', '2', '4')
+V4L2_PIX_FMT_YVU444M = v4l2_fourcc('Y', 'M', '4', '2')
+V4L2_PIX_FMT_NV12_4L4 = v4l2_fourcc('V', 'T', '1', '2')
+V4L2_PIX_FMT_NV12_16L16 = v4l2_fourcc('H', 'M', '1', '2')
+V4L2_PIX_FMT_NV12_32L32 = v4l2_fourcc('S', 'T', '1', '2')
+V4L2_PIX_FMT_NV15_4L4 = v4l2_fourcc('V', 'T', '1', '5')
+V4L2_PIX_FMT_P010_4L4 = v4l2_fourcc('T', '0', '1', '0')
+V4L2_PIX_FMT_NV12_8L128 = v4l2_fourcc('A', 'T', '1', '2')
+V4L2_PIX_FMT_NV12_10BE_8L128 = v4l2_fourcc_be('A', 'X', '1', '2')
+V4L2_PIX_FMT_NV12_COL128 = v4l2_fourcc('N', 'C', '1', '2')
+V4L2_PIX_FMT_NV12_10_COL128 = v4l2_fourcc('N', 'C', '3', '0')
+V4L2_PIX_FMT_NV12MT = v4l2_fourcc('T', 'M', '1', '2')
+V4L2_PIX_FMT_NV12MT_16X16 = v4l2_fourcc('V', 'M', '1', '2')
+V4L2_PIX_FMT_NV12M_8L128 = v4l2_fourcc('N', 'A', '1', '2')
+V4L2_PIX_FMT_NV12M_10BE_8L128 = v4l2_fourcc_be('N', 'T', '1', '2')
+V4L2_PIX_FMT_NV12MT_COL128 = v4l2_fourcc('N', 'c', '1', '2')
+V4L2_PIX_FMT_NV12MT_10_COL128 = v4l2_fourcc('N', 'c', '3', '0')
+V4L2_PIX_FMT_SBGGR8 = v4l2_fourcc('B', 'A', '8', '1')
+V4L2_PIX_FMT_SGBRG8 = v4l2_fourcc('G', 'B', 'R', 'G')
+V4L2_PIX_FMT_SGRBG8 = v4l2_fourcc('G', 'R', 'B', 'G')
+V4L2_PIX_FMT_SRGGB8 = v4l2_fourcc('R', 'G', 'G', 'B')
+V4L2_PIX_FMT_SBGGR10 = v4l2_fourcc('B', 'G', '1', '0')
+V4L2_PIX_FMT_SGBRG10 = v4l2_fourcc('G', 'B', '1', '0')
+V4L2_PIX_FMT_SGRBG10 = v4l2_fourcc('B', 'A', '1', '0')
+V4L2_PIX_FMT_SRGGB10 = v4l2_fourcc('R', 'G', '1', '0')
+V4L2_PIX_FMT_SBGGR10P = v4l2_fourcc('p', 'B', 'A', 'A')
+V4L2_PIX_FMT_SGBRG10P = v4l2_fourcc('p', 'G', 'A', 'A')
+V4L2_PIX_FMT_SGRBG10P = v4l2_fourcc('p', 'g', 'A', 'A')
+V4L2_PIX_FMT_SRGGB10P = v4l2_fourcc('p', 'R', 'A', 'A')
+V4L2_PIX_FMT_SBGGR10ALAW8 = v4l2_fourcc('a', 'B', 'A', '8')
+V4L2_PIX_FMT_SGBRG10ALAW8 = v4l2_fourcc('a', 'G', 'A', '8')
+V4L2_PIX_FMT_SGRBG10ALAW8 = v4l2_fourcc('a', 'g', 'A', '8')
+V4L2_PIX_FMT_SRGGB10ALAW8 = v4l2_fourcc('a', 'R', 'A', '8')
+V4L2_PIX_FMT_SBGGR10DPCM8 = v4l2_fourcc('b', 'B', 'A', '8')
+V4L2_PIX_FMT_SGBRG10DPCM8 = v4l2_fourcc('b', 'G', 'A', '8')
+V4L2_PIX_FMT_SGRBG10DPCM8 = v4l2_fourcc('B', 'D', '1', '0')
+V4L2_PIX_FMT_SRGGB10DPCM8 = v4l2_fourcc('b', 'R', 'A', '8')
+V4L2_PIX_FMT_SBGGR12 = v4l2_fourcc('B', 'G', '1', '2')
+V4L2_PIX_FMT_SGBRG12 = v4l2_fourcc('G', 'B', '1', '2')
+V4L2_PIX_FMT_SGRBG12 = v4l2_fourcc('B', 'A', '1', '2')
+V4L2_PIX_FMT_SRGGB12 = v4l2_fourcc('R', 'G', '1', '2')
+V4L2_PIX_FMT_SBGGR12P = v4l2_fourcc('p', 'B', 'C', 'C')
+V4L2_PIX_FMT_SGBRG12P = v4l2_fourcc('p', 'G', 'C', 'C')
+V4L2_PIX_FMT_SGRBG12P = v4l2_fourcc('p', 'g', 'C', 'C')
+V4L2_PIX_FMT_SRGGB12P = v4l2_fourcc('p', 'R', 'C', 'C')
+V4L2_PIX_FMT_SBGGR14 = v4l2_fourcc('B', 'G', '1', '4')
+V4L2_PIX_FMT_SGBRG14 = v4l2_fourcc('G', 'B', '1', '4')
+V4L2_PIX_FMT_SGRBG14 = v4l2_fourcc('G', 'R', '1', '4')
+V4L2_PIX_FMT_SRGGB14 = v4l2_fourcc('R', 'G', '1', '4')
+V4L2_PIX_FMT_SBGGR14P = v4l2_fourcc('p', 'B', 'E', 'E')
+V4L2_PIX_FMT_SGBRG14P = v4l2_fourcc('p', 'G', 'E', 'E')
+V4L2_PIX_FMT_SGRBG14P = v4l2_fourcc('p', 'g', 'E', 'E')
+V4L2_PIX_FMT_SRGGB14P = v4l2_fourcc('p', 'R', 'E', 'E')
+V4L2_PIX_FMT_SBGGR16 = v4l2_fourcc('B', 'Y', 'R', '2')
+V4L2_PIX_FMT_SGBRG16 = v4l2_fourcc('G', 'B', '1', '6')
+V4L2_PIX_FMT_SGRBG16 = v4l2_fourcc('G', 'R', '1', '6')
+V4L2_PIX_FMT_SRGGB16 = v4l2_fourcc('R', 'G', '1', '6')
+V4L2_PIX_FMT_HSV24 = v4l2_fourcc('H', 'S', 'V', '3')
+V4L2_PIX_FMT_HSV32 = v4l2_fourcc('H', 'S', 'V', '4')
+V4L2_PIX_FMT_MJPEG = v4l2_fourcc('M', 'J', 'P', 'G')
+V4L2_PIX_FMT_JPEG = v4l2_fourcc('J', 'P', 'E', 'G')
+V4L2_PIX_FMT_DV = v4l2_fourcc('d', 'v', 's', 'd')
+V4L2_PIX_FMT_MPEG = v4l2_fourcc('M', 'P', 'E', 'G')
+V4L2_PIX_FMT_H264 = v4l2_fourcc('H', '2', '6', '4')
+V4L2_PIX_FMT_H264_NO_SC = v4l2_fourcc('A', 'V', 'C', '1')
+V4L2_PIX_FMT_H264_MVC = v4l2_fourcc('M', '2', '6', '4')
+V4L2_PIX_FMT_H263 = v4l2_fourcc('H', '2', '6', '3')
+V4L2_PIX_FMT_MPEG1 = v4l2_fourcc('M', 'P', 'G', '1')
+V4L2_PIX_FMT_MPEG2 = v4l2_fourcc('M', 'P', 'G', '2')
+V4L2_PIX_FMT_MPEG2_SLICE = v4l2_fourcc('M', 'G', '2', 'S')
+V4L2_PIX_FMT_MPEG4 = v4l2_fourcc('M', 'P', 'G', '4')
+V4L2_PIX_FMT_XVID = v4l2_fourcc('X', 'V', 'I', 'D')
+V4L2_PIX_FMT_VC1_ANNEX_G = v4l2_fourcc('V', 'C', '1', 'G')
+V4L2_PIX_FMT_VC1_ANNEX_L = v4l2_fourcc('V', 'C', '1', 'L')
+V4L2_PIX_FMT_VP8 = v4l2_fourcc('V', 'P', '8', '0')
+V4L2_PIX_FMT_VP8_FRAME = v4l2_fourcc('V', 'P', '8', 'F')
+V4L2_PIX_FMT_VP9 = v4l2_fourcc('V', 'P', '9', '0')
+V4L2_PIX_FMT_VP9_FRAME = v4l2_fourcc('V', 'P', '9', 'F')
+V4L2_PIX_FMT_HEVC = v4l2_fourcc('H', 'E', 'V', 'C')
+V4L2_PIX_FMT_FWHT = v4l2_fourcc('F', 'W', 'H', 'T')
+V4L2_PIX_FMT_FWHT_STATELESS = v4l2_fourcc('S', 'F', 'W', 'H')
+V4L2_PIX_FMT_H264_SLICE = v4l2_fourcc('S', '2', '6', '4')
+V4L2_PIX_FMT_HEVC_SLICE = v4l2_fourcc('S', '2', '6', '5')
+V4L2_PIX_FMT_AV1_FRAME = v4l2_fourcc('A', 'V', '1', 'F')
+V4L2_PIX_FMT_SPK = v4l2_fourcc('S', 'P', 'K', '0')
+V4L2_PIX_FMT_RV30 = v4l2_fourcc('R', 'V', '3', '0')
+V4L2_PIX_FMT_RV40 = v4l2_fourcc('R', 'V', '4', '0')
+V4L2_PIX_FMT_CPIA1 = v4l2_fourcc('C', 'P', 'I', 'A')
+V4L2_PIX_FMT_WNVA = v4l2_fourcc('W', 'N', 'V', 'A')
+V4L2_PIX_FMT_SN9C10X = v4l2_fourcc('S', '9', '1', '0')
+V4L2_PIX_FMT_SN9C20X_I420 = v4l2_fourcc('S', '9', '2', '0')
+V4L2_PIX_FMT_PWC1 = v4l2_fourcc('P', 'W', 'C', '1')
+V4L2_PIX_FMT_PWC2 = v4l2_fourcc('P', 'W', 'C', '2')
+V4L2_PIX_FMT_ET61X251 = v4l2_fourcc('E', '6', '2', '5')
+V4L2_PIX_FMT_SPCA501 = v4l2_fourcc('S', '5', '0', '1')
+V4L2_PIX_FMT_SPCA505 = v4l2_fourcc('S', '5', '0', '5')
+V4L2_PIX_FMT_SPCA508 = v4l2_fourcc('S', '5', '0', '8')
+V4L2_PIX_FMT_SPCA561 = v4l2_fourcc('S', '5', '6', '1')
+V4L2_PIX_FMT_PAC207 = v4l2_fourcc('P', '2', '0', '7')
+V4L2_PIX_FMT_MR97310A = v4l2_fourcc('M', '3', '1', '0')
+V4L2_PIX_FMT_JL2005BCD = v4l2_fourcc('J', 'L', '2', '0')
+V4L2_PIX_FMT_SN9C2028 = v4l2_fourcc('S', 'O', 'N', 'X')
+V4L2_PIX_FMT_SQ905C = v4l2_fourcc('9', '0', '5', 'C')
+V4L2_PIX_FMT_PJPG = v4l2_fourcc('P', 'J', 'P', 'G')
+V4L2_PIX_FMT_OV511 = v4l2_fourcc('O', '5', '1', '1')
+V4L2_PIX_FMT_OV518 = v4l2_fourcc('O', '5', '1', '8')
+V4L2_PIX_FMT_STV0680 = v4l2_fourcc('S', '6', '8', '0')
+V4L2_PIX_FMT_TM6000 = v4l2_fourcc('T', 'M', '6', '0')
+V4L2_PIX_FMT_CIT_YYVYUY = v4l2_fourcc('C', 'I', 'T', 'V')
+V4L2_PIX_FMT_KONICA420 = v4l2_fourcc('K', 'O', 'N', 'I')
+V4L2_PIX_FMT_JPGL = v4l2_fourcc('J', 'P', 'G', 'L')
+V4L2_PIX_FMT_SE401 = v4l2_fourcc('S', '4', '0', '1')
+V4L2_PIX_FMT_S5C_UYVY_JPG = v4l2_fourcc('S', '5', 'C', 'I')
+V4L2_PIX_FMT_Y8I = v4l2_fourcc('Y', '8', 'I', ' ')
+V4L2_PIX_FMT_Y12I = v4l2_fourcc('Y', '1', '2', 'I')
+V4L2_PIX_FMT_Z16 = v4l2_fourcc('Z', '1', '6', ' ')
+V4L2_PIX_FMT_MT21C = v4l2_fourcc('M', 'T', '2', '1')
+V4L2_PIX_FMT_MM21 = v4l2_fourcc('M', 'M', '2', '1')
+V4L2_PIX_FMT_MT2110T = v4l2_fourcc('M', 'T', '2', 'T')
+V4L2_PIX_FMT_MT2110R = v4l2_fourcc('M', 'T', '2', 'R')
+V4L2_PIX_FMT_INZI = v4l2_fourcc('I', 'N', 'Z', 'I')
+V4L2_PIX_FMT_CNF4 = v4l2_fourcc('C', 'N', 'F', '4')
+V4L2_PIX_FMT_HI240 = v4l2_fourcc('H', 'I', '2', '4')
+V4L2_PIX_FMT_QC08C = v4l2_fourcc('Q', '0', '8', 'C')
+V4L2_PIX_FMT_QC10C = v4l2_fourcc('Q', '1', '0', 'C')
+V4L2_PIX_FMT_AJPG = v4l2_fourcc('A', 'J', 'P', 'G')
+V4L2_PIX_FMT_HEXTILE = v4l2_fourcc('H', 'X', 'T', 'L')
+V4L2_PIX_FMT_IPU3_SBGGR10 = v4l2_fourcc('i', 'p', '3', 'b')
+V4L2_PIX_FMT_IPU3_SGBRG10 = v4l2_fourcc('i', 'p', '3', 'g')
+V4L2_PIX_FMT_IPU3_SGRBG10 = v4l2_fourcc('i', 'p', '3', 'G')
+V4L2_PIX_FMT_IPU3_SRGGB10 = v4l2_fourcc('i', 'p', '3', 'r')
+V4L2_PIX_FMT_PISP_COMP1_RGGB = v4l2_fourcc('P', 'C', '1', 'R')
+V4L2_PIX_FMT_PISP_COMP1_GRBG = v4l2_fourcc('P', 'C', '1', 'G')
+V4L2_PIX_FMT_PISP_COMP1_GBRG = v4l2_fourcc('P', 'C', '1', 'g')
+V4L2_PIX_FMT_PISP_COMP1_BGGR = v4l2_fourcc('P', 'C', '1', 'B')
+V4L2_PIX_FMT_PISP_COMP1_MONO = v4l2_fourcc('P', 'C', '1', 'M')
+V4L2_PIX_FMT_PISP_COMP2_RGGB = v4l2_fourcc('P', 'C', '2', 'R')
+V4L2_PIX_FMT_PISP_COMP2_GRBG = v4l2_fourcc('P', 'C', '2', 'G')
+V4L2_PIX_FMT_PISP_COMP2_GBRG = v4l2_fourcc('P', 'C', '2', 'g')
+V4L2_PIX_FMT_PISP_COMP2_BGGR = v4l2_fourcc('P', 'C', '2', 'B')
+V4L2_PIX_FMT_PISP_COMP2_MONO = v4l2_fourcc('P', 'C', '2', 'M')
+V4L2_PIX_FMT_RPI_BE = v4l2_fourcc('R', 'P', 'B', 'P')
+V4L2_PIX_FMT_PISP_COMP1_RGGB = v4l2_fourcc('P', 'C', '1', 'R')
+V4L2_PIX_FMT_PISP_COMP1_GRBG = v4l2_fourcc('P', 'C', '1', 'G')
+V4L2_PIX_FMT_PISP_COMP1_GBRG = v4l2_fourcc('P', 'C', '1', 'g')
+V4L2_PIX_FMT_PISP_COMP1_BGGR = v4l2_fourcc('P', 'C', '1', 'B')
+V4L2_PIX_FMT_PISP_COMP2_RGGB = v4l2_fourcc('P', 'C', '2', 'R')
+V4L2_PIX_FMT_PISP_COMP2_GRBG = v4l2_fourcc('P', 'C', '2', 'G')
+V4L2_PIX_FMT_PISP_COMP2_GBRG = v4l2_fourcc('P', 'C', '2', 'g')
+V4L2_PIX_FMT_PISP_COMP2_BGGR = v4l2_fourcc('P', 'C', '2', 'B')
+V4L2_SDR_FMT_CU8 = v4l2_fourcc('C', 'U', '0', '8')
+V4L2_SDR_FMT_CU16LE = v4l2_fourcc('C', 'U', '1', '6')
+V4L2_SDR_FMT_CS8 = v4l2_fourcc('C', 'S', '0', '8')
+V4L2_SDR_FMT_CS14LE = v4l2_fourcc('C', 'S', '1', '4')
+V4L2_SDR_FMT_RU12LE = v4l2_fourcc('R', 'U', '1', '2')
+V4L2_SDR_FMT_PCU16BE = v4l2_fourcc('P', 'C', '1', '6')
+V4L2_SDR_FMT_PCU18BE = v4l2_fourcc('P', 'C', '1', '8')
+V4L2_SDR_FMT_PCU20BE = v4l2_fourcc('P', 'C', '2', '0')
+V4L2_TCH_FMT_DELTA_TD16 = v4l2_fourcc('T', 'D', '1', '6')
+V4L2_TCH_FMT_DELTA_TD08 = v4l2_fourcc('T', 'D', '0', '8')
+V4L2_TCH_FMT_TU16 = v4l2_fourcc('T', 'U', '1', '6')
+V4L2_TCH_FMT_TU08 = v4l2_fourcc('T', 'U', '0', '8')
+V4L2_META_FMT_VSP1_HGO = v4l2_fourcc('V', 'S', 'P', 'H')
+V4L2_META_FMT_VSP1_HGT = v4l2_fourcc('V', 'S', 'P', 'T')
+V4L2_META_FMT_UVC = v4l2_fourcc('U', 'V', 'C', 'H')
+V4L2_META_FMT_D4XX = v4l2_fourcc('D', '4', 'X', 'X')
+V4L2_META_FMT_VIVID = v4l2_fourcc('V', 'I', 'V', 'D')
+V4L2_META_FMT_SENSOR_DATA = v4l2_fourcc('S', 'E', 'N', 'S')
+V4L2_META_FMT_BCM2835_ISP_STATS = v4l2_fourcc('B', 'S', 'T', 'A')
+V4L2_META_FMT_RK_ISP1_PARAMS = v4l2_fourcc('R', 'K', '1', 'P')
+V4L2_META_FMT_RK_ISP1_STAT_3A = v4l2_fourcc('R', 'K', '1', 'S')
+V4L2_META_FMT_RK_ISP1_EXT_PARAMS = v4l2_fourcc('R', 'K', '1', 'E')
+V4L2_META_FMT_RPI_BE_CFG = v4l2_fourcc('R', 'P', 'B', 'C')
+V4L2_META_FMT_RPI_FE_CFG = v4l2_fourcc('R', 'P', 'F', 'C')
+V4L2_META_FMT_RPI_FE_STATS = v4l2_fourcc('R', 'P', 'F', 'S')
+VIDIOC_QUERYCAP = _IOR('V', 0, v4l2_capability)
+VIDIOC_ENUM_FMT = _IOWR('V', 2, v4l2_fmtdesc)
+VIDIOC_G_FMT = _IOWR('V', 4, v4l2_format)
+VIDIOC_S_FMT = _IOWR('V', 5, v4l2_format)
+VIDIOC_REQBUFS = _IOWR('V', 8, v4l2_requestbuffers)
+VIDIOC_QUERYBUF = _IOWR('V', 9, v4l2_buffer)
+VIDIOC_G_FBUF = _IOR('V', 10, v4l2_framebuffer)
+VIDIOC_S_FBUF = _IOW('V', 11, v4l2_framebuffer)
+VIDIOC_OVERLAY = _IOW('V', 14, c_int)
+VIDIOC_QBUF = _IOWR('V', 15, v4l2_buffer)
+VIDIOC_EXPBUF = _IOWR('V', 16, v4l2_exportbuffer)
+VIDIOC_DQBUF = _IOWR('V', 17, v4l2_buffer)
+VIDIOC_STREAMON = _IOW('V', 18, c_int)
+VIDIOC_STREAMOFF = _IOW('V', 19, c_int)
+VIDIOC_G_PARM = _IOWR('V', 21, v4l2_streamparm)
+VIDIOC_S_PARM = _IOWR('V', 22, v4l2_streamparm)
+VIDIOC_ENUMSTD = _IOWR('V', 25, v4l2_standard)
+VIDIOC_ENUMINPUT = _IOWR('V', 26, v4l2_input)
+VIDIOC_G_CTRL = _IOWR('V', 27, v4l2_control)
+VIDIOC_S_CTRL = _IOWR('V', 28, v4l2_control)
+VIDIOC_G_TUNER = _IOWR('V', 29, v4l2_tuner)
+VIDIOC_S_TUNER = _IOW('V', 30, v4l2_tuner)
+VIDIOC_G_AUDIO = _IOR('V', 33, v4l2_audio)
+VIDIOC_S_AUDIO = _IOW('V', 34, v4l2_audio)
+VIDIOC_QUERYCTRL = _IOWR('V', 36, v4l2_queryctrl)
+VIDIOC_QUERYMENU = _IOWR('V', 37, v4l2_querymenu)
+VIDIOC_G_INPUT = _IOR('V', 38, c_int)
+VIDIOC_S_INPUT = _IOWR('V', 39, c_int)
+VIDIOC_G_EDID = _IOWR('V', 40, v4l2_edid)
+VIDIOC_S_EDID = _IOWR('V', 41, v4l2_edid)
+VIDIOC_G_OUTPUT = _IOR('V', 46, c_int)
+VIDIOC_S_OUTPUT = _IOWR('V', 47, c_int)
+VIDIOC_ENUMOUTPUT = _IOWR('V', 48, v4l2_output)
+VIDIOC_G_AUDOUT = _IOR('V', 49, v4l2_audioout)
+VIDIOC_S_AUDOUT = _IOW('V', 50, v4l2_audioout)
+VIDIOC_G_MODULATOR = _IOWR('V', 54, v4l2_modulator)
+VIDIOC_S_MODULATOR = _IOW('V', 55, v4l2_modulator)
+VIDIOC_G_FREQUENCY = _IOWR('V', 56, v4l2_frequency)
+VIDIOC_S_FREQUENCY = _IOW('V', 57, v4l2_frequency)
+VIDIOC_CROPCAP = _IOWR('V', 58, v4l2_cropcap)
+VIDIOC_G_CROP = _IOWR('V', 59, v4l2_crop)
+VIDIOC_S_CROP = _IOW('V', 60, v4l2_crop)
+VIDIOC_G_JPEGCOMP = _IOR('V', 61, v4l2_jpegcompression)
+VIDIOC_S_JPEGCOMP = _IOW('V', 62, v4l2_jpegcompression)
+VIDIOC_TRY_FMT = _IOWR('V', 64, v4l2_format)
+VIDIOC_ENUMAUDIO = _IOWR('V', 65, v4l2_audio)
+VIDIOC_ENUMAUDOUT = _IOWR('V', 66, v4l2_audioout)
+VIDIOC_G_PRIORITY = _IOR('V', 67, __u32)
+VIDIOC_S_PRIORITY = _IOW('V', 68, __u32)
+VIDIOC_G_SLICED_VBI_CAP = _IOWR('V', 69, v4l2_sliced_vbi_cap)
+VIDIOC_LOG_STATUS = _IO('V', 70)
+VIDIOC_G_EXT_CTRLS = _IOWR('V', 71, v4l2_ext_controls)
+VIDIOC_S_EXT_CTRLS = _IOWR('V', 72, v4l2_ext_controls)
+VIDIOC_TRY_EXT_CTRLS = _IOWR('V', 73, v4l2_ext_controls)
+VIDIOC_G_ENC_INDEX = _IOR('V', 76, v4l2_enc_idx)
+VIDIOC_ENCODER_CMD = _IOWR('V', 77, v4l2_encoder_cmd)
+VIDIOC_TRY_ENCODER_CMD = _IOWR('V', 78, v4l2_encoder_cmd)
+VIDIOC_DBG_S_REGISTER = _IOW('V', 79, v4l2_dbg_register)
+VIDIOC_DBG_G_REGISTER = _IOWR('V', 80, v4l2_dbg_register)
+VIDIOC_S_HW_FREQ_SEEK = _IOW('V', 82, v4l2_hw_freq_seek)
+VIDIOC_S_DV_TIMINGS = _IOWR('V', 87, v4l2_dv_timings)
+VIDIOC_G_DV_TIMINGS = _IOWR('V', 88, v4l2_dv_timings)
+VIDIOC_DQEVENT = _IOR('V', 89, v4l2_event)
+VIDIOC_SUBSCRIBE_EVENT = _IOW('V', 90, v4l2_event_subscription)
+VIDIOC_UNSUBSCRIBE_EVENT = _IOW('V', 91, v4l2_event_subscription)
+VIDIOC_CREATE_BUFS = _IOWR('V', 92, v4l2_create_buffers)
+VIDIOC_PREPARE_BUF = _IOWR('V', 93, v4l2_buffer)
+VIDIOC_G_SELECTION = _IOWR('V', 94, v4l2_selection)
+VIDIOC_S_SELECTION = _IOWR('V', 95, v4l2_selection)
+VIDIOC_DECODER_CMD = _IOWR('V', 96, v4l2_decoder_cmd)
+VIDIOC_TRY_DECODER_CMD = _IOWR('V', 97, v4l2_decoder_cmd)
+VIDIOC_QUERY_DV_TIMINGS = _IOR('V', 99, v4l2_dv_timings)
+VIDIOC_DV_TIMINGS_CAP = _IOWR('V', 100, v4l2_dv_timings_cap)
+VIDIOC_ENUM_FREQ_BANDS = _IOWR('V', 101, v4l2_frequency_band)
+VIDIOC_DBG_G_CHIP_INFO = _IOWR('V', 102, v4l2_dbg_chip_info)
+VIDIOC_QUERY_EXT_CTRL = _IOWR('V', 103, v4l2_query_ext_ctrl)
+VIDIOC_REMOVE_BUFS = _IOWR('V', 104, v4l2_remove_buffers)

@@ -1,0 +1,95 @@
+Metadata-Version: 2.4
+Name: videodev2
+Version: 0.0.4
+Summary: Python ctypes bindings for Video4Linux2 (V4L2) API
+Home-page: https://github.com/raspberrypi/py-videodev2
+Author: Raspberry Pi
+License: BSD-3-Clause
+Project-URL: Bug Reports, https://github.com/raspberrypi/py-videodev2/issues
+Project-URL: Source, https://github.com/raspberrypi/py-videodev2
+Keywords: v4l2 video4linux2 linux video capture ctypes
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Multimedia :: Video :: Capture
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+Requires-Dist: twine; extra == "dev"
+Requires-Dist: wheel; extra == "dev"
+Requires-Dist: build; extra == "dev"
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: project-url
+Dynamic: provides-extra
+Dynamic: requires-python
+Dynamic: summary
+
+# videodev2
+
+Python ctypes bindings for Video4Linux2 (V4L2) API
+
+## Overview
+
+This package provides Python ctypes bindings for the Linux Video4Linux2 (V4L2) API, automatically generated from the `videodev2.h` header file. It includes all V4L2 structures, enums, constants, and IOCTL definitions needed for video device programming.
+
+## Installation
+
+```bash
+pip install videodev2
+```
+
+## Usage
+
+```python
+import videodev2
+
+# Access V4L2 symbols through the videodev2 module
+from videodev2 import videodev2
+
+# Example: Query device capabilities
+import fcntl
+
+# Open video device
+fd = open('/dev/video0', 'rb+', buffering=0)
+
+# Query capabilities
+cap = videodev2.v4l2_capability()
+fcntl.ioctl(fd, videodev2.VIDIOC_QUERYCAP, cap)
+print(f"Driver: {cap.driver.decode()}")
+print(f"Card: {cap.card.decode()}")
+
+# Set format
+fmt = videodev2.v4l2_format()
+fmt.type = videodev2.V4L2_BUF_TYPE_VIDEO_CAPTURE
+fmt.fmt.pix.width = 640
+fmt.fmt.pix.height = 480
+fmt.fmt.pix.pixelformat = videodev2.v4l2_fourcc('Y', 'U', 'Y', 'V')
+fcntl.ioctl(fd, videodev2.VIDIOC_S_FMT, fmt)
+```
+
+## Features
+
+- Complete V4L2 API coverage
+- All structures, enums, and constants
+- IOCTL definitions
+- Helper functions (e.g., `v4l2_fourcc`)
+- Compatible with Python 3.6+
+
+## License
+
+This project is licensed under the BSD 3-Clause License.
