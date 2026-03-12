@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Logs
+*.log
+
+# Linux / system files
+.cache/
+.bash_history
+.bashrc
+.bash_logout
+
+# Arduino cache (has Arduino instal·lat al sistema)
+.arduino15/
+
+# VSCode
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
