@@ -1,104 +1,88 @@
 <!-- TOP SECTION -->
 <div align="center">
-  <h1>⚽ SmartGoal – Intelligent Football Goal System</h1>
+  <h1>⚽ SmartGoal – AI-Powered Intelligent Football Goal</h1>
   <p>
-    <i>Automatic goal detection and real-time match tracking for everyday football.</i>
+    <i>High-speed 3D tracking, real-time ball analytics, and professional goal detection.</i>
   </p>
+  <img src="https://img.shields.io/badge/Hardware-Raspberry%20Pi%204-red?style=for-the-badge&logo=raspberrypi" alt="Raspberry Pi 4">
+  <img src="https://img.shields.io/badge/Software-Python%20%2B%20OpenCV-blue?style=for-the-badge&logo=python" alt="Python OpenCV">
+  <img src="https://img.shields.io/badge/Performance-90%20FPS-green?style=for-the-badge" alt="90 FPS">
 </div>
 
+---
+
+## 🌍 The Vision: Professional Analytics for Everyone
+
+In recreational football, disputes over goal-line clearances and the lack of performance data are common. SmartGoal bridges the gap between amateur play and professional stadiums. 
+
+Using **Advanced Computer Vision**, SmartGoal doesn't just count points—it analyzes the game. It transforms standard goalposts into an intelligent arena capable of measuring strike speed and ball trajectory in real-time, providing an immersive, data-driven experience for players of all levels.
 
 ---
 
-## 🌍 Why This Project?
+## 🚀 Key Technical Innovations
 
-In informal football matches, scorekeeping often depends entirely on players remembering the goals. This frequently leads to confusion, disagreements, or simply losing track of the score. There is no standardized or reliable system available for public fields and recreational environments.
+Unlike traditional beam-break sensors, SmartGoal uses an **Optical Processing Pipeline** to "see" the ball:
 
-SmartGoal is designed to solve this issue through technology. By integrating sensors directly into the goal structure, the system automatically detects when the ball fully crosses the goal line. This guarantees objective scoring without requiring referees or manual input.
-
-The result is a fairer, more immersive, and more professional playing experience — even in casual matches.
-
----
-
-## 🧩 Project Vision
-
-Our aim is to create an accessible and robust smart goal system that can be installed on standard football goals without altering gameplay.
-
-The system focuses on three key principles:
-
-- Precision in goal detection  
-- Instant feedback for players  
-- Simplicity of installation and use  
+- **90 FPS High-Speed Capture:** Utilizing the Raspberry Pi 4 and Sony IMX219 sensor to eliminate motion blur at strike speeds over 100 km/h.
+- **3D Spatial Mapping:** A custom physics engine that calculates the **Z-axis (depth)** using the Pinhole Camera Model. It knows how far the ball is by analyzing its pixel-diameter in real-time.
+- **Intelligent Filtering:** An HSV-based color mask combined with a **Circularity Filter** ensures the system only tracks the ball, ignoring shoes, grass, or field lines.
 
 ---
 
 ## ⚙️ How It Works
 
-The SmartGoal system combines hardware and software into a compact, autonomous unit:
+### 1️⃣ Optical Acquisition Layer
+The high-speed camera captures the pitch at a frame every 11ms. The code forces a low exposure time (shutter speed) to ensure the ball remains a crisp circle even during the hardest shots.
 
-### 1️⃣ Detection Layer
-Sensors positioned along the goal frame and net determine whether the ball has completely crossed the line.
+### 2️⃣ Computer Vision Logic
+The frame is converted to the **HSV color space**. After applying Gaussian blurs and morphological operations (Erosion/Dilation), the algorithm identifies contours and filters them by **circularity** ($4\pi \times Area / Perimeter^2$).
 
-### 2️⃣ Processing Unit
-A microcontroller analyzes sensor signals and validates goals using predefined logic to prevent false positives.
-
-### 3️⃣ Display & Feedback
-A digital scoreboard updates automatically and can optionally trigger visual or sound feedback when a goal is scored.
-
-### 4️⃣ Connectivity (Optional)
-Wireless communication allows match data to be viewed on a mobile device or stored for later analysis.
+### 3️⃣ Physics & Speed Engine
+Once a ball is confirmed, the system maps its 3D coordinates $(X, Y, Z)$. By calculating the **Euclidean distance** between frames over a precise delta-time, the system outputs the exact velocity in **km/h**.
 
 ---
 
-## 🏗️ Technical Breakdown
+## 🏗️ Technical Stack
 
 ### 📦 Hardware
-- Embedded microcontroller  
-- Goal-line detection sensors  
-- Outdoor-protected electronic enclosure  
-- Digital score display  
-- Rechargeable power supply  
+- **Raspberry Pi 4 (8GB):** The core computational brain.
+- **Sony IMX219 Sensor:** High-frame-rate 8MP camera.
+- **62.2° HFOV Lens:** Optimized for 90cm wide goal coverage.
+- **Custom Case:** Weather-protected enclosure for pitch-side deployment.
 
-### 💾 Software
-- Signal filtering and validation algorithms  
-- Goal confirmation logic  
-- Real-time scoreboard control  
-- Configurable match timer and game modes  
+### 💾 Software (Python 3.11)
+- **OpenCV:** Real-time image processing and contour analysis.
+- **Picamera2:** Low-level hardware interface for 90-120 FPS capture.
+- **NumPy:** Vectorized mathematics for 3D trajectory calculations.
+- **EMA Filtering:** Exponential Moving Average for speed smoothing.
 
 ---
 
 ## 🎮 Core Functionalities
 
-| Function | Purpose |
+| Feature | Technical Implementation |
 |----------|---------|
-| Automatic Goal Counting | Eliminates disputes and manual errors |
-| Live Score Display | Keeps players informed instantly |
-| Match Timer | Tracks game duration |
-| Basic Statistics | Records goals per match |
-| Multiple Game Modes | Friendly match, timed match, target score |
-
----
-
-## 🌦️ Designed for Real Environments
-
-The system is built to operate outdoors under varying weather conditions. Components are protected inside a resistant enclosure, and the installation system is adaptable to different goal sizes.
-
-Energy efficiency is also a priority, ensuring long operation times without frequent charging.
+| **Instant Speedometer** | Real-time calculation of strike velocity in km/h. |
+| **3D Depth Tracking** | Detects ball movement toward/away from the camera. |
+| **Smart Detection** | Differentiates between the ball and player movement. |
+| **High-Speed Path** | Displays a 20-frame visual "tail" of the ball's flight. |
+| **Goal Validation** | Objective confirmation when the ball crosses the Z-plane. |
 
 ---
 
 ## 🔮 Future Development
 
-Planned upgrades include (this may change):
+We are currently working on expanding the system's intelligence:
 
-- Mobile application for match history
-- Tournament mode with multiple teams
-- Cloud-based data storage
-- Integration with LED goal-line lighting effects
+- **Shot Heatmaps:** Visualizing where in the goal most strikes occur.
+- **Goalkeeper Analysis:** Measuring reaction times based on the ball's launch.
+- **Mobile Integration:** Syncing match stats directly to an app via WebSockets.
+- **Multi-Ball Support:** Tracking complex drills with multiple targets.
 
 ---
 
 <div align="center">
   <br>
   <strong>SmartGoal Project</strong><br>
-  Engineering Innovation in Recreational Football
+  <i>Redefining the Beautiful Game with Computer Vision.</i>
 </div>
