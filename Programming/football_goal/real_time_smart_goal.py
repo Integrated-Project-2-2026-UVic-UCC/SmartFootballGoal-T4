@@ -14,8 +14,6 @@ MIN_RADIUS = 10             # Minimum pixel radius to consider it a ball
 ALPHA = 0.4                 # Speed smoothing (0.1 = smooth, 0.9 = instant)
 
 # COLOR SETTINGS (HSV)
-# Adjust these for your specific ball color
-# Yellow/Greenish example:
 LOWER_HSV = np.array([25, 80, 80])
 UPPER_HSV = np.array([45, 255, 255])
 
@@ -109,7 +107,7 @@ try:
             if pts[i - 1] is None or pts[i] is None:
                 continue
             
-            # Thickness gets smaller for older points (visual effect)
+            # Thickness gets smaller for older points (visual effect), not needed but i wanted to do it
             thickness = int(np.sqrt(TRAJECTORY_BUF / float(i + 1)) * 2.5)
             cv2.line(frame, pts[i - 1], pts[i], (0, 255, 0), thickness)
 
