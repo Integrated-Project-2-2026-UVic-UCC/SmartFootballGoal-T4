@@ -1,5 +1,5 @@
 
-## 💻 Programming: The AI Vision Pipeline
+## 💻 Programming: The Vision Pipeline
 
 The software architecture is a custom-built **Object Tracking & Physics Engine** written in Python 3.
 
