@@ -9,4 +9,4 @@ The mechanical structure ensures the electronics survive the impact and environm
 ### 🛡️ Impact & Protection
 - **Vibration Isolation:** The Raspberry Pi is mounted on rubber standoffs inside the case to protect the CPU and SD card from the shock of the ball hitting the frame.
 - **Lens Shield:** A high-transparency polycarbonate plate protects the camera lens from high-velocity direct impacts without distorting the optical path.
-- **Modular Mounting:** The enclosure features a universal "clamp" system, allowing it to be attached to standard metal goalposts or portable PVC goals without permanent modifications.
+
