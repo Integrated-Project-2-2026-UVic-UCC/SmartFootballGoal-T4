@@ -75,9 +75,8 @@ Once a ball is confirmed, the system maps its 3D coordinates $(X, Y, Z)$. By cal
 We are currently working on expanding the system's intelligence:
 
 - **Shot Heatmaps:** Visualizing where in the goal most strikes occur.
-- **Goalkeeper Analysis:** Measuring reaction times based on the ball's launch.
-- **Mobile Integration:** Syncing match stats directly to an app via WebSockets.
-- **Multi-Ball Support:** Tracking complex drills with multiple targets.
+- **Mobile Integration:** Syncing match stats directly to an app/webpage.
+
 
 ---
 
