@@ -1,6 +1,6 @@
 <!-- TOP SECTION -->
 <div align="center">
-  <h1>⚽ SmartGoal – AI-Powered Intelligent Football Goal</h1>
+  <h1>⚽ SmartGoal – Intelligent Football Goal</h1>
   <p>
     <i>High-speed 3D tracking, real-time ball analytics, and professional goal detection.</i>
   </p>
