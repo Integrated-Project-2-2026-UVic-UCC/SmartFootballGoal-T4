@@ -1,124 +1,115 @@
-#source env/bin/activate (open the enviroment)
 import cv2
 import numpy as np
 import time
+import math
 from collections import deque
 from picamera2 import Picamera2
 
 # ==============================
-# CONFIGURATION
+# CONFIGURACIÓN
 # ==============================
-BALL_DIAMETER_M = 0.22      # Physical size of ball (meters)
-TRAJECTORY_BUF = 32         # How many past positions to remember for the path
-MIN_RADIUS = 10             # Minimum pixel radius to consider it a ball
-ALPHA = 0.4                 # Speed smoothing (0.1 = smooth, 0.9 = instant)
+BALL_DIAMETER_M = 0.21     
+H_FOV = 62.2                 
+TRAJECTORY_BUF = 20
+ALPHA = 0.3                  
 
-# COLOR SETTINGS (HSV)
-LOWER_HSV = np.array([25, 80, 80])
-UPPER_HSV = np.array([45, 255, 255])
+#Valor de colores HSV
+LOWER_COLOR = np.array([111, 163, 90])
+UPPER_COLOR = np.array([180, 255, 255]) #with the filtrer
 
 # ==============================
-# INITIALIZE CAMERA
+# INICIO CÁMERA
 # ==============================
 picam2 = Picamera2()
+# Configuramos la cámara para que entregue BGR directamente para OpenCV
 config = picam2.create_video_configuration(
-    main={"size": (640, 480), "format": "RGB888"},
-    controls={"FrameDurationLimits": (8333, 8333), "ExposureTime": 3000} 
+    main={"size": (640, 480), "format": "BGR888"}, # <-- CAMBIO A BGR
+    controls={
+        "FrameDurationLimits": (11111, 11111), # 90 FPS estables
+        "ExposureTime": 2000                 
+    }
 )
 picam2.configure(config)
 picam2.start()
 
-# Data storage
-pts = deque(maxlen=TRAJECTORY_BUF) # List of (x,y) coordinates
-prev_time = None
-prev_centroid = None
+IMG_W, IMG_H = 640, 480
+CX, CY = IMG_W // 2, IMG_H // 2
+# Focal length exacto para 640x480 y 62.2 grados
+FOCAL_L = (IMG_W / 2) / math.tan(math.radians(H_FOV / 2))
+
+pts = deque(maxlen=TRAJECTORY_BUF)
+prev_data = None 
+prev_time = time.time()
 smoothed_speed_kmh = 0
 
-print("System Active. Press Ctrl+C in terminal to stop.")
+print(f"Iniciado a 90 FPS. Focal Length: {FOCAL_L:.2f}")
 
 try:
     while True:
-        # 1. Capture Frame
+        # 1. CAPTURA
         frame = picam2.capture_array()
         t_now = time.time()
         
-        # 2. Image Processing (Color Detection)
-        # Picamera2 returns RGB, OpenCV usually uses HSV for color masking
-        hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
-        mask = cv2.inRange(hsv, LOWER_HSV, UPPER_HSV)
+        # 2. PROCESAMIENTO (Ahora usamos BGR2HSV porque la cámara entrega BGR)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         
-        # Clean up noise (remove small dots, smooth edges)
-        mask = cv2.erode(mask, None, iterations=2)
+        # 3. MÁSCARA
+        mask = cv2.inRange(hsv, LOWER_COLOR, UPPER_COLOR)
+        mask = cv2.GaussianBlur(mask, (5, 5), 0)
         mask = cv2.dilate(mask, None, iterations=2)
+        mask = cv2.erode(mask, None, iterations=1)
 
-        # 3. Find Ball Contours
+        # VENTANA DE DEPURACIÓN (Si esta ventana sale negra, el color está mal)
+        cv2.imshow("Mascara (Debe verse el balon blanco)", mask)
+
         cnts, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        center = None
+        center_px = None
 
         if len(cnts) > 0:
-            # Find the largest contour (the ball)
             c = max(cnts, key=cv2.contourArea)
             ((x, y), radius) = cv2.minEnclosingCircle(c)
-            M = cv2.moments(c)
+            pixel_diameter = 2 * radius
             
-            # Calculate Center
-            if M["m00"] > 0:
-                center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
+            # Bajamos el umbral de radio por si el balón está lejos
+            if radius > 4: 
+                center_px = (int(x), int(y))
+                
+                # --- MATEMÁTICAS 3D ---
+                z_m = (BALL_DIAMETER_M * FOCAL_L) / pixel_diameter
+                m_per_px = BALL_DIAMETER_M / pixel_diameter
+                x_m = (x - CX) * m_per_px
+                y_m = (y - CY) * m_per_px
 
-            # Only process if it meets a minimum size
-            if radius > MIN_RADIUS:
-                # --- VISUALS: Draw ball outline ---
-                cv2.circle(frame, (int(x), int(y)), int(radius), (0, 255, 255), 2)
-                cv2.circle(frame, center, 5, (0, 0, 255), -1)
-
-                # --- SPEED CALCULATION ---
-                if prev_centroid is not None and prev_time is not None:
-                    dt = t_now - prev_time
-                    if 0 < dt < 0.2: # Only calc if detection is continuous
-                        # Calculate pixel movement
-                        dx = center[0] - prev_centroid[0]
-                        dy = center[1] - prev_centroid[1]
-                        dist_px = np.hypot(dx, dy)
-
-                        # Dynamic Calibration: 
-                        # Ratio = Real Diameter / Pixel Diameter
-                        m_per_px = BALL_DIAMETER_M / (2 * radius)
-                        dist_m = dist_px * m_per_px
-                        
-                        # Calculate Speed
-                        speed_mps = dist_m / dt
-                        current_kmh = speed_mps * 3.6
-                        
-                        # Apply smoothing filter
+                # --- VELOCIDAD 3D ---
+                dt = t_now - prev_time
+                if prev_data is not None and dt > 0:
+                    dx, dy, dz = x_m - prev_data['x'], y_m - prev_data['y'], z_m - prev_data['z']
+                    dist_3d = math.sqrt(dx**2 + dy**2 + dz**2)
+                    speed_mps = dist_3d / dt
+                    current_kmh = speed_mps * 3.6
+                    
+                    if current_kmh < 250:
                         smoothed_speed_kmh = (ALPHA * current_kmh) + (1 - ALPHA) * smoothed_speed_kmh
 
-                prev_centroid = center
+                prev_data = {'x': x_m, 'y': y_m, 'z': z_m}
                 prev_time = t_now
+
+                # Dibujar
+                cv2.circle(frame, center_px, int(radius), (0, 255, 0), 2)
+                cv2.putText(frame, f"{z_m:.1f}m", (center_px[0]+10, center_px[1]), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 1)
         else:
-            # If ball is lost, reset tracking history to avoid speed spikes
-            prev_centroid = None
-            prev_time = None
+            # Si perdemos el balón, reseteamos tiempo para no dar saltos de velocidad
+            prev_data = None
+            prev_time = t_now
 
-        # 4. Trajectory Tracking (The "Tail")
-        pts.appendleft(center)
-
-        # Draw the trajectory line
-        for i in range(1, len(pts)):
-            if pts[i - 1] is None or pts[i] is None:
-                continue
-            
-            # Thickness gets smaller for older points (visual effect), not needed but i wanted to do it
-            thickness = int(np.sqrt(TRAJECTORY_BUF / float(i + 1)) * 2.5)
-            cv2.line(frame, pts[i - 1], pts[i], (0, 255, 0), thickness)
-
-        # 5. UI Overlays
-        cv2.putText(frame, f"Speed: {smoothed_speed_kmh:.1f} km/h", (10, 35),
+        # UI
+        cv2.rectangle(frame, (10, 10), (320, 60), (0, 0, 0), -1)
+        cv2.putText(frame, f"Vel: {smoothed_speed_kmh:.1f} km/h", (20, 45),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
         
-        # Display the result
-        cv2.imshow("Smart Football Tracker", frame)
+        cv2.imshow("Smart Goal 3D", frame)
 
-        # Exit on 'q'
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
