@@ -1,60 +1,66 @@
 """
 main.py
 ───────
-Entry point.  Change config.MODE to switch between live camera and video file.
+Entry point.  Run with:  python main.py
 
-    config.MODE = "camera"          → PiCamera2 real-time stream
-    config.MODE = "video"           → video file at config.VIDEO_PATH
+Goal clip recording is triggered when ALL three conditions are true:
+  1. Ball is inside the goal zone   (GOAL_ZONE_NEAR ≤ z ≤ GOAL_ZONE_FAR)
+  2. Ball velocity exceeds minimum  (velocity > GOAL_MIN_VELOCITY)
+  3. Cooldown has elapsed           (≥ GOAL_SEND_INTERVAL s since last trigger)
 
-Press  Q  to quit at any time.
+Press  Q  to quit.
 """
 
 import time
 import cv2
 
 import config
-import server                               # ← web server                  
+import server
+import recording
 from sources   import build_source
 from detection import detect_ball
 from tracker   import BallTracker
 from drawing   import draw_ball, draw_mode_label
 
-# Distance window that triggers a server push (meters)
-_ZONE_NEAR     = 0.05                       #     0.295                          
-_ZONE_FAR      = 2.305                       #          0.305                     
-_SEND_INTERVAL = 2.0                        # seconds between pushes        
 
-
-def run_loop(source, tracker: BallTracker, mode: str) -> None:
-    """Main capture-detect-track-draw loop."""
-    last_send_time = 0.0                    
+def run_loop(source, tracker: BallTracker, recorder: recording.GoalRecorder) -> None:
+    last_trigger_time = 0.0
 
     try:
         while True:
             ok, frame = source.read()
-            if not ok:                         # video ended / camera error
+            if not ok:
                 break
 
             current_time = time.time()
-            detection = detect_ball(frame, config.HSV_LOWER, config.HSV_UPPER, config.MIN_RADIUS)
+            detection    = detect_ball(
+                frame, config.HSV_LOWER, config.HSV_UPPER, config.MIN_RADIUS
+            )
 
             if detection:
                 x_px, y_px, radius = detection
                 result = tracker.update(x_px, y_px, radius, current_time)
-                draw_ball(frame, x_px, y_px, radius,
-                          result["z_m"], result["velocity"])
 
-                # ── Push to web server every 2 s when inside target zone ──
-                in_zone  = _ZONE_NEAR <= result["z_m"] <= _ZONE_FAR
-                time_due = (current_time - last_send_time) >= _SEND_INTERVAL
-                if in_zone and time_due:
+                draw_ball(frame, x_px, y_px, radius, result["z_m"], result["velocity"])
+
+                # ── Goal detection & recording trigger ────────────────────
+                in_zone    = config.GOAL_ZONE_NEAR <= result["z_m"] <= config.GOAL_ZONE_FAR
+                fast_enough = result["velocity"] > config.GOAL_MIN_VELOCITY
+                cooldown_ok = (current_time - last_trigger_time) >= config.GOAL_SEND_INTERVAL
+
+                if in_zone and fast_enough and cooldown_ok:
                     server.record_velocity(result["velocity"], result["z_m"])
-                    last_send_time = current_time
+                    recorder.trigger_goal(current_time, result["velocity"], result["z_m"])
+                    last_trigger_time = current_time
                 # ─────────────────────────────────────────────────────────
+
             else:
                 tracker.reset()
 
-            draw_mode_label(frame, mode)
+            draw_mode_label(frame, "camera")
+
+            # Feed the annotated frame into the rolling buffer every frame
+            recorder.add_frame(frame, current_time)
 
             cv2.imshow("Ball Velocity Tracker", frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -66,14 +72,15 @@ def run_loop(source, tracker: BallTracker, mode: str) -> None:
 
 
 def main():
-    print(f"[INFO] Starting in '{config.MODE}' mode.")
+    print("[INFO] Starting ball tracker.")
 
-    server.start()                          # launch Flask in background     [NEW]
+    server.start()
 
-    source  = build_source(config)
-    tracker = BallTracker(config)
+    source   = build_source(config)
+    tracker  = BallTracker(config)
+    recorder = recording.GoalRecorder(server, config)
 
-    run_loop(source, tracker, config.MODE)
+    run_loop(source, tracker, recorder)
 
     print("[INFO] Tracker stopped.")
 
