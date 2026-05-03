@@ -25,10 +25,10 @@ FRAME_DURATION = 11_111    # µs  (~90 fps cap)
 EXPOSURE_TIME  = 2_000     # µs
 
 # ── Goal detection & server push ─────────────
-GOAL_ZONE_NEAR     = 0.5  # m — near edge of goal zone
-GOAL_ZONE_FAR      = 30.5  # m — far  edge of goal zone
-GOAL_SEND_INTERVAL = 2.0   # s  — minimum time between server pushes
-GOAL_MIN_VELOCITY  = 10.0  # m/s — shots below this speed are ignored
+GOAL_ZONE_NEAR     = 0.105  # m — near edge of goal zone
+GOAL_ZONE_FAR      = 1.005  # m — far  edge of goal zone
+GOAL_SEND_INTERVAL = 5.0   # s  — minimum time between server pushes
+GOAL_MIN_VELOCITY  = 1.0  # m/s — shots below this speed are ignored
 
 # ── Recording ────────────────────────────────
 VIDEO_DIR          = "videos"   # folder where goal clips are saved

@@ -128,7 +128,7 @@ class GoalRecorder:
         writer = cv2.VideoWriter(out_path, fourcc, write_fps, (w, h))
 
         for _, frame in frames:
-            writer.write(frame)
+            writer.write(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
         writer.release()
 
         print(
@@ -138,5 +138,44 @@ class GoalRecorder:
             f"({cfg.SLOWMO_FACTOR}× slow-mo)"
         )
 
+        # Remuxar con faststart para que el navegador pueda reproducir sin
+        # descargar el archivo entero (mueve el índice al inicio del MP4)
+        out_path = self._make_faststart(out_path)
+
         # Hand the clip off to the web server
         self._server.register_video(out_path)
+
+    def _make_faststart(self, src_path: str) -> str:
+        """
+        Re-encodar a H.264 + faststart para que cualquier navegador pueda
+        reproducir el clip directamente (mp4v de OpenCV no es compatible).
+        Devuelve la ruta del archivo final (reemplaza el original).
+        """
+        import shutil, subprocess, os
+        if not shutil.which("ffmpeg"):
+            print("[RECORDER] ffmpeg no encontrado — instala con: sudo apt install -y ffmpeg")
+            return src_path
+
+        tmp_path = src_path.replace(".mp4", "_h264.mp4")
+        result = subprocess.run(
+            [
+                "ffmpeg", "-y", "-i", src_path,
+                "-c:v", "libx264",        # H.264: compatible con todos los navegadores
+                "-preset", "fast",
+                "-crf", "23",
+                "-movflags", "+faststart", # índice al inicio → reproducción inmediata
+                "-an",                     # sin audio
+                tmp_path,
+            ],
+            capture_output=True
+        )
+        if result.returncode == 0:
+            os.replace(tmp_path, src_path)
+            print(f"[RECORDER] H.264 OK → '{src_path}'")
+        else:
+            print(f"[RECORDER] ffmpeg error: {result.stderr.decode()[-300:]}")
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+        return src_path

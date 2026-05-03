@@ -26,9 +26,4 @@ def draw_ball(frame, x_px: float, y_px: float, radius: float,
                 cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
 
 
-def draw_mode_label(frame, mode: str) -> None:
-    """Small mode indicator in the top-right corner."""
-    label = f"MODE: {mode.upper()}"
-    cv2.putText(frame, label,
-                (frame.shape[1] - 180, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.55, (200, 200, 200), 1)
+

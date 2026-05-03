@@ -37,28 +37,10 @@ class CameraSource:
         self._cam.stop()
 
 
-# ── Pre-recorded video file ───────────────────────────────────────────────────
-
-class VideoSource:
-    def __init__(self, path: str):
-        self._cap = cv2.VideoCapture(path)
-        if not self._cap.isOpened():
-            raise FileNotFoundError(f"Cannot open video file: '{path}'")
-
-    def read(self):
-        return self._cap.read()          # (ret, frame) – standard OpenCV tuple
-
-    def release(self):
-        self._cap.release()
-
 
 # ── Factory ───────────────────────────────────────────────────────────────────
 
 def build_source(cfg):
     """Return the appropriate source based on cfg.MODE."""
-    if cfg.MODE == "camera":
-        return CameraSource(cfg)
-    elif cfg.MODE == "video":
-        return VideoSource(cfg.VIDEO_PATH)
-    else:
-        raise ValueError(f"Unknown MODE '{cfg.MODE}'. Use 'camera' or 'video'.")
+    return CameraSource(cfg)
+    
