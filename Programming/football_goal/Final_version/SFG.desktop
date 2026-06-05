@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/user/SFG_V2/script.sh
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=script
+Comment=Start when iniciated

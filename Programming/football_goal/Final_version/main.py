@@ -27,21 +27,22 @@ import recording
 from sources   import build_source
 from detection import detect_ball
 from tracker   import BallTracker
-from drawing   import draw_ball, draw_mode_label
+from drawing   import draw_ball
 
 
 def _has_display() -> bool:
     """Devuelve True si hay un servidor de display disponible."""
-    # En Linux, DISPLAY indica X11; en sistemas sin pantalla estará vacío o ausente
-    if os.environ.get("DISPLAY"):
-        return True
-    # Intento adicional: si cv2 puede abrir una ventana
-    try:
-        cv2.namedWindow("__test__", cv2.WINDOW_NORMAL)
-        cv2.destroyWindow("__test__")
-        return True
-    except cv2.error:
-        return False
+    # En Linux headless (Raspberry Pi sin HDMI) DISPLAY y WAYLAND_DISPLAY
+    # estarán vacíos. Comprobamos ambos antes de tocar OpenCV.
+    if os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"):
+        # Verificación secundaria: que OpenCV realmente pueda abrir ventana
+        try:
+            cv2.namedWindow("__test__", cv2.WINDOW_NORMAL)
+            cv2.destroyWindow("__test__")
+            return True
+        except Exception:
+            return False
+    return False
 
 
 def run_loop(source, tracker: BallTracker, recorder: recording.GoalRecorder,
@@ -89,14 +90,14 @@ def run_loop(source, tracker: BallTracker, recorder: recording.GoalRecorder,
             recorder.add_frame(frame, current_time)
 
             if not headless:
-                draw_mode_label(frame, "camera")
                 cv2.imshow("Ball Velocity Tracker", frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
             else:
                 # Sin pantalla: ceder tiempo al SO para que los hilos de
                 # grabación y servidor puedan trabajar.
-                time.sleep(0.001)
+                # 10 ms es suficiente a 90 fps (el loop tarda ~11 ms por frame)
+                time.sleep(0.010)
 
     finally:
         source.release()

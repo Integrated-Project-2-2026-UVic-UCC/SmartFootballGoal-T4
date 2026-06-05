@@ -3,9 +3,9 @@ import math
 # ── Ball & optics ────────────────────────────
 BALL_DIAMETER_M    = 0.204
 CALIBRATION_FACTOR = 2.14
-H_FOV              = 62.2       # horizontal field-of-view in degrees
-IMG_W, IMG_H       = 640, 480
-MIN_RADIUS         = 6          # px — smaller detections are ignored
+H_FOV              = 62.2 #62.2
+IMG_W, IMG_H       = 1640, 1232   # full FOV 
+MIN_RADIUS         = 10          # px — smaller detections are ignored
 
 # ── Derived constants (do not edit) ──────────
 CX, CY          = IMG_W // 2, IMG_H // 2
@@ -25,8 +25,8 @@ FRAME_DURATION = 11_111    # µs  (~90 fps cap)
 EXPOSURE_TIME  = 2_000     # µs
 
 # ── Goal detection & server push ─────────────
-GOAL_ZONE_NEAR     = 0.105  # m — near edge of goal zone
-GOAL_ZONE_FAR      = 1.005  # m — far  edge of goal zone
+GOAL_ZONE_NEAR     = 0.055  # m — near edge of goal zone
+GOAL_ZONE_FAR      = 1.505  # m — far  edge of goal zone
 GOAL_SEND_INTERVAL = 5.0   # s  — minimum time between server pushes
 GOAL_MIN_VELOCITY  = 1.0  # m/s — shots below this speed are ignored
 

@@ -128,7 +128,8 @@ class GoalRecorder:
         writer = cv2.VideoWriter(out_path, fourcc, write_fps, (w, h))
 
         for _, frame in frames:
-            writer.write(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            # PiCamera2 BGR888 entrega bytes en orden RGB; VideoWriter espera BGR
+            writer.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
         writer.release()
 
         print(

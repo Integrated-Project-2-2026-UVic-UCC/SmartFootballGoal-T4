@@ -172,9 +172,9 @@ def serve_qr_wifi():
 
 @app.route("/qr/server")
 def serve_qr_server():
-    """QR to connect do the webserver (QR_server.png)."""
+    """QR to connect do the webserver (QR_server.jpg)."""
     folder = str(Path(__file__).parent)
-    return send_from_directory(folder, "QR_server.png")
+    return send_from_directory(folder, "QR_server.jpg")
 
 
 @app.route("/video/<path:filename>")
@@ -344,7 +344,7 @@ def dashboard():
         <span class="vel-value" id="vel">—</span>
         <span class="vel-unit">m/s</span>
       </div>
-      <div class="zone-badge">Goal zone: 59.5 – 60.5 cm</div>
+      <div class="zone-badge">Goal zone: 89.5 – 90.5 cm</div>
       <div class="meta">
         Distance &nbsp;<span id="dist">—</span> m<br>
         Last update &nbsp;<span id="ts">—</span>
@@ -459,7 +459,7 @@ def dashboard():
       _knownVideos = j.videos;
 
       const grid  = document.getElementById('replay-grid');
-      const slots = ['Gol anterior', 'Último gol'];
+      const slots = ['Lastest goal', 'Previous'];
       let html = '';
       for (let i = 0; i < 2; i++) {
         const name = j.videos[i];
