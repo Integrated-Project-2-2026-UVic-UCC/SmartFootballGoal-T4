@@ -1,5 +1,9 @@
+
 <div align="center">
   <h1>⚽ SmartGoal</h1>
+
+  [![SmartGoal Demo](https://img.youtube.com/vi/oHqELqLCC2w/maxresdefault.jpg)](https://www.youtube.com/watch?v=oHqELqLCC2w)
+
 </div>
 
 ### Computer-vision football goal with real-time ball tracking, speed measurement, and automatic slow-motion recording.
@@ -215,3 +219,5 @@ Sergi Ocaña, Mireia Sabaté, Martí Sayago, Oleguer Treserra
 Degree in Mechatronics Engineering — UVIC, 2026
 
 Tutor: Clara I. Sandino, Moises Garin Escriva
+```
+
