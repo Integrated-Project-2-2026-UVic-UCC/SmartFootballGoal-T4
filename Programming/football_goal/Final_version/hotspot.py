@@ -1,23 +1,20 @@
 """
 hotspot.py
 ──────────
-Crea un hotspot WiFi con contraseña para que los dispositivos cercanos
-puedan conectarse y ver el dashboard sin necesidad de router externo.
+Creates a WiFi hotspot with password for the nearby devices without needing an external router.
 
-Requisitos (ejecutar una sola vez como root):
+Ir requires executing the following comand for the first time:
     sudo apt install -y network-manager qrencode
 
-Uso
+Use
 ───
     import hotspot
     info = hotspot.start()   # devuelve {"ssid": ..., "password": ..., "ip": ..., "url": ...}
     hotspot.stop()           # cierra el hotspot al salir
 
-Estrategia
-──────────
   1. nmcli / NetworkManager — Raspberry Pi OS, Ubuntu, etc.
-  2. hostapd + dnsmasq como fallback si nmcli no está disponible.
-  3. Imprime instrucciones de conexión + QR ASCII en la terminal.
+  2. hostapd + dnsmasq as a fallback if nmcli ins't working.
+  3. Prints the intructions + QR ASCII in the ternminal.
 """
 
 import os
@@ -40,7 +37,7 @@ _backend: Optional[str] = None
 _con_name = "sfgoal-hotspot"
 
 
-# ── API pública ───────────────────────────────────────────────────────────────
+# ── API  ───────────────────────────────────────────────────────────────
 
 def start() -> dict:
     """Levanta el hotspot. Devuelve {"ssid", "password", "ip", "url"}."""
@@ -187,12 +184,12 @@ def _print_connection_info(info: dict) -> None:
     print("╔══════════════════════════════════════════════╗")
     print("║       📶  SMART GOAL  –  WiFi Hotspot        ║")
     print("╠══════════════════════════════════════════════╣")
-    print(f"║  Red        :  {info['ssid']:<30}║")
-    print(f"║  Contraseña :  {info['password']:<30}║")
+    print(f"║  Network        :  {info['ssid']:<30}║")
+    print(f"║  Password :  {info['password']:<30}║")
     print(f"║  URL        :  {url:<30}║")
     print("╠══════════════════════════════════════════════╣")
-    print("║  1. Conéctate al WiFi de arriba              ║")
-    print("║  2. Abre la URL en cualquier navegador       ║")
+    print("║  1. Connect to the wifi                      ║")
+    print("║  2. Open the URL in your browseregador       ║")
     print("╚══════════════════════════════════════════════╝")
 
     if shutil.which("qrencode"):
