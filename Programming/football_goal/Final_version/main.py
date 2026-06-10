@@ -3,16 +3,16 @@ main.py
 ───────
 Entry point.  Run with:  python main.py
 
-Funciona con o sin pantalla (headless):
-  - Con HDMI: muestra ventana cv2 en tiempo real.
-  - Sin HDMI: salta toda la UI, el tracking y la grabación funcionan igual.
+Works with or without a display (headless):
+  - With HDMI: shows a real-time OpenCV (cv2) window.
+  - Without HDMI: skips the entire UI; tracking and recording work exactly the same.
 
 Goal clip recording is triggered when ALL three conditions are true:
-  1. Ball is inside the goal zone   (GOAL_ZONE_NEAR ≤ z ≤ GOAL_ZONE_FAR)
-  2. Ball velocity exceeds minimum  (velocity > GOAL_MIN_VELOCITY)
-  3. Cooldown has elapsed           (≥ GOAL_SEND_INTERVAL s since last trigger)
+  1. Ball is inside the goal zone      (GOAL_ZONE_NEAR ≤ z ≤ GOAL_ZONE_FAR)
+  2. Ball velocity exceeds minimum     (velocity > GOAL_MIN_VELOCITY)
+  3. Cooldown has elapsed              (≥ GOAL_SEND_INTERVAL s since last trigger)
 
-Press  Q  to quit (solo en modo con pantalla).
+Press Q to quit (display mode only).
 """
 
 import atexit
@@ -31,11 +31,12 @@ from drawing   import draw_ball
 
 
 def _has_display() -> bool:
-    """Devuelve True si hay un servidor de display disponible."""
-    # En Linux headless (Raspberry Pi sin HDMI) DISPLAY y WAYLAND_DISPLAY
-    # estarán vacíos. Comprobamos ambos antes de tocar OpenCV.
+  """Returns True if a display server is available."""
+  # On a headless Linux system (e.g., a Raspberry Pi without HDMI),
+  # DISPLAY and WAYLAND_DISPLAY will be unset. We check both before
+  # attempting to use OpenCV.
     if os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"):
-        # Verificación secundaria: que OpenCV realmente pueda abrir ventana
+       # Secondary check: verify that OpenCV can actually create a window.
         try:
             cv2.namedWindow("__test__", cv2.WINDOW_NORMAL)
             cv2.destroyWindow("__test__")
@@ -50,7 +51,7 @@ def run_loop(source, tracker: BallTracker, recorder: recording.GoalRecorder,
     last_trigger_time = 0.0
 
     if headless:
-        print("[INFO] Modo headless — sin ventana de visualización.")
+        print("[INFO] Headless mode — no screen to see the process.")
 
     try:
         while True:
@@ -67,7 +68,7 @@ def run_loop(source, tracker: BallTracker, recorder: recording.GoalRecorder,
                 x_px, y_px, radius = detection
                 result = tracker.update(x_px, y_px, radius, current_time)
 
-                # ── Goal detection & recording trigger ────────────────────
+                # ── Goal detection and recording trigger ────────────────────
                 in_zone     = config.GOAL_ZONE_NEAR <= result["z_m"] <= config.GOAL_ZONE_FAR
                 fast_enough = result["velocity"] > config.GOAL_MIN_VELOCITY
                 cooldown_ok = (current_time - last_trigger_time) >= config.GOAL_SEND_INTERVAL
@@ -85,8 +86,8 @@ def run_loop(source, tracker: BallTracker, recorder: recording.GoalRecorder,
                 tracker.reset()
 
             # Feed the annotated frame into the rolling buffer every frame
-            # (En headless el frame no tiene anotaciones, pero eso es irrelevante
-            #  para la grabación del clip.)
+            # In headless the frame dosn't have anotations 
+            #---------------------------------------
             recorder.add_frame(frame, current_time)
 
             if not headless:
@@ -94,9 +95,9 @@ def run_loop(source, tracker: BallTracker, recorder: recording.GoalRecorder,
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
             else:
-                # Sin pantalla: ceder tiempo al SO para que los hilos de
-                # grabación y servidor puedan trabajar.
-                # 10 ms es suficiente a 90 fps (el loop tarda ~11 ms por frame)
+                # Without a display: yield CPU time to the OS so the recording and server
+                # threads can continue running.
+                # 10 ms is sufficient at 90 FPS (the main loop takes ~11 ms per frame).
                 time.sleep(0.010)
 
     finally:
